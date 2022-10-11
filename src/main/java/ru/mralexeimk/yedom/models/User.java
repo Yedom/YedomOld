@@ -1,6 +1,7 @@
 package ru.mralexeimk.yedom.models;
 
 import lombok.Data;
+import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.interfaces.validation.*;
 
 import javax.validation.constraints.Email;
@@ -15,11 +16,11 @@ public class User {
     private int id;
 
     @NotEmpty(message = "{auth.username.empty}", groups = FirstOrder.class)
-    @Size(min = 4, max = 30, message = "{auth.username.size}", groups = SecondOrder.class)
+    @Size(min = YedomConfig.minUsernameLength, max = YedomConfig.maxUsernameLength, message = "{auth.username.size}", groups = SecondOrder.class)
     private String username;
 
     @NotEmpty(message = "{auth.password.empty}", groups = ThirdOrder.class)
-    @Size(min = 6, max = 50, message = "{auth.password.size}", groups = FourthOrder.class)
+    @Size(min = YedomConfig.minPasswordLength, message = "{auth.password.size}", groups = FourthOrder.class)
     private String password;
 
     @NotEmpty(message = "{auth.email.empty}", groups = FifthOrder.class)

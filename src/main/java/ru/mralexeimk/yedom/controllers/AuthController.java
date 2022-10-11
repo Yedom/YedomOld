@@ -2,11 +2,14 @@ package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.SpringConfig;
+import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.UserDB;
 import ru.mralexeimk.yedom.interfaces.validation.OrderedChecks;
 import ru.mralexeimk.yedom.models.Code;
@@ -18,6 +21,7 @@ import ru.mralexeimk.yedom.utils.UserValidator;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/auth")
@@ -60,7 +64,7 @@ public class AuthController {
         if(session.getAttribute("newpassword") != null) {
             return "auth/newpassword";
         }
-        return "redirect:/auth/restore";
+        return "auth/restore";
     }
 
     @GetMapping("/restore/{baseCode}")
@@ -81,15 +85,19 @@ public class AuthController {
                 }
             }
         }
-        return "redirect:/auth/restore";
+        return "redirect:auth/restore";
     }
 
     @PostMapping("/newpassword")
-    public String newPasswordApply(@RequestBody String data, HttpSession session) {
+    public @ResponseBody ResponseEntity<Object> newPasswordApply(@RequestBody String data,
+                                                                                  HttpSession session) {
         JSONObject json = new JSONObject(data);
         String operation = json.getString("operation");
         if(operation.equalsIgnoreCase("newpassword")) {
             String password = json.getString("password");
+            if(password.length() < YedomConfig.minPasswordLength) {
+                return new ResponseEntity<>(HttpStatus.valueOf(501));
+            }
             try {
                 String email = (String) session.getAttribute("email");
                 User user = userDB.getUserByEmail(email);
@@ -97,9 +105,11 @@ public class AuthController {
                 userDB.updateById(user.getId(), user);
                 session.removeAttribute("newpassword");
                 session.removeAttribute("email");
-            } catch (Exception ignored) { }
+            } catch (Exception ex) {
+                return new ResponseEntity<>(HttpStatus.valueOf(500));
+            }
         }
-        return "redirect:/auth/login";
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
     @PostMapping("/restore")
@@ -111,7 +121,7 @@ public class AuthController {
             try {
                 User user = userDB.getUserByEmail(email);
                 EmailService.saveCode(user, EmailService.getRandomCode());
-                String link =  SpringConfig.DOMAIN +
+                String link =  YedomConfig.DOMAIN + "auth/restore/" +
                         CommonUtils.hashEncoder(EmailService.getCodeByUser().get(user).getCode());
                 session.setAttribute("email", email);
                 emailService.sendMessage(email,
