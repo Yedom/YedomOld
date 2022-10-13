@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Created-By: IntelliJ IDEA
 Built-By: пк
 Build-Jdk: version 17.0.1
-Implementation-Title: Yetube
+Implementation-Title: Yedom
 Implementation-Version: 0.0.1
 Implementation-Vendor-Id: ru.mralexeimk
 Main-Class: ${start-class}
