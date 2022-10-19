@@ -1,20 +1,23 @@
 package ru.mralexeimk.yedom.models;
 
-import lombok.Data;
+import lombok.*;
 import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.validation.*;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
 public class User {
-    private int id;
-
     @NotEmpty(message = "{auth.username.empty}", groups = FirstOrder.class)
     @Size(min = YedomConfig.minUsernameLength, max = YedomConfig.maxUsernameLength, message = "{auth.username.size}", groups = SecondOrder.class)
     private String username;
@@ -27,17 +30,16 @@ public class User {
     @Email(message = "{auth.email.incorrect}", groups = SixthOrder.class)
     private String email;
 
-    private Timestamp createdOn;
-    private Timestamp lastLogin;
-
     private Set<String> args = new HashSet<>();
 
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
-        createdOn = new Timestamp(System.currentTimeMillis());
-        lastLogin = new Timestamp(System.currentTimeMillis());
+    }
+
+    public User(UserEntity userEntity) {
+        this(userEntity.getUsername(), userEntity.getPassword(), userEntity.getEmail());
     }
 
     public User() {

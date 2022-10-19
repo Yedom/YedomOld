@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils;
+package ru.mralexeimk.yedom.utils.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -6,12 +6,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import java.util.HashMap;
 
 @Service
 public class EmailService {
-    private static final HashMap<User, Code> codeByUser = new HashMap<>();
+    private static final HashMap<String, Code> codeByUsername = new HashMap<>();
     private final JavaMailSender emailSender;
 
     @Autowired
@@ -36,26 +37,26 @@ public class EmailService {
                 try {
                     Thread.sleep(1000*60*10);
                 } catch(Exception ignored) {}
-                for(User user : codeByUser.keySet()) {
+                for(String userName : codeByUsername.keySet()) {
                     long current_time = System.currentTimeMillis();
-                    if(current_time - codeByUser.get(user).getStartTime() >= 1000*60*5) {
-                        removeCode(user);
+                    if(current_time - codeByUsername.get(userName).getStartTime() >= 1000*60*5) {
+                        removeCode(userName);
                     }
                 }
             }
         }).start();
     }
 
-    public static void removeCode(User user) {
-        codeByUser.remove(user);
+    public static void removeCode(String userName) {
+        codeByUsername.remove(userName);
     }
 
-    public static void saveCode(User user, Code code) {
-        codeByUser.put(user, code);
+    public static void saveCode(String userName, Code code) {
+        codeByUsername.put(userName, code);
     }
 
-    public static HashMap<User, Code> getCodeByUser() {
-        return codeByUser;
+    public static HashMap<String, Code> getCodeByUser() {
+        return codeByUsername;
     }
 
     public static Code getRandomCode() {

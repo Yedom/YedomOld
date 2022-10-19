@@ -32,6 +32,7 @@
 <div class="bg page-header header-filter">
     <div class="main main-raised col-md-4 mx-auto text-center section">
         <input style="border:none" disabled="disabled" name="username" type="text" th:value="${user.username}" value="Username" />
+        <div style="color:red" th:if="${#fields.hasErrors('username')}" th:errors="*{user.username}">Username error</div>
         <br />
         <br />
         <input onclick="clickEdit()" type="submit" name="edit" value="Редактировать" th:value="#{auth.lk.edit}"/>

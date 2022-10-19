@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils;
+package ru.mralexeimk.yedom.utils.language;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

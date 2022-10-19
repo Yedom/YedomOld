@@ -4,39 +4,43 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.config.SpringConfig;
 import ru.mralexeimk.yedom.config.YedomConfig;
-import ru.mralexeimk.yedom.database.UserDB;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repository.UserRepository;
 import ru.mralexeimk.yedom.interfaces.validation.OrderedChecks;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
-import ru.mralexeimk.yedom.utils.EmailService;
-import ru.mralexeimk.yedom.utils.LanguageUtil;
+import ru.mralexeimk.yedom.utils.services.EmailService;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.UserValidator;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.HashMap;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
-    private final UserDB userDB;
+    private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final EmailService emailService;
     private final LanguageUtil languageUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthController(UserDB userDB, UserValidator userValidator, EmailService emailService, LanguageUtil languageUtil) {
-        this.userDB = userDB;
+    public AuthController(UserRepository userRepository, UserValidator userValidator,
+                          EmailService emailService, LanguageUtil languageUtil,
+                          PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.emailService = emailService;
         this.languageUtil = languageUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/reg")
@@ -71,11 +75,12 @@ public class AuthController {
     public String confirmChangePassword(@PathVariable String baseCode, HttpSession session) {
         if (session.getAttribute("email") != null) {
             String email = (String) session.getAttribute("email");
-            User user = userDB.getUserByEmail(email);
-            if(user != null) {
-                if (EmailService.getCodeByUser().containsKey(user)) {
+            UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+            if(userEntity != null) {
+                if (EmailService.getCodeByUser().containsKey(userEntity.getUsername())) {
                     try {
-                        String baseCodeActual = CommonUtils.hashEncoder(EmailService.getCodeByUser().get(user).getCode());
+                        String baseCodeActual = CommonUtils.hashEncoder(
+                                EmailService.getCodeByUser().get(userEntity.getUsername()).getCode());
                         if (baseCodeActual.equals(baseCode)) {
                             session.setAttribute("newpassword", true);
                             return "auth/newpassword";
@@ -100,11 +105,14 @@ public class AuthController {
             }
             try {
                 String email = (String) session.getAttribute("email");
-                User user = userDB.getUserByEmail(email);
-                user.setPassword(password);
-                userDB.updateById(user.getId(), user);
-                session.removeAttribute("newpassword");
-                session.removeAttribute("email");
+                UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+                if (userEntity != null) {
+                    userEntity.setPassword(passwordEncoder.encode(password));
+                    userRepository.save(userEntity);
+                    session.removeAttribute("newpassword");
+                    session.removeAttribute("email");
+                }
+                else return new ResponseEntity<>(HttpStatus.valueOf(500));
             } catch (Exception ex) {
                 return new ResponseEntity<>(HttpStatus.valueOf(500));
             }
@@ -119,15 +127,20 @@ public class AuthController {
         if(operation.equalsIgnoreCase("restore")) {
             String email = json.getString("email");
             try {
-                User user = userDB.getUserByEmail(email);
-                EmailService.saveCode(user, EmailService.getRandomCode());
-                String link =  YedomConfig.DOMAIN + "auth/restore/" +
-                        CommonUtils.hashEncoder(EmailService.getCodeByUser().get(user).getCode());
-                session.setAttribute("email", email);
-                emailService.sendMessage(email,
-                        languageUtil.getLocalizedMessage("auth.mail.restore.title"),
-                        languageUtil.getLocalizedMessage("auth.mail.restore.body",
-                                link));
+                UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+                if(userEntity != null) {
+                    EmailService.saveCode(userEntity.getUsername(), EmailService.getRandomCode());
+                    String link = YedomConfig.DOMAIN + "auth/restore/" +
+                            CommonUtils.hashEncoder(
+                                    EmailService.getCodeByUser().get(userEntity.getUsername()).getCode());
+                    session.setAttribute("email", email);
+                    emailService.sendMessage(email,
+                            languageUtil.getLocalizedMessage("auth.mail.restore.title"),
+                            languageUtil.getLocalizedMessage("auth.mail.restore.body",
+                                    link));
+                }
+                else bindingResult.rejectValue("email", "",
+                        languageUtil.getLocalizedMessage("auth.email.incorrect"));
             } catch (Exception ex) {
                 bindingResult.rejectValue("email", "",
                         languageUtil.getLocalizedMessage("auth.email.incorrect"));
@@ -148,7 +161,7 @@ public class AuthController {
 
         Code code = EmailService.getRandomCode();
 
-        EmailService.saveCode(user, code);
+        EmailService.saveCode(user.getUsername(), code);
         emailService.sendMessage(user.getEmail(),
                 languageUtil.getLocalizedMessage("auth.mail.title"),
                 languageUtil.getLocalizedMessage("auth.mail.body", code.getCode())
@@ -166,11 +179,13 @@ public class AuthController {
         if (bindingResult.hasErrors())
             return "auth/login";
 
-        User logUser = userDB.getUserByUsername(user.getUsername());
-        logUser.setLastLogin(CommonUtils.getCurrentTimestamp());
+        UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
 
-        session.setAttribute("user", logUser);
+        if(userEntity == null) return "auth/login";
 
+        userEntity.setLastLogin(CommonUtils.getCurrentTimestamp());
+        userRepository.save(userEntity);
+        session.setAttribute("user", new User(userEntity));
         return "redirect:/";
     }
 
@@ -180,13 +195,19 @@ public class AuthController {
         if(EmailService.isCorrectCode(code.getCode())) {
             if (session.getAttribute("user") != null) {
                 User user = (User) session.getAttribute("user");
-                if (EmailService.getCodeByUser().containsKey(user) &&
-                        EmailService.getCodeByUser().get(user).getCode().equals(code.getCode())) {
-                    user.setCreatedOn(CommonUtils.getCurrentTimestamp());
-                    user.setLastLogin(CommonUtils.getCurrentTimestamp());
-                    userDB.save(user);
+                if (EmailService.getCodeByUser().containsKey(user.getUsername()) &&
+                        EmailService.getCodeByUser()
+                                .get(user.getUsername()).getCode().equals(code.getCode())) {
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setUsername(user.getUsername());
+                    userEntity.setEmail(user.getEmail());
+                    userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+                    userEntity.setCreateOn(CommonUtils.getCurrentTimestamp());
+                    userEntity.setLastLogin(CommonUtils.getCurrentTimestamp());
+                    userRepository.save(userEntity);
+
                     session.setAttribute("user", user);
-                    EmailService.removeCode(user);
+                    EmailService.removeCode(user.getUsername());
                 } else bindingResult.rejectValue("code", "",
                         languageUtil.getLocalizedMessage("auth.confirm.deny"));
             } else bindingResult.rejectValue("code", "",

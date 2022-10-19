@@ -5,18 +5,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.mralexeimk.yedom.database.UserDB;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repository.UserRepository;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 @Component
 public class UserValidator implements Validator {
-    private final UserDB userDB;
+    private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final LanguageUtil languageUtil;
 
     @Autowired
-    public UserValidator(UserDB userDB, PasswordEncoder encoder, LanguageUtil languageUtil) {
-        this.userDB = userDB;
+    public UserValidator(UserRepository userRepository, PasswordEncoder encoder, LanguageUtil languageUtil) {
+        this.userRepository = userRepository;
         this.encoder = encoder;
         this.languageUtil = languageUtil;
     }
@@ -27,9 +29,20 @@ public class UserValidator implements Validator {
     }
 
     public void regValidator(User user, Errors errors) {
-        if (userDB.getUserByEmail(user.getEmail()) != null) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             errors.rejectValue("email", "",
                     languageUtil.getLocalizedMessage("auth.email.in_use"));
+        }
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            errors.rejectValue("username", "",
+                    languageUtil.getLocalizedMessage("auth.username.in_use"));
+        }
+    }
+
+    public void updateValidator(User user, Errors errors) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            errors.rejectValue("username", "",
+                    languageUtil.getLocalizedMessage("auth.username.in_use"));
         }
     }
 
@@ -47,14 +60,15 @@ public class UserValidator implements Validator {
         }
 
         if(!error) {
-            if(userDB.getUserByUsername(user.getUsername()) == null) {
+            if(userRepository.findByUsername(user.getUsername()).isEmpty()) {
                 errors.rejectValue("username", "",
                         languageUtil.getLocalizedMessage("auth.user_not_found"));
             }
             else {
-                User db_user = userDB.getUserByUsername(user.getUsername());
-                if (!encoder.matches(user.getPassword(), db_user.getPassword())) {
-                    languageUtil.getLocalizedMessage("auth.password_incorrect");
+                UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
+                if (userEntity != null && !encoder.matches(user.getPassword(), userEntity.getPassword())) {
+                    errors.rejectValue("password", "",
+                            languageUtil.getLocalizedMessage("auth.password_incorrect"));
                 }
             }
         }
@@ -68,6 +82,9 @@ public class UserValidator implements Validator {
             }
             else if(user.getArgs().contains("onLogin")) {
                 loginValidator(user, errors);
+            }
+            else if(user.getArgs().contains("onUpdate")) {
+                updateValidator(user, errors);
             }
         }
     }

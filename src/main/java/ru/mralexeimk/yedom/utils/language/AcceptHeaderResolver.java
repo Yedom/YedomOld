@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils;
+package ru.mralexeimk.yedom.utils.language;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

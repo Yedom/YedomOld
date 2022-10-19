@@ -4,9 +4,12 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.database.UserDB;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repository.UserRepository;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.UserValidator;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotBlank;
@@ -14,11 +17,13 @@ import javax.validation.constraints.NotBlank;
 @Controller
 @RequestMapping("/lk")
 public class LkController {
-    private final UserDB userDB;
+    private final UserRepository userRepository;
+    private final UserValidator userValidator;
 
     @Autowired
-    public LkController(UserDB userDB) {
-        this.userDB = userDB;
+    public LkController(UserRepository userRepository, UserValidator userValidator) {
+        this.userRepository = userRepository;
+        this.userValidator = userValidator;
     }
 
     @GetMapping()
@@ -38,16 +43,16 @@ public class LkController {
         } catch (NumberFormatException e) {
             return "errors/invalid";
         }
-        User user = userDB.getUserById(id);
-        if(user == null) {
+        UserEntity userEntity = userRepository.findById(id).orElse(null);
+        if(userEntity == null) {
             return "errors/notfound";
         }
-        model.addAttribute("user", user);
+        model.addAttribute("user", new User(userEntity));
         return "lk/user";
     }
 
     @PostMapping
-    public String lkPost(@RequestBody String data, HttpSession session) {
+    public String lkPost(@RequestBody String data, HttpSession session, BindingResult bindingResult) {
         JSONObject json = new JSONObject(data);
         String operation = json.getString("operation");
         if(operation.equalsIgnoreCase("logout")) {
@@ -56,10 +61,22 @@ public class LkController {
         }
         if(operation.equalsIgnoreCase("save")) {
             User user = (User) session.getAttribute("user");
-            user = userDB.getUserByUsername(user.getUsername());
-            user.setUsername(json.getString("username"));
-            userDB.updateById(user.getId(), user);
-            session.setAttribute("user", user);
+            UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
+
+            if(userEntity == null) {
+                session.removeAttribute("user");
+                return "redirect:/";
+            }
+
+            user.setPassword(json.getString("password"));
+            userValidator.validate(user.addArg("onUpdate"), bindingResult);
+
+            if (bindingResult.hasErrors())
+                return "lk/home";
+
+            userEntity.setUsername(user.getUsername());
+            userRepository.save(userEntity);
+            session.setAttribute("user", new User(userEntity));
         }
         return "redirect:lk/";
     }
