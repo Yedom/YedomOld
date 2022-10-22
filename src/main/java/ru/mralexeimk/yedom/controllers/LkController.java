@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repository.UserRepository;
+import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.UserValidator;
 
@@ -30,7 +30,7 @@ public class LkController {
     public String lkGet(Model model, HttpSession session) {
         if(session.getAttribute("user") != null) {
             model.addAttribute("user", session.getAttribute("user"));
-            return "lk/home";
+            return "index";
         }
         return "redirect:auth/login";
     }
@@ -72,7 +72,7 @@ public class LkController {
             userValidator.validate(user.addArg("onUpdate"), bindingResult);
 
             if (bindingResult.hasErrors())
-                return "lk/home";
+                return "index";
 
             userEntity.setUsername(user.getUsername());
             userRepository.save(userEntity);

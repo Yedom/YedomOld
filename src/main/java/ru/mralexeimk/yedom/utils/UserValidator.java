@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repository.UserRepository;
+import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 

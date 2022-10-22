@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title}">Yedom</title>
+    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+</head>
+<body>
+<div>
+    <input type="text" id="search" name="search" placeholder="Поиск курсов" th:placeholder="#{courses.search}" />
+    <input onclick="clickSearch()" type="submit" id="searchBtn" value="Поиск" th:value="#{common.search}" />
+    <br />
+    <br />
+    <input onclick="clickAddCourse()" type="submit" id="addCourse" value="Добавить курс" th:value="#{course.add}" />
+    <h1 th:text="#{courses.list}">Course List</h1>
+    <table style="width:100%">
+        <thead>
+        <tr>
+            <th th:text="#{course.title}">Title</th>
+            <th th:text="#{course.author}">Author</th>
+            <th th:text="#{course.views}">Views</th>
+            <th th:text="#{course.likes}">Likes</th>
+            <th th:text="#{course.sponsors}">Sponsors</th>
+            <th th:text="#{course.tags}">Tags</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <td th:text="${course.title}"></td>
+            <td th:text="${course.author}"></td>
+            <td th:text="${course.views}"></td>
+            <td th:text="${course.likes}"></td>
+            <td th:text="${course.sponsors}"></td>
+            <td th:text="${course.tags}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script th:inline="javascript">
+    function clickSearch() {
+        let text = $('#search').val();
+        if(text === '') {
+            window.location.href = '/courses';
+        }
+        else {
+            window.location.href = "/courses?search=" + text;
+        }
+    }
+    function clickAddCourse() {
+        window.location.href = '/courses/add';
+    }
+</script>
+
+</body>
+</html>
