@@ -9,6 +9,5 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Integer> {
     List<CourseEntity> findByAuthor(String author);
     List<CourseEntity> findTop10ByOrderByViewsDesc();
     List<CourseEntity> findByOrderByViewsDesc();
-    List<CourseEntity> findByIdIn(List<Integer> ids);
 }
 

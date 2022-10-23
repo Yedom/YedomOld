@@ -11,12 +11,16 @@ import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.repositories.CourseRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/courses")
@@ -34,8 +38,19 @@ public class CoursesController {
             model.addAttribute("courses", courseRepository.findByOrderByViewsDesc());
         }
         else {
-            model.addAttribute("courses",
-                    courseRepository.findByIdIn(List.of(1,4,8)));
+            String response = CommonUtils.recSocketSend(search);
+            if(response.equals("")) {
+                model.addAttribute("courses", new ArrayList<CourseEntity>());
+            }
+            else {
+                List<Integer> IDS = Stream.of(response.split(","))
+                        .map(Integer::parseInt).toList();
+                List<CourseEntity> courses = new ArrayList<>();
+                for (Integer id : IDS) {
+                    courses.add(courseRepository.findById(id).orElse(null));
+                }
+                model.addAttribute("courses", courses);
+            }
         }
         return "courses/index";
     }
