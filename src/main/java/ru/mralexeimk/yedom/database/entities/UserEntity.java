@@ -2,6 +2,11 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,6 +37,14 @@ public class UserEntity {
 
     @Column(name = "last_login")
     private Timestamp lastLogin;
+
+    public UserEntity(User user) {
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+        this.createOn = CommonUtils.getCurrentTimestamp();
+        this.lastLogin = CommonUtils.getCurrentTimestamp();
+    }
 
     @Override
     public boolean equals(Object o) {

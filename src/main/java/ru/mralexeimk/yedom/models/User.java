@@ -46,6 +46,11 @@ public class User {
 
     }
 
+    public User clearArgs() {
+        this.args.clear();
+        return this;
+    }
+
     public User addArg(String arg) {
         this.args.add(arg);
         return this;

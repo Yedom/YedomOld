@@ -157,6 +157,7 @@ public class AuthController {
         if (bindingResult.hasErrors())
             return "auth/reg";
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         session.setAttribute("user", user);
 
         Code code = EmailService.getRandomCode();
@@ -198,12 +199,7 @@ public class AuthController {
                 if (EmailService.getCodeByUser().containsKey(user.getUsername()) &&
                         EmailService.getCodeByUser()
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
-                    UserEntity userEntity = new UserEntity();
-                    userEntity.setUsername(user.getUsername());
-                    userEntity.setEmail(user.getEmail());
-                    userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
-                    userEntity.setCreateOn(CommonUtils.getCurrentTimestamp());
-                    userEntity.setLastLogin(CommonUtils.getCurrentTimestamp());
+                    UserEntity userEntity = new UserEntity(user);
                     userRepository.save(userEntity);
 
                     session.setAttribute("user", user);

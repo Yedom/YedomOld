@@ -2,6 +2,7 @@ package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,18 +20,21 @@ import javax.validation.constraints.NotBlank;
 public class LkController {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LkController(UserRepository userRepository, UserValidator userValidator) {
+    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping()
     public String lkGet(Model model, HttpSession session) {
         if(session.getAttribute("user") != null) {
-            model.addAttribute("user", session.getAttribute("user"));
-            return "index";
+            User user = (User) session.getAttribute("user");
+            model.addAttribute("user", user);
+            return "lk/index";
         }
         return "redirect:auth/login";
     }
@@ -60,7 +64,7 @@ public class LkController {
             return "redirect:/";
         }
         if(operation.equalsIgnoreCase("save")) {
-            User user = (User) session.getAttribute("user");
+            User user = ((User) session.getAttribute("user")).clearArgs();
             UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
 
             if(userEntity == null) {
@@ -68,15 +72,16 @@ public class LkController {
                 return "redirect:/";
             }
 
-            user.setPassword(json.getString("password"));
+            user.setUsername(json.getString("username"));
+            //user.setPassword(json.getString("password"));
             userValidator.validate(user.addArg("onUpdate"), bindingResult);
+            //user.setPassword(passwordEncoder.encode(user.getPassword()));
 
             if (bindingResult.hasErrors())
-                return "index";
-
+                return "lk/index";
             userEntity.setUsername(user.getUsername());
             userRepository.save(userEntity);
-            session.setAttribute("user", new User(userEntity));
+            session.setAttribute("user", user);
         }
         return "redirect:lk/";
     }

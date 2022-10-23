@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import ru.mralexeimk.yedom.models.Course;
 
 import javax.persistence.*;
 import java.util.Comparator;
@@ -35,6 +36,15 @@ public class CourseEntity {
 
     @Column(name = "tags")
     private String tags;
+
+    public CourseEntity(Course course) {
+        this.setTitle(course.getTitle());
+        this.setAuthor(course.getAuthor());
+        this.setTags(course.getTags());
+        this.setViews(course.getViews());
+        this.setLikes(course.getLikes());
+        this.setSponsors(course.getSponsors());
+    }
 
     @Override
     public boolean equals(Object o) {
