@@ -71,20 +71,26 @@ public class CoursesController {
 
     @GetMapping("/add")
     public String add(@ModelAttribute("course") Course course, HttpSession session) {
-        if(session.getAttribute("user") == null) {
-            return "redirect:/auth/login";
+        if(session.getAttribute("user") != null) {
+            User user = (User) session.getAttribute("user");
+            if(user.isEmailConfirmed()) {
+                return "courses/add";
+            }
         }
-        return "courses/add";
+        return "redirect:/auth/login";
     }
 
     @PostMapping("/add")
     public String addPost(@ModelAttribute("course") @Valid Course course,
                       HttpSession session) {
-        if(session.getAttribute("user") == null) {
+        if(session.getAttribute("user") == null)
             return "redirect:/auth/login";
-        }
 
         User user = (User) session.getAttribute("user");
+
+        if(!user.isEmailConfirmed())
+            return "redirect:/auth/login";
+
         course.setAuthor(user.getUsername());
         course.setViews(0);
         course.setLikes(0);

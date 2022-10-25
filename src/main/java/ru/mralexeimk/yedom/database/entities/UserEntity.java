@@ -32,6 +32,9 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "role")
+    private String role = "user";
+
     @Column(name = "created_on")
     private Timestamp createOn;
 

@@ -2,6 +2,8 @@ package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.UserValidator;
+import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 @Controller
@@ -33,8 +37,11 @@ public class LkController {
     public String lkGet(Model model, HttpSession session) {
         if(session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            model.addAttribute("user", user);
-            return "lk/index";
+            user.setPassword("");
+            if(user.isEmailConfirmed()) {
+                model.addAttribute("user", user);
+                return "lk/index";
+            }
         }
         return "redirect:auth/login";
     }
@@ -56,33 +63,37 @@ public class LkController {
     }
 
     @PostMapping
-    public String lkPost(@RequestBody String data, HttpSession session, BindingResult bindingResult) {
-        JSONObject json = new JSONObject(data);
-        String operation = json.getString("operation");
-        if(operation.equalsIgnoreCase("logout")) {
+    public String lkPost(@ModelAttribute("user") User userModel, HttpSession session,
+                                                       BindingResult bindingResult) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:auth/login";
+        }
+
+        User user = (User) session.getAttribute("user");
+        user.setNewPassword(userModel.getNewPassword());
+        user.setNewPasswordRepeat(userModel.getNewPasswordRepeat());
+        user.setPassword(userModel.getPassword());
+        user.setUsername(userModel.getUsername());
+
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail()).orElse(null);
+
+        if(userEntity == null) {
             session.removeAttribute("user");
-            return "redirect:/";
+            return "redirect:auth/login";
         }
-        if(operation.equalsIgnoreCase("save")) {
-            User user = ((User) session.getAttribute("user")).clearArgs();
-            UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
 
-            if(userEntity == null) {
-                session.removeAttribute("user");
-                return "redirect:/";
-            }
+        userValidator.validate(user.withArgs("onUpdate"), bindingResult);
 
-            user.setUsername(json.getString("username"));
-            //user.setPassword(json.getString("password"));
-            userValidator.validate(user.addArg("onUpdate"), bindingResult);
-            //user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (bindingResult.hasErrors())
+            return "lk/index";
 
-            if (bindingResult.hasErrors())
-                return "lk/index";
-            userEntity.setUsername(user.getUsername());
-            userRepository.save(userEntity);
-            session.setAttribute("user", user);
-        }
-        return "redirect:lk/";
+        user.setPassword(passwordEncoder.encode(user.getNewPassword()));
+
+        userEntity.setUsername(user.getUsername());
+        userEntity.setPassword(user.getPassword());
+
+        userRepository.save(userEntity);
+        session.setAttribute("user", user);
+        return "redirect:/lk";
     }
 }

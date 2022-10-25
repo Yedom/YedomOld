@@ -18,7 +18,7 @@ import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.services.EmailService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import ru.mralexeimk.yedom.utils.UserValidator;
+import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -59,12 +59,12 @@ public class AuthController {
     }
 
     @GetMapping("/restore")
-    public String restorePassword(@ModelAttribute("email") String email) {
+    public String restorePassword() {
         return "auth/restore";
     }
 
     @GetMapping("/newpassword")
-    public String newPassword(@ModelAttribute("password") String password, HttpSession session) {
+    public String newPassword(HttpSession session) {
         if(session.getAttribute("newpassword") != null) {
             return "auth/newpassword";
         }
@@ -77,10 +77,10 @@ public class AuthController {
             String email = (String) session.getAttribute("email");
             UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
             if(userEntity != null) {
-                if (EmailService.getCodeByUser().containsKey(userEntity.getUsername())) {
+                if (emailService.getCodeByUser().containsKey(userEntity.getUsername())) {
                     try {
                         String baseCodeActual = CommonUtils.hashEncoder(
-                                EmailService.getCodeByUser().get(userEntity.getUsername()).getCode());
+                                emailService.getCodeByUser().get(userEntity.getUsername()).getCode());
                         if (baseCodeActual.equals(baseCode)) {
                             session.setAttribute("newpassword", true);
                             return "auth/newpassword";
@@ -121,7 +121,8 @@ public class AuthController {
     }
 
     @PostMapping("/restore")
-    public String changePassword(@RequestBody String data, BindingResult bindingResult, HttpSession session) {
+    public @ResponseBody ResponseEntity<Object> changePassword(@RequestBody String data,
+                                                               HttpSession session) {
         JSONObject json = new JSONObject(data);
         String operation = json.getString("operation");
         if(operation.equalsIgnoreCase("restore")) {
@@ -129,30 +130,28 @@ public class AuthController {
             try {
                 UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
                 if(userEntity != null) {
-                    EmailService.saveCode(userEntity.getUsername(), EmailService.getRandomCode());
+                    emailService.saveCode(userEntity.getUsername(), emailService.getRandomCode());
                     String link = YedomConfig.DOMAIN + "auth/restore/" +
                             CommonUtils.hashEncoder(
-                                    EmailService.getCodeByUser().get(userEntity.getUsername()).getCode());
+                                    emailService.getCodeByUser().get(userEntity.getUsername()).getCode());
                     session.setAttribute("email", email);
                     emailService.sendMessage(email,
                             languageUtil.getLocalizedMessage("auth.mail.restore.title"),
                             languageUtil.getLocalizedMessage("auth.mail.restore.body",
                                     link));
                 }
-                else bindingResult.rejectValue("email", "",
-                        languageUtil.getLocalizedMessage("auth.email.incorrect"));
+                else return new ResponseEntity<>(HttpStatus.valueOf(500));
             } catch (Exception ex) {
-                bindingResult.rejectValue("email", "",
-                        languageUtil.getLocalizedMessage("auth.email.incorrect"));
+                return new ResponseEntity<>(HttpStatus.valueOf(500));
             }
         }
-        return "redirect:auth/restore";
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
     @PostMapping("/reg")
     public String registerUser(@ModelAttribute("user") @Validated(OrderedChecks.class) User user,
                                BindingResult bindingResult, HttpSession session) {
-        userValidator.validate(user.addArg("onReg"), bindingResult);
+        userValidator.validate(user.withArgs("onReg"), bindingResult);
 
         if (bindingResult.hasErrors())
             return "auth/reg";
@@ -160,9 +159,9 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         session.setAttribute("user", user);
 
-        Code code = EmailService.getRandomCode();
+        Code code = emailService.getRandomCode();
 
-        EmailService.saveCode(user.getUsername(), code);
+        emailService.saveCode(user.getUsername(), code);
         emailService.sendMessage(user.getEmail(),
                 languageUtil.getLocalizedMessage("auth.mail.title"),
                 languageUtil.getLocalizedMessage("auth.mail.body", code.getCode())
@@ -174,13 +173,16 @@ public class AuthController {
     @PostMapping("/login")
     public String loginUser(@ModelAttribute("user") User user,
                             BindingResult bindingResult, HttpSession session) {
+        userValidator.validate(user.withArgs("onLogin"), bindingResult);
+        UserEntity userEntity = userRepository.findByEmail(user.getUsername()).orElse(null);
 
-        userValidator.validate(user.addArg("onLogin"), bindingResult);
-
-        if (bindingResult.hasErrors())
+        if (bindingResult.hasErrors() && userEntity == null)
             return "auth/login";
 
-        UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
+
+        if(userEntity == null) {
+            userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
+        }
 
         if(userEntity == null) return "auth/login";
 
@@ -193,17 +195,16 @@ public class AuthController {
     @PostMapping("/confirm")
     public String confirmUser(@ModelAttribute("code") @Valid Code code,
                               BindingResult bindingResult, HttpSession session) {
-        if(EmailService.isCorrectCode(code.getCode())) {
+        if(emailService.isCorrectCode(code.getCode())) {
             if (session.getAttribute("user") != null) {
                 User user = (User) session.getAttribute("user");
-                if (EmailService.getCodeByUser().containsKey(user.getUsername()) &&
-                        EmailService.getCodeByUser()
+                if (emailService.getCodeByUser().containsKey(user.getUsername()) &&
+                        emailService.getCodeByUser()
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
-                    UserEntity userEntity = new UserEntity(user);
-                    userRepository.save(userEntity);
-
+                    user.setEmailConfirmed(true);
+                    userRepository.save(new UserEntity(user));
                     session.setAttribute("user", user);
-                    EmailService.removeCode(user.getUsername());
+                    emailService.removeCode(user.getUsername());
                 } else bindingResult.rejectValue("code", "",
                         languageUtil.getLocalizedMessage("auth.confirm.deny"));
             } else bindingResult.rejectValue("code", "",

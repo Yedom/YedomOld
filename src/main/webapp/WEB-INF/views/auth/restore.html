@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title th:text="#{title}">Yedom</title>
   <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/form.css" th:href="@{/resources/css/form.css}">
+  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/form.css}">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
 </head>
@@ -34,11 +34,11 @@
 
 <div class="bg page-header header-filter">
   <div class="main main-raised col-md-4 mx-auto text-center section">
-    <input id="email" name="email" type="text" placeholder="email" th:value="${email}" />
-    <br />
+    <input id="email" name="email" type="text" placeholder="email" />
     <br />
     <p id="label" hidden="hidden" style="color: green;" th:text="#{auth.password.restore.sent}"></p>
-    <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+    <br />
+    <p id="error" style="color:red"></p>
     <input id="restore" onclick="clickRestore()" name="restore" type="submit" value="Восстановить пароль" th:value="#{auth.password.restore}"/>
     <br />
   </div>
@@ -62,13 +62,21 @@
 <script th:inline="javascript">
   function clickRestore() {
     let data = {operation: "restore", email: $('#email').val()};
-    fetch("/auth/restore", {
+    const response = fetch("/auth/restore", {
       method: "POST",
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
     });
-    $('#label').removeAttr("hidden");
-    $('#restore').attr('hidden', 'hidden');
+    $('#error').text("");
+    response.then(function (response) {
+      if(response.status === 200) {
+        $('#label').removeAttr("hidden");
+        $('#restore').attr('hidden', 'hidden');
+      }
+      else if(response.status === 500) {
+        $('#error').text([[#{auth.email.incorrect}]]);
+      }
+    });
   }
 </script>
 

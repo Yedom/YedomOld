@@ -1,9 +1,13 @@
 package ru.mralexeimk.yedom.utils.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
@@ -12,7 +16,7 @@ import java.util.HashMap;
 
 @Service
 public class EmailService {
-    private static final HashMap<String, Code> codeByUsername = new HashMap<>();
+    private final HashMap<String, Code> codeByUsername = new HashMap<>();
     private final JavaMailSender emailSender;
 
     @Autowired
@@ -31,11 +35,13 @@ public class EmailService {
         }).start();
     }
 
-    public static void start() {
+    @EventListener(ContextRefreshedEvent.class)
+    public void start() {
+        System.out.println("Email service started!");
         new Thread(() -> {
             while(true) {
                 try {
-                    Thread.sleep(1000*60*10);
+                    Thread.sleep(1000* YedomConfig.confirmCodeTimeout);
                 } catch(Exception ignored) {}
                 for(String userName : codeByUsername.keySet()) {
                     long current_time = System.currentTimeMillis();
@@ -47,26 +53,27 @@ public class EmailService {
         }).start();
     }
 
-    public static void removeCode(String userName) {
+    public void removeCode(String userName) {
         codeByUsername.remove(userName);
     }
 
-    public static void saveCode(String userName, Code code) {
+    public void saveCode(String userName, Code code) {
         codeByUsername.put(userName, code);
     }
 
-    public static HashMap<String, Code> getCodeByUser() {
+    public HashMap<String, Code> getCodeByUser() {
         return codeByUsername;
     }
 
-    public static Code getRandomCode() {
+    public Code getRandomCode() {
         return new Code(String.valueOf(CommonUtils.getRandomNumber(100000, 999999)));
     }
 
-    public static boolean isCorrectCode(String code) {
+    public boolean isCorrectCode(String code) {
         try {
             int num = Integer.parseInt(code);
-            if(num >= 100000 && num <= 999999) return true;
+            if(num >= Math.pow(10, YedomConfig.confirmCodeLength - 1) &&
+                    num < Math.pow(10, YedomConfig.confirmCodeLength)) return true;
         } catch(Exception ignored) {}
         return false;
     }

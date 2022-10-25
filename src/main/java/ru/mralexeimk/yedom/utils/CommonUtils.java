@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils;
 
+import org.json.JSONObject;
 import ru.mralexeimk.yedom.config.YedomConfig;
 
 import java.io.DataInputStream;
@@ -28,6 +29,17 @@ public class CommonUtils {
             hash = "0" + hash;
         }
         return hash;
+    }
+
+    public static String bodyToOperation(String body) {
+        String[] params = body.split("&");
+        for (String param : params) {
+            String[] keyValue = param.split("=");
+            if(keyValue.length > 1 && !keyValue[1].equals("")) {
+                return keyValue[0];
+            }
+        }
+        return null;
     }
 
     public static String recSocketSend(String msg) {

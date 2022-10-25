@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="#{title}">Yedom</title>
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-    <link rel="stylesheet" href="../../resources/css/form.css" th:href="@{/resources/css/form.css}">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/form.css}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
 </head>
@@ -36,7 +36,7 @@
 <div class="bg page-header header-filter">
     <div class="main main-raised col-md-4 mx-auto text-center section">
         <form th:method="POST" th:action="@{/auth/login}" th:object="${user}">
-            <label th:for="username" th:text="#{auth.username}">Имя пользователя</label>:  <br/>
+            <label th:for="username" th:text="#{auth.username_or_email}">Имя пользователя или Email</label>:  <br/>
             <input type="text" th:field="*{username}" id="username"/>
             <div style="color:red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name Error</div>
             <br/>
