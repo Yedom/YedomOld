@@ -13,7 +13,7 @@ import java.util.Comparator;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "coursers")
+@Table(name = "courses")
 public class CourseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

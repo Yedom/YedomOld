@@ -7,9 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
+import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.enums.SocketType;
 import ru.mralexeimk.yedom.interfaces.repositories.CourseRepository;
+import ru.mralexeimk.yedom.interfaces.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
@@ -20,17 +23,18 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/courses")
 public class CoursesController {
     private final CourseRepository courseRepository;
+    private final TagRepository tagRepository;
     private final TagsService tagsService;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, TagsService tagsService) {
+    public CoursesController(CourseRepository courseRepository, TagRepository tagRepository, TagsService tagsService) {
         this.courseRepository = courseRepository;
+        this.tagRepository = tagRepository;
         this.tagsService = tagsService;
     }
 
@@ -45,12 +49,13 @@ public class CoursesController {
                 model.addAttribute("courses", new ArrayList<CourseEntity>());
             }
             else {
-                List<Integer> IDS = Stream.of(response.split(","))
-                        .map(Integer::parseInt).toList();
+                List<Integer> IDS = tagsService.responseIdsToList(response);
                 List<CourseEntity> courses = new ArrayList<>();
+
                 for (Integer id : IDS) {
                     courses.add(courseRepository.findById(id).orElse(null));
                 }
+
                 model.addAttribute("courses", courses);
             }
         }
@@ -109,7 +114,17 @@ public class CoursesController {
     @PostMapping("/add/tagsUpdate")
     public ResponseEntity<String> tagsUpdate(@RequestBody String body) {
         JSONObject json = new JSONObject(body);
-        String search = json.getString("title");
+        String search = CommonUtils.getLastN(
+                json.getString("title").split(" "),
+                YedomConfig.MAX_WORDS_IN_REQUEST);
+        String response = tagsService.sendSocket(SocketType.SEARCH_RELATED_TAGS, search);
+        String htmlResponse = "";
+        if(!response.equals("")) {
+            List<Integer> IDS = tagsService.responseIdsToList(response);
+            for(int id : IDS) {
+                TagEntity tagEntity = tagRepository.findById(id).orElse(null);
+            }
+        }
 
         return new ResponseEntity<>("{\"status\": \"ok\"}", HttpStatus.OK);
     }

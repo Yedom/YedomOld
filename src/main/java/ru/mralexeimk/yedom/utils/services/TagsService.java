@@ -11,6 +11,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class TagsService {
@@ -23,7 +25,7 @@ public class TagsService {
         try (Socket socket = new Socket(YedomConfig.HOST, YedomConfig.REC_PORT);
              DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
              DataInputStream din = new DataInputStream(socket.getInputStream())) {
-            socket.setSoTimeout(1000);
+            socket.setSoTimeout(YedomConfig.REC_TIMEOUT);
 
             dout.writeUTF(socketType.toString() + ":" + msg);
             dout.flush();
@@ -33,5 +35,10 @@ public class TagsService {
             ex.printStackTrace();
         }
         return response;
+    }
+
+    public List<Integer> responseIdsToList(String response) {
+        return Stream.of(response.split(","))
+                .map(Integer::parseInt).toList();
     }
 }

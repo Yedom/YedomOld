@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CommonUtils {
     public static int getRandomNumber(int min, int max) {
@@ -30,4 +32,9 @@ public class CommonUtils {
         }
         return hash;
     }
+
+    public static String getLastN(String[] array, int n) {
+        return Stream.of(array).skip(array.length - n).collect(Collectors.joining(" "));
+    }
+
 }

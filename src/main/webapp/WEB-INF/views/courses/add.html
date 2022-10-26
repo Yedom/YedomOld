@@ -102,13 +102,13 @@
     }
 
     //check if char symbol is special (shift, ctrl, ...)
-    function isSpecialSymbol(char) {
-        return char.length > 1;
+    function isSpecialSymbol(code) {
+        return code === 8 || code === 17 || code === 37 || code === 39;
     }
 
     title.on('keydown', function(e) {
-        if(this.value.length > 10) {
-            if(!isSpecialSymbol(this.value)) return false;
+        if(this.value.length > 100) {
+            if(!isSpecialSymbol(e.keyCode)) return false;
         }
     });
 
