@@ -30,32 +30,4 @@ public class CommonUtils {
         }
         return hash;
     }
-
-    public static String bodyToOperation(String body) {
-        String[] params = body.split("&");
-        for (String param : params) {
-            String[] keyValue = param.split("=");
-            if(keyValue.length > 1 && !keyValue[1].equals("")) {
-                return keyValue[0];
-            }
-        }
-        return null;
-    }
-
-    public static String recSocketSend(String msg) {
-        String response = "";
-        try (Socket socket = new Socket(YedomConfig.HOST, YedomConfig.REC_PORT);
-             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
-             DataInputStream din = new DataInputStream(socket.getInputStream())) {
-            socket.setSoTimeout(1000);
-
-            dout.writeUTF(msg);
-            dout.flush();
-
-            response = din.readUTF();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return response;
-    }
 }

@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class RolesService {
 
     private final HashMap<String, Set<String>> permsOfRole = new HashMap<>();
 
+    @Autowired
     public RolesService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }

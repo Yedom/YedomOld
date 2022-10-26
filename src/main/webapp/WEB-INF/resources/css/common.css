@@ -13,6 +13,24 @@ form {
     background-size: cover;
 }
 
+#tagsToAdd {
+
+}
+
+#tagsToAdd span {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+
+#tagsToAdd span:hover {
+    cursor: pointer;
+    background-color: #000;
+    color: #fff;
+}
+
 div.editable {
     width: 300px;
     height: 200px;
