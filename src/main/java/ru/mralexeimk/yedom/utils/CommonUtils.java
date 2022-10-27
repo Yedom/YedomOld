@@ -3,7 +3,9 @@ package ru.mralexeimk.yedom.utils;
 import org.json.JSONObject;
 import org.springframework.validation.Errors;
 import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.models.User;
 
+import javax.servlet.http.HttpSession;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -34,6 +36,17 @@ public class CommonUtils {
             hash = "0" + hash;
         }
         return hash;
+    }
+
+    public static String preventUnauthorizedAccess(HttpSession session) {
+        if(session.getAttribute("user") == null)
+            return "redirect:/auth/login";
+
+        User user = (User) session.getAttribute("user");
+
+        if(!user.isEmailConfirmed())
+            return "redirect:/auth/login";
+        return null;
     }
 
     public static String getLastN(String[] array, int n) {

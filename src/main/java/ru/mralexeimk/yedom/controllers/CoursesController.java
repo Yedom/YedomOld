@@ -31,24 +31,28 @@ public class CoursesController {
     private final CourseValidator courseValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
-    private final RolesService rolesService;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService) {
+    public CoursesController(CourseRepository courseRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService) {
         this.courseRepository = courseRepository;
         this.courseValidator = courseValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
-        this.rolesService = rolesService;
     }
 
     @GetMapping
-    public String index(Model model, @RequestParam(required = false, name = "search") String search) {
+    public String index(Model model, @RequestParam(required = false, name = "search") String search,
+                        HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+
         if(search == null) {
             model.addAttribute("courses", courseRepository.findByOrderByViewsDesc());
         }
         else {
-            String response = tagsService.sendSocket(SocketType.SEARCH_COURSES, search);
+            String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
             if(response.equals("")) {
                 model.addAttribute("courses", new ArrayList<CourseEntity>());
             }
@@ -67,7 +71,11 @@ public class CoursesController {
     }
 
     @GetMapping("/{id}")
-    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model) {
+    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model,
+                            HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
         int id;
         try {
             id = Integer.parseInt(strId);
@@ -82,24 +90,18 @@ public class CoursesController {
 
     @GetMapping("/add")
     public String add(@ModelAttribute("course") Course course, HttpSession session) {
-        if(session.getAttribute("user") != null) {
-            User user = (User) session.getAttribute("user");
-            if(user.isEmailConfirmed()) {
-                return "courses/add";
-            }
-        }
-        return "redirect:/auth/login";
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        return "courses/add";
     }
 
     @PostMapping("/add")
     public String addPost(@Valid @ModelAttribute("course") Course course,
                           BindingResult bindingResult, HttpSession session) {
-        if(session.getAttribute("user") == null)
-            return "redirect:/auth/login";
-        User user = (User) session.getAttribute("user");
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
 
-        if(!user.isEmailConfirmed())
-            return "redirect:/auth/login";
+        User user = (User) session.getAttribute("user");
 
         Course cloneCourse = new Course(course);
         cloneCourse.setTags(
@@ -126,10 +128,15 @@ public class CoursesController {
 
     @GetMapping(value = "/add/tagsUpdate", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public String tagsUpdate(@RequestParam(required = false, name = "tags") String tags) {
+    public String tagsUpdate(@RequestParam(required = false, name = "tags") String tags,
+                             HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
         StringBuilder htmlResponse = new StringBuilder();
         if(tags != null && !tags.equals("")) {
             try {
+                User user = (User) session.getAttribute("user");
                 Set<String> tagsSet = new HashSet<>(Arrays.asList(tags.split("@")[0].split(", ")));
                 tags = tags
                         .replaceAll(",", "")
@@ -137,7 +144,7 @@ public class CoursesController {
                 String search = CommonUtils.getLastN(
                         tags.split(" "),
                         YedomConfig.MAX_WORDS_IN_REQUEST);
-                String response = tagsService.sendSocket(SocketType.SEARCH_RELATED_TAGS, search);
+                String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search);
 
                 if (!response.equals("")) {
                     List<Integer> IDS = tagsService.responseIdsToList(response);

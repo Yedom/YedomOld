@@ -1,9 +1,6 @@
 package ru.mralexeimk.yedom.controllers;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +10,10 @@ import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 @Controller
@@ -25,29 +22,34 @@ public class LkController {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
+    private final LanguageUtil languageUtil;
 
     @Autowired
-    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, LanguageUtil languageUtil) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
+        this.languageUtil = languageUtil;
     }
 
     @GetMapping()
     public String lkGet(Model model, HttpSession session) {
-        if(session.getAttribute("user") != null) {
-            User user = (User) session.getAttribute("user");
-            user.setPassword("");
-            if(user.isEmailConfirmed()) {
-                model.addAttribute("user", user);
-                return "lk/index";
-            }
-        }
-        return "redirect:auth/login";
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        user.setPassword("");
+        model.addAttribute("user", user);
+
+        return "lk/index";
     }
 
     @GetMapping("/{id}")
-    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model) {
+    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model,
+                            HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
         int id;
         try {
             id = Integer.parseInt(strId);
@@ -59,13 +61,19 @@ public class LkController {
             return "errors/notfound";
         }
         model.addAttribute("user", new User(userEntity));
+
         return "lk/user";
     }
 
     @PostMapping
-    public String lkPost(@ModelAttribute("user") User userModel, HttpSession session,
-                                                       BindingResult bindingResult) {
-        if (session.getAttribute("user") == null) {
+    public String lkPost(@ModelAttribute("user") User userModel,
+                         @RequestParam(value = "log_out", required = false) String logOut,
+                         HttpSession session, BindingResult bindingResult) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        if (logOut != null) {
+            session.removeAttribute("user");
             return "redirect:auth/login";
         }
 
@@ -94,6 +102,8 @@ public class LkController {
 
         userRepository.save(userEntity);
         session.setAttribute("user", user);
+
+        session.removeAttribute("user");
         return "redirect:/lk";
     }
 }
