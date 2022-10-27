@@ -32,7 +32,7 @@ public class TagsService {
 
             response = din.readUTF();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
         return response;
     }

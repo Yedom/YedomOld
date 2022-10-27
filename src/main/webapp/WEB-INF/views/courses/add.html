@@ -50,7 +50,7 @@
             <textarea rows="2" cols="60" th:field="*{title}" id="title"></textarea>
             <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
             <br />
-            <label th:for="tags" th:text="#{course.tags}">Тэги</label>:
+            <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
             <br/>
             <textarea rows="8" cols="40" th:field="*{tags}" id="tags"></textarea>
             <div style="color:red" th:if="${#fields.hasErrors('tags')}" th:errors="*{tags}">Tags Error</div>
@@ -90,6 +90,9 @@
         tags.bind('copy paste', function (e) {
             e.preventDefault();
         });
+        if(title.val().length >= 5) {
+            updateTags();
+        }
     });
 
     function spanClick(span) {
@@ -100,8 +103,7 @@
     }
 
     function updateTags() {
-        let data = tags.val() + ', ' + title.val();
-        if(data[0] === ' ') data = data.substring(1);
+        let data = tags.val() + '@' + title.val();
         fetch("/courses/add/tagsUpdate?tags="+data)
             .then((response) => response.json())
             .then((data) => {
@@ -117,7 +119,7 @@
     });
 
     title.on('keyup', function () {
-        if(this.value.length > 5) {
+        if(this.value.length >= 5) {
             updateTags();
         }
         else {
@@ -126,10 +128,10 @@
     });
 
     //fit to format
-    tags.on('keyup', function() {
+    tags.on('keyup', function(e) {
         let sym = this.value[this.value.length - 1];
         //check if symbol is tag's separator
-        if(isSymbolInArray(sym, tagsArray)) {
+        if(isSymbolInArray(sym, tagsArray) && e.keyCode !== 8) {
             let predVal = this.value.substring(0, this.value.length - 1);
             let spl = predVal.split(', ');
 
@@ -138,13 +140,14 @@
                 this.value += ', ';
                 this.value = processTagsString(this.value)
             }
+            updateTags();
         }
     });
 
     //prevent keydown repeating
     tags.on('keydown', function(e) {
         let sym = this.value[this.value.length - 1];
-        if(isSymbolInArray(sym, tagsArray)) {
+        if(isSymbolInArray(sym, tagsArray) && e.keyCode !== 8) {
             e.preventDefault();
         }
     });

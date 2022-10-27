@@ -21,6 +21,9 @@ public class YedomConfig {
     // Smart Search config
     public static final int REC_PORT = 2003;
     public static final int REC_TIMEOUT = 1000;
+    public static final int MIN_TAGS_COUNT = 3;
+    public static final String TAGS_DISABLED_SYMBOLS = ",.!#$%^&*()_+{}|:<>?`~";
     public static final int MAX_WORDS_IN_REQUEST = 10;
-    public static final int MAX_TAGS_SUGGESTIONS = 20;
+    public static final int MAX_TAGS_SUGGESTIONS = 30;
+    public static final String REGEX_TAGS = "^(([^@ ]{1,32}[ ]{0,1}){1,4}[@]{0,1}){3,30}$";
 }

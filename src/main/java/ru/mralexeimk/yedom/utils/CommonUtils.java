@@ -1,6 +1,7 @@
 package ru.mralexeimk.yedom.utils;
 
 import org.json.JSONObject;
+import org.springframework.validation.Errors;
 import ru.mralexeimk.yedom.config.YedomConfig;
 
 import java.io.DataInputStream;
@@ -11,6 +12,8 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,4 +43,22 @@ public class CommonUtils {
         return Stream.of(array).skip(array.length - n).collect(Collectors.joining(" "));
     }
 
+    public static boolean regexMatch(String str, String regex) {
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(str);
+        return m.find();
+    }
+
+    public static boolean containsSymbols(String str, String symbols) {
+        for (int i = 0; i < symbols.length(); i++) {
+            if (str.contains(String.valueOf(symbols.charAt(i)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String clearSpacesAroundSymbol(String str, String symbol) {
+        return str.replaceAll(" *"+symbol+" *", "@");
+    }
 }
