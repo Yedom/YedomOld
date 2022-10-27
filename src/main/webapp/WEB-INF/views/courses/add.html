@@ -5,8 +5,8 @@
     <title th:text="#{title}">Yedom</title>
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
 <nav class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="150">
@@ -56,8 +56,6 @@
             <div style="color:red" th:if="${#fields.hasErrors('tags')}" th:errors="*{tags}">Tags Error</div>
             <br />
             <div id="tagsToAdd" class="unselectable">
-                <span onclick="spanClick(this)">tag1</span>
-                <span onclick="spanClick(this)">tag2</span>
             </div>
             <br />
             <br />
@@ -89,7 +87,6 @@
     let tags = $('#tags');
 
     $(document).ready(function () {
-        //disable copy-paste in textarea
         tags.bind('copy paste', function (e) {
             e.preventDefault();
         });
@@ -98,12 +95,19 @@
     function spanClick(span) {
         span.setAttribute("hidden", "hidden");
         let tag = span.innerText;
-        tags.val(removeSymbolsToLastComma(tags.val()) + tag + ', ');
+        tags.val(isCommaExistFromEnd(tags.val()) ? tags.val() + tag : tags.val() + ', ' + tag);
+        updateTags();
     }
 
-    //check if char symbol is special (shift, ctrl, ...)
-    function isSpecialSymbol(code) {
-        return code === 8 || code === 17 || code === 37 || code === 39;
+    function updateTags() {
+        let data = tags.val() + ', ' + title.val();
+        if(data[0] === ' ') data = data.substring(1);
+        fetch("/courses/add/tagsUpdate?tags="+data)
+            .then((response) => response.json())
+            .then((data) => {
+                //console.log(data.tags);
+                $('#tagsToAdd').html(data.tags);
+            });
     }
 
     title.on('keydown', function(e) {
@@ -112,166 +116,14 @@
         }
     });
 
-    title.on('keyup', function() {
-        if (this.value.length > 5) {
-            let data = {title: tags.val().replaceAll(',', '') + ' ' + title.val()};
-            const response = fetch("/courses/add/tagsUpdate", {
-                method: "POST",
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            response.then(function (response) {
-
-            });
+    title.on('keyup', function () {
+        if(this.value.length > 5) {
+            updateTags();
+        }
+        else {
+            $('#tagsToAdd').html("");
         }
     });
-
-    //remove symbols from string to last comma
-    function removeSymbolsToLastComma(str) {
-        let lastComma = str.lastIndexOf(',') + 2;
-        if (lastComma !== -1) {
-            return str.substring(0, lastComma);
-        }
-        return str;
-    }
-
-    //check if symbol in array
-    function isSymbolInArray(symbol, array) {
-        for (let i = 0; i < array.length; i++) {
-            if (symbol === array[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //trim string and remove first and last spaces
-    function trimString(string) {
-        let result = "";
-        let isSpace = false;
-        for (let i = 0; i < string.length; i++) {
-            if (string[i] === ' ') {
-                if (!isSpace) {
-                    result += string[i];
-                    isSpace = true;
-                }
-            } else {
-                result += string[i];
-                isSpace = false;
-            }
-        }
-        if (result[0] === ' ') {
-            result = result.substring(1);
-        }
-        if (result[result.length - 1] === ' ') {
-            result = result.substring(0, result.length - 1);
-        }
-        return result;
-    }
-
-    //remove spaces before commas
-    function removeSpacesBeforeCommas(string) {
-        let result = "";
-        for (let i = 0; i < string.length; i++) {
-            if (string[i] === ' ' && string[i + 1] === ',') {
-                result += ',';
-                i++;
-            } else {
-                result += string[i];
-            }
-        }
-        return result;
-    }
-
-    //add space after comma if not exist
-    function addSpaceAfterComma(string) {
-        let result = "";
-        for (let i = 0; i < string.length; i++) {
-            if (string[i] === ',') {
-                if (string[i + 1] !== ' ') {
-                    result += ', ';
-                } else {
-                    result += ',';
-                }
-            } else {
-                result += string[i];
-            }
-        }
-        return result;
-    }
-
-    //check if comma exist from end white its space
-    function isCommaExist(string) {
-        for (let i = string.length - 1; i >= 0; i--) {
-            if (string[i] === ',') {
-                return true;
-            }
-            if (string[i] !== ' ') {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    //select first N words in every separated by comma string
-    function selectFirstNWords(string, N) {
-        let result = "";
-        let words = string.split(', ');
-        for (let i = 0; i < words.length; i++) {
-            let word = words[i];
-            let wordArray = word.split(' ');
-            let M = Math.min(wordArray.length, N);
-            for (let j = 0; j < M; j++) {
-                if (j < M) {
-                    result += wordArray[j];
-                    if (j < M - 1) {
-                        result += ' ';
-                    }
-                }
-            }
-            if (i < words.length - 1) {
-                result += ', ';
-            }
-        }
-        return result;
-    }
-
-    //replace repeated commas in string to one
-    function replaceRepeatedCommas(string) {
-        let result = "";
-        let isComma = false;
-        for (let i = 0; i < string.length; i++) {
-            if (string[i] === ',') {
-                if (!isComma) {
-                    result += string[i];
-                    isComma = true;
-                }
-            } else {
-                result += string[i];
-                isComma = false;
-            }
-        }
-        return result;
-    }
-
-    //get sum of symbols in array
-    function getSumOfSymbolsInArray(array) {
-        let sum = 0;
-        for (let i = 0; i < array.length; i++) {
-            sum += array[i].length;
-        }
-        return sum;
-    }
-
-    //processing tags string
-    function processTagsString(string) {
-        string = trimString(string);
-        string = replaceRepeatedCommas(string);
-        string = removeSpacesBeforeCommas(string);
-        string = addSpaceAfterComma(string);
-        string = selectFirstNWords(string, 4);
-        return string;
-    }
 
     //fit to format
     tags.on('keyup', function() {

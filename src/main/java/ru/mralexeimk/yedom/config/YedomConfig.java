@@ -22,4 +22,5 @@ public class YedomConfig {
     public static final int REC_PORT = 2003;
     public static final int REC_TIMEOUT = 1000;
     public static final int MAX_WORDS_IN_REQUEST = 10;
+    public static final int MAX_TAGS_SUGGESTIONS = 20;
 }

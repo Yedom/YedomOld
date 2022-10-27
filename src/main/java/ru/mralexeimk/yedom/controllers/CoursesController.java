@@ -2,8 +2,7 @@ package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +20,7 @@ import ru.mralexeimk.yedom.utils.services.TagsService;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/courses")
@@ -111,21 +109,35 @@ public class CoursesController {
     }
 
     //@ResponseBody
-    @PostMapping("/add/tagsUpdate")
-    public ResponseEntity<String> tagsUpdate(@RequestBody String body) {
-        JSONObject json = new JSONObject(body);
-        String search = CommonUtils.getLastN(
-                json.getString("title").split(" "),
-                YedomConfig.MAX_WORDS_IN_REQUEST);
-        String response = tagsService.sendSocket(SocketType.SEARCH_RELATED_TAGS, search);
-        String htmlResponse = "";
-        if(!response.equals("")) {
-            List<Integer> IDS = tagsService.responseIdsToList(response);
-            for(int id : IDS) {
-                TagEntity tagEntity = tagRepository.findById(id).orElse(null);
+    @GetMapping(value = "/add/tagsUpdate", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public String tagsUpdate(@RequestParam(required = false, name = "tags") String tags) {
+        StringBuilder htmlResponse = new StringBuilder();
+        if(tags != null && !tags.equals("")) {
+            Set<String> tagsSet = new HashSet<>(Arrays.asList(tags.split(", ")));
+            System.out.println(tagsSet);
+            tags = tags.replaceAll(",", "");
+            String search = CommonUtils.getLastN(
+                    tags.split(" "),
+                    YedomConfig.MAX_WORDS_IN_REQUEST);
+            String response = tagsService.sendSocket(SocketType.SEARCH_RELATED_TAGS, search);
+
+            if (!response.equals("")) {
+                List<Integer> IDS = tagsService.responseIdsToList(response);
+
+                int c = 0;
+                for (int id : IDS) {
+                    TagEntity tagEntity = tagRepository.findById(id).orElse(null);
+                    if (c > YedomConfig.MAX_TAGS_SUGGESTIONS) break;
+                    if(tagEntity == null || tagsSet.contains(tagEntity.getTag())) continue;
+                    htmlResponse
+                            .append("<span onclick=\"spanClick(this)\">")
+                            .append(tagEntity.getTag())
+                            .append("</span>");
+                    ++c;
+                }
             }
         }
-
-        return new ResponseEntity<>("{\"status\": \"ok\"}", HttpStatus.OK);
+        return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
     }
 }

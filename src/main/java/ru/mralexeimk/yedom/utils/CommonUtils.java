@@ -34,6 +34,9 @@ public class CommonUtils {
     }
 
     public static String getLastN(String[] array, int n) {
+        if (array.length - n < 0) {
+            return String.join(" ", array);
+        }
         return Stream.of(array).skip(array.length - n).collect(Collectors.joining(" "));
     }
 
