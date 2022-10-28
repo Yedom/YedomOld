@@ -32,8 +32,8 @@ public class LkController {
         this.languageUtil = languageUtil;
     }
 
-    @GetMapping()
-    public String lkGet(Model model, HttpSession session) {
+    @GetMapping("/account")
+    public String accountGet(Model model, HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
@@ -41,32 +41,33 @@ public class LkController {
         user.setPassword("");
         model.addAttribute("user", user);
 
-        return "lk/index";
+        return "lk/account";
     }
 
-    @GetMapping("/{id}")
-    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model,
-                            HttpSession session) {
+    @GetMapping("/profile")
+    public String profileGet(Model model, HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        int id;
-        try {
-            id = Integer.parseInt(strId);
-        } catch (NumberFormatException e) {
-            return "errors/invalid";
-        }
-        UserEntity userEntity = userRepository.findById(id).orElse(null);
-        if(userEntity == null) {
-            return "errors/notfound";
-        }
-        model.addAttribute("user", new User(userEntity));
+        User user = (User) session.getAttribute("user");
 
-        return "lk/user";
+
+        return "lk/profile";
+    }
+
+    @GetMapping("/courses")
+    public String coursesGet(Model model, HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+
+
+        return "lk/courses";
     }
 
     @PostMapping
-    public String lkPost(@ModelAttribute("user") User userModel,
+    public String accountPost(@ModelAttribute("user") User userModel,
                          @RequestParam(value = "log_out", required = false) String logOut,
                          HttpSession session, BindingResult bindingResult) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
@@ -93,7 +94,7 @@ public class LkController {
         userValidator.validate(user.withArgs("onUpdate"), bindingResult);
 
         if (bindingResult.hasErrors())
-            return "lk/index";
+            return "lk/account";
 
         user.setPassword(passwordEncoder.encode(user.getNewPassword()));
 
@@ -104,6 +105,6 @@ public class LkController {
         session.setAttribute("user", user);
 
         session.removeAttribute("user");
-        return "redirect:/lk";
+        return "redirect:/lk/account";
     }
 }
