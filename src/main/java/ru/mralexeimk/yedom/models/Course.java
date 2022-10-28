@@ -7,14 +7,16 @@ import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.validation.FirstOrder;
 import ru.mralexeimk.yedom.interfaces.validation.SecondOrder;
+import ru.mralexeimk.yedom.interfaces.validation.ThirdOrder;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
 public class Course {
-    @Size(min = YedomConfig.minCourseLength, max = YedomConfig.maxCourseLength, message = "{course.title.size}", groups = FirstOrder.class)
+    @Size(min = YedomConfig.minCourseLength, max = YedomConfig.maxCourseLength, message = "{course.title.size}")
     private String title;
     private String author;
     private String tags;
@@ -36,6 +38,10 @@ public class Course {
         this(courseEntity.getTitle(), courseEntity.getAuthor(),
                 courseEntity.getTags(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getSponsors());
+    }
+
+    public Course(Course a) {
+        this(a.getTitle(), a.getAuthor(), a.getTags(), a.getViews(), a.getLikes(), a.getSponsors());
     }
 
     public Course() {

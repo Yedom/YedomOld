@@ -6,31 +6,39 @@ import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.enums.SocketType;
 import ru.mralexeimk.yedom.models.Code;
+import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.multithreading.ClientSocket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
 public class TagsService {
-    public String sendSocket(SocketType socketType) {
-        return sendSocket(socketType, "");
+    private final Map<String, ClientSocket> clientSocketByEmail = new HashMap<>();
+
+    public String sendSocket(User user, SocketType socketType) {
+        return sendSocket(user, socketType, "");
     }
 
-    public String sendSocket(SocketType socketType, String msg) {
+    public String sendSocket(User user, SocketType socketType, String msg) {
         String response = "";
-        try (Socket socket = new Socket(YedomConfig.HOST, YedomConfig.REC_PORT);
-             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
-             DataInputStream din = new DataInputStream(socket.getInputStream())) {
-            socket.setSoTimeout(YedomConfig.REC_TIMEOUT);
-
-            dout.writeUTF(socketType.toString() + ":" + msg);
-            dout.flush();
-
-            response = din.readUTF();
+        try {
+            ClientSocket clientSocket;
+            if (clientSocketByEmail.containsKey(user.getEmail()) &&
+                    clientSocketByEmail.get(user.getEmail()).isAlive()) {
+                clientSocket = clientSocketByEmail.get(user.getEmail());
+            } else {
+                clientSocket = new ClientSocket();
+                clientSocket.sendMessage(user.getEmail());
+                clientSocketByEmail.put(user.getEmail(), clientSocket);
+            }
+            clientSocket.sendMessage(socketType.toString() + ":" + msg);
+            response = clientSocket.receiveMessage();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
