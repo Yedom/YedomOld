@@ -15,14 +15,13 @@
 <!-- Particles Container -->
 <div id="particles-container"></div>
 
-
 <!-- Header -->
 <header class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="150">
-    <div class="container unselectable">
+    <div class="container unselectable header-container">
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a style="z-index: 3;" class="nav-link" href="/courses">
+                    <a class="nav-link" href="/courses">
                         <i class="material-icons">list</i>
                         <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
                     </a>
@@ -44,17 +43,16 @@
     </div>
 </header>
 
-
 <!-- Image on center -->
 <div class="bg page-header">
     <div class="unselectable title сol-md-5 mx-auto text-center section">
-        <img src="../resources/images/screen.png" width="791" height="475" alt="Yedom">
+        <img src="../resources/images/screen.png" width="791" height="435" alt="Yedom">
     </div>
 </div>
 
 <!-- Footer -->
 <footer class="footer" data-background-color="black">
-    <div class="container unselectable">
+    <div class="container unselectable footer-container">
         <nav class="float-left">
             <ul>
                 <li>
@@ -75,24 +73,6 @@
     particlesJS.load('particles-container', '../resources/assets/particles.json', function () {
         console.log('particles-js loaded!');
     });
-
-    $('header').css("z-index", "unset");
-    $('.dropdown-menu').css("z-index", "unset");
-
-    //console.log z-index attribute for every element in this html
-    $(document).ready(function () {
-        $('*').each(function () {
-            let z = $(this).css('z-index');
-            if (z !== 'auto') {
-                console.log($(this));
-                console.log(z);
-            }
-            else {
-                $(this).css('z-index', 'unset');
-            }
-        });
-    });
-
 </script>
 
 <script src="../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>

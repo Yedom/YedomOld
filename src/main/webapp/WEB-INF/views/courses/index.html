@@ -3,40 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title}">Yedom</title>
+    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
+
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
 </head>
 <body>
-<div>
-    <input type="text" id="search" name="search" placeholder="Поиск курсов" th:placeholder="#{courses.search}" />
-    <input onclick="clickSearch()" type="submit" id="searchBtn" value="Поиск" th:value="#{common.search}" />
-    <br />
-    <br />
-    <input onclick="clickAddCourse()" type="submit" id="addCourse" value="Добавить курс" th:value="#{course.add}" />
-    <h1 th:text="#{courses.list}">Course List</h1>
-    <table style="width:100%">
-        <thead>
-        <tr>
-            <th th:text="#{course.title}">Title</th>
-            <th th:text="#{course.author}">Author</th>
-            <th th:text="#{course.views}">Views</th>
-            <th th:text="#{course.likes}">Likes</th>
-            <th th:text="#{course.sponsors}">Sponsors</th>
-            <th th:text="#{course.tags}">Tags</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="course : ${courses}">
-            <td th:text="${course.title}"></td>
-            <td th:text="${course.author}"></td>
-            <td th:text="${course.views}"></td>
-            <td th:text="${course.likes}"></td>
-            <td th:text="${course.sponsors}"></td>
-            <td th:text="${course.tags}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 
+<div class="col-lg-12 mx-auto p-3 py-md-5">
+    <!-- Header -->
+    <header class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="150">
+        <div class="container unselectable header-container">
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="clickAddCourse()">
+                            <i class="material-icons">add</i>
+                            <span th:text="#{course.add}" class="hot-bar">Добавить курс</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses">
+                            <i class="material-icons">list</i>
+                            <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
+                        </a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown">
+                            <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
+                        <div class="dropdown-menu dropdown-with-icons">
+                            <a href="/lk/profile" class="dropdown-item"><i class="material-icons">login</i>
+                                <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
+                            <a href="/lk/account" class="dropdown-item"><i class="material-icons">account_box</i>
+                                <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
+                            <a href="/lk/courses" class="dropdown-item"><i class="material-icons">edit</i>
+                                <span class="hot-bar" th:text="#{common.my_courses}">Мои курсы</span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <!-- Courses -->
+    <div class="container">
+        <input type="text" id="search" name="search" placeholder="Поиск курсов" th:placeholder="#{courses.search}" />
+        <input onclick="clickSearch()" type="submit" id="searchBtn" value="Поиск" th:value="#{common.search}" />
+        <br />
+        <h1 th:text="#{courses.list}">Course List</h1>
+        <table style="width:100%">
+            <thead>
+            <tr>
+                <th th:text="#{course.title}">Title</th>
+                <th th:text="#{course.author}">Author</th>
+                <th th:text="#{course.views}">Views</th>
+                <th th:text="#{course.likes}">Likes</th>
+                <th th:text="#{course.sponsors}">Sponsors</th>
+                <th th:text="#{course.tags.title}">Tags</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="course : ${courses}">
+                <td th:text="${course.title}"></td>
+                <td th:text="${course.author}"></td>
+                <td th:text="${course.views}"></td>
+                <td th:text="${course.likes}"></td>
+                <td th:text="${course.sponsors}"></td>
+                <td th:text="${course.tags}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 <script th:inline="javascript">
     function clickSearch() {
         let text = $('#search').val();
@@ -52,5 +96,8 @@
     }
 </script>
 
+<script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+<script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+<script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
 </body>
 </html>
