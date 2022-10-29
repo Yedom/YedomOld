@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title th:text="#{title}">Yedom</title>
+    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
 </head>
-<body>
+<body class="index-page sidebar-collapse">
+
+<!-- Header -->
+<div class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="10">
+    <div class="container unselectable header-container">
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/courses">
+                        <i class="material-icons">list</i>
+                        <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
+                    </a>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown">
+                        <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
+                    <div class="dropdown-menu dropdown-with-icons">
+                        <a href="/lk/profile" class="dropdown-item"><i class="material-icons">login</i>
+                            <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
+                        <a href="/lk/account" class="dropdown-item"><i class="material-icons">account_box</i>
+                            <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
+                        <a href="/lk/courses" class="dropdown-item"><i class="material-icons">edit</i>
+                            <span class="hot-bar" th:text="#{common.my_courses}">Мои курсы</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+</div>
+
+<div class="main main-raised col-md-4 mx-auto text-center section">
+    <div class="container">
+
+        <!-- Errors -->
+        <div th:if="${#fields.hasErrors('user.*')}">
+            <h4  th:text="#{common.errors}">Errors:</h4>
+            <ul>
+                <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
+            </ul>
+        </div>
+    </div>
+</div>
+
+<footer class="footer" data-background-color="black">
+    <div class="container">
+        <nav class="float-left">
+            <ul>
+                <li>
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom" th:text="#{common.developers}">Разработчики</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="copyright float-right">
+            2022-<script>document.write(new Date().getFullYear())</script> © <text th:text="#{title}">Yedom</text>
+        </div>
+    </div>
+</footer>
+
+<script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+<script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+<script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
 
 </body>
 </html>

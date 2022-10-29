@@ -55,8 +55,8 @@
             <textarea rows="8" cols="40" th:field="*{tags}" id="tags"></textarea>
             <div style="color:red" th:if="${#fields.hasErrors('tags')}" th:errors="*{tags}">Tags Error</div>
             <br />
-            <div id="tagsToAdd" class="unselectable">
-            </div>
+                <div id="tagsToAdd" class="unselectable">
+                </div>
             <br />
             <br />
             <input type="submit" value="Сохранить курс" th:value="#{course.add}"/>
@@ -96,10 +96,24 @@
     });
 
     function spanClick(span) {
-        span.setAttribute("hidden", "hidden");
-        let tag = span.innerText;
-        tags.val(isCommaExistFromEnd(tags.val()) ? tags.val() + tag : tags.val() + ', ' + tag);
-        updateTags();
+        if(title.val().split(', ').length < 30) {
+            span.setAttribute("hidden", "hidden");
+            let tag = span.innerText;
+            tags.val(isCommaExistFromEnd(tags.val()) ? tags.val() + tag : tags.val() + ', ' + tag);
+            updateTags();
+        }
+    }
+
+    //remove repeated tags
+    function processTags(dataTags) {
+        let splTags = tags.val().split(', ');
+        splTags.forEach(function (splTag) {
+            if(splTag.length > 0) {
+                dataTags = dataTags.replaceAll(
+                    "<span onclick=\"spanClick(this)\">" + splTag + "</span>", "");
+            }
+        });
+        return dataTags;
     }
 
     function updateTags() {
@@ -108,12 +122,12 @@
             .then((response) => response.json())
             .then((data) => {
                 //console.log(data.tags);
-                $('#tagsToAdd').html(data.tags);
+                $('#tagsToAdd').html(processTags(data.tags));
             });
     }
 
     title.on('keydown', function(e) {
-        if(this.value.length > 100) {
+        if(title.val().split(', ').length >= 30) {
             if(!isSpecialSymbol(e.keyCode)) return false;
         }
     });

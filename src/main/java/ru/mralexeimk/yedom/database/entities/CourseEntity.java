@@ -7,6 +7,7 @@ import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.Course;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Comparator;
 
 @Getter
@@ -24,6 +25,9 @@ public class CourseEntity {
 
     @Column(name = "author")
     private String author;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "views")
     private int views;

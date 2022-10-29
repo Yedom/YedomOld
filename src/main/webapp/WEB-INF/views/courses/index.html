@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
 
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 </head>
 <body>
-
 <div class="col-lg-12 mx-auto p-3 py-md-5">
     <!-- Header -->
-    <header class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="150">
+    <header class="navbar fixed-top navbar-expand-lg navbar-transparent">
         <div class="container unselectable header-container">
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
@@ -45,45 +46,107 @@
             </div>
         </div>
     </header>
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
 
-    <!-- Courses -->
-    <div class="container">
-        <input type="text" id="search" name="search" placeholder="Поиск курсов" th:placeholder="#{courses.search}" />
-        <input onclick="clickSearch()" type="submit" id="searchBtn" value="Поиск" th:value="#{common.search}" />
-        <br />
-        <h1 th:text="#{courses.list}">Course List</h1>
-        <table style="width:100%">
-            <thead>
-            <tr>
-                <th th:text="#{course.title}">Title</th>
-                <th th:text="#{course.author}">Author</th>
-                <th th:text="#{course.views}">Views</th>
-                <th th:text="#{course.likes}">Likes</th>
-                <th th:text="#{course.sponsors}">Sponsors</th>
-                <th th:text="#{course.tags.title}">Tags</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="course : ${courses}">
-                <td th:text="${course.title}"></td>
-                <td th:text="${course.author}"></td>
-                <td th:text="${course.views}"></td>
-                <td th:text="${course.likes}"></td>
-                <td th:text="${course.sponsors}"></td>
-                <td th:text="${course.tags}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    <main>
+        <!-- Search -->
+
+        <section class="py-5 text-center container">
+            <div class="row py-lg-5">
+                <div class="col-lg-6 col-md-8 mx-auto">
+                    <input type="text" id="search" name="search" placeholder="Поиск курсов" th:name="search" th:placeholder="#{courses.search}" />
+                    <input onclick="clickSearch()" type="submit" id="searchBtn" value="Поиск" th:value="#{common.search}" />
+                    <br />
+                    <br />
+                    <span th:text="#{course.tags.popular}">Популярные теги</span>
+                    <div id="tagsToAdd" class="unselectable">
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses -->
+        <div class="container">
+            <h1 class="unselectable" th:text="#{courses.list}">Courses List</h1>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <div class="col" th:each="course : ${courses}">
+                    <div class="card-plain card-blog card">
+                        <h4 class="card-title card-content unselectable">
+                            <a href="#" th:text="${course.title}">Course Title</a>
+                        </h4>
+                        <div class="unselectable perspective card-content card-header card-header-image">
+                            <a href="#">
+                                <img class="courseImg" src="../../resources/images/screen.png"
+                                     th:src="@{/resources/images/screen.png}" alt="...">
+                            </a>
+                        </div>
+                        <div class="card-body card-content unselectable">
+                            <p class="card-description" th:text="${course.description}">
+                                Course Description
+                            </p>
+                            <div class="card-footer unselectable">
+                                <div class="author">
+                                    <a href="#">
+                                        <img src="../../resources/images/screen.png"
+                                             th:src="@{/resources/images/screen.png}" alt="..." class="avatar img-raised">
+                                        <span class="authorName" th:text="${course.author}">Author</span>
+                                    </a>
+                                </div>
+                                <div class="stats">
+                                    <i class="material-icons">visibility</i> <span class="views" th:text="${course.views}">145</span>
+                                    &nbsp;&nbsp;
+                                    <i class="material-icons">thumb_up</i> <span class="likes" th:text="${course.likes}">965</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 <script th:inline="javascript">
+    let search = $('#search');
+    let els = $('.perspective');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    search.val(searchParam);
+
+    els.each(function () {
+        const height = this.clientHeight
+        const width = this.clientWidth
+        $(this).on('mousemove', function(e) {
+            let xVal = e.clientX - e.target.getBoundingClientRect().x - width/2;
+            let yVal = e.clientY - e.target.getBoundingClientRect().y - height/2;
+            const yRotation = 4 * ((xVal - width / 2) / width)
+            const xRotation = -4 * ((yVal - height / 2) / height)
+            this.style.transform =
+                'perspective(500px) scale(1.1) rotateX(' + xRotation + 'deg) rotateY(' + yRotation + 'deg)'
+        });
+        $(this).on('mouseout', function() {
+            this.style.transform = ' perspective(500px) scale(1) rotateX(0) rotateY(0) ';
+            this.style.transition = 'all 3s ease-out';
+        });
+        $(this).on('mouseover', function() {
+            this.style.transform = ' perspective(500px) scale(1.1) rotateX(0) rotateY(0) ';
+            this.style.transition = 'all 3s ease-out';
+        });
+        $(this).on('hover', function() {
+            this.style.transform = 'perspective(500px) scale(1.1) rotateX(0) rotateY(0)';
+            this.style.transition = 'all 0s ease-out';
+        });
+    });
+
+    fetch("/courses/popularTags")
+        .then((response) => response.json())
+        .then((data) => {
+            //console.log(data.tags);
+            $('#tagsToAdd').html(data.tags);
+        });
+
     function clickSearch() {
-        let text = $('#search').val();
+        let text = search.val();
         if(text === '') {
             window.location.href = '/courses';
         }
@@ -94,6 +157,13 @@
     function clickAddCourse() {
         window.location.href = '/courses/add';
     }
+
+    function spanClick(span) {
+        $('.tag').attr('hidden', 'hidden');
+        window.location.href = "/courses?search=" + span.innerText;
+    }
+
+
 </script>
 
 <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>

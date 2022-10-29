@@ -49,7 +49,7 @@ public class CoursesController {
         User user = (User) session.getAttribute("user");
 
         if(search == null) {
-            model.addAttribute("courses", courseRepository.findByOrderByViewsDesc());
+            model.addAttribute("courses", courseRepository.findTop10ByOrderByViewsDesc());
         }
         else {
             String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
@@ -162,6 +162,34 @@ public class CoursesController {
                     }
                 }
             } catch (Exception ignored) {}
+        }
+        return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
+    }
+
+    @GetMapping(value = "/popularTags", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public String popularTags(HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        StringBuilder htmlResponse = new StringBuilder();
+        User user = (User) session.getAttribute("user");
+        String response = tagsService.sendSocket(user, SocketType.GET_POPULAR_TAGS);
+
+        if (!response.equals("")) {
+            List<Integer> IDS = tagsService.responseIdsToList(response);
+
+            int c = 0;
+            for (int id : IDS) {
+                TagEntity tagEntity = tagRepository.findById(id).orElse(null);
+                if (c > YedomConfig.MAX_TAGS_SUGGESTIONS) break;
+                if (tagEntity == null) continue;
+                htmlResponse
+                        .append("<span class=\"tag\" onclick=\"spanClick(this)\">")
+                        .append(tagEntity.getTag())
+                        .append("</span>");
+                ++c;
+            }
         }
         return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
     }

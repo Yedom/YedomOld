@@ -41,6 +41,9 @@ public class CourseValidator implements Validator {
             if(course.getTags().split("@").length < YedomConfig.MIN_TAGS_COUNT) {
                 reject("tags", "course.tags.count", errors);
             }
+            if(course.getTags().split("@").length > YedomConfig.MAX_TAGS_COUNT) {
+                reject("tags", "course.tags.max_count", errors);
+            }
         }
     }
 }

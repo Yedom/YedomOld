@@ -10,10 +10,11 @@ public class ClientSocket {
     private Socket socket;
     private DataOutputStream dout;
     private DataInputStream din;
+    private boolean isActive = false;
 
     public ClientSocket() {
         try {
-            socket = new Socket(YedomConfig.HOST, YedomConfig.REC_PORT);
+            socket = new Socket(YedomConfig.REC_HOST, YedomConfig.REC_PORT);
             dout = new DataOutputStream(socket.getOutputStream());
             din = new DataInputStream(socket.getInputStream());
         } catch (Exception ex) {
@@ -52,5 +53,21 @@ public class ClientSocket {
 
     public boolean isAlive() {
         return socket.isConnected();
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void activate() {
+        isActive = true;
+    }
+
+    public void deactivate() {
+        isActive = false;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }

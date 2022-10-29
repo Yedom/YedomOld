@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.services;
 
+import ch.qos.logback.core.net.server.Client;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -22,27 +23,51 @@ public class TagsService {
     private final Map<String, ClientSocket> clientSocketByEmail = new HashMap<>();
 
     public String sendSocket(User user, SocketType socketType) {
-        return sendSocket(user, socketType, "");
+        return sendSocket(user, socketType, "", false);
     }
 
     public String sendSocket(User user, SocketType socketType, String msg) {
+        return sendSocket(user, socketType, msg, false);
+    }
+
+    public String sendSocket(User user, SocketType socketType, String msg, boolean resending) {
         String response = "";
         try {
-            ClientSocket clientSocket;
-            if (clientSocketByEmail.containsKey(user.getEmail()) &&
-                    clientSocketByEmail.get(user.getEmail()).isAlive()) {
-                clientSocket = clientSocketByEmail.get(user.getEmail());
-            } else {
-                clientSocket = new ClientSocket();
-                clientSocket.sendMessage(user.getEmail());
-                clientSocketByEmail.put(user.getEmail(), clientSocket);
+            ClientSocket clientSocket = createConnection(user);
+            if(!clientSocket.isActive()) {
+                clientSocket.activate();
+                clientSocket.getSocket().setSoTimeout(YedomConfig.REC_TIMEOUT);
+
+                clientSocket.sendMessage(socketType.toString() + ":" + msg);
+                response = clientSocket.receiveMessage();
+                clientSocket.deactivate();
             }
-            clientSocket.sendMessage(socketType.toString() + ":" + msg);
-            response = clientSocket.receiveMessage();
         } catch (Exception ex) {
+            if (clientSocketByEmail.containsKey(user.getEmail())) {
+                ClientSocket clientSocket = clientSocketByEmail.get(user.getEmail());
+                clientSocket.close();
+                clientSocketByEmail.remove(user.getEmail());
+                if(!resending)
+                    return sendSocket(user, socketType, msg, true);
+            }
             ex.printStackTrace();
         }
         return response;
+    }
+
+    public ClientSocket createConnection(User user) {
+        ClientSocket clientSocket = null;
+        try {
+            if (clientSocketByEmail.containsKey(user.getEmail())) {
+                clientSocket = clientSocketByEmail.get(user.getEmail());
+            } else {
+                clientSocket = new ClientSocket();
+                clientSocket.getSocket().setSoTimeout(YedomConfig.REC_TIMEOUT);
+                clientSocket.sendMessage(user.getEmail());
+                clientSocketByEmail.put(user.getEmail(), clientSocket);
+            }
+        } catch (Exception ignored) {}
+        return clientSocket;
     }
 
     public List<Integer> responseIdsToList(String response) {

@@ -79,9 +79,9 @@ public class SpringConfig implements WebMvcConfigurer {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/yedom");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("root");
+        dataSource.setUrl(YedomConfig.DB_URL);
+        dataSource.setUsername(YedomConfig.DB_USERNAME);
+        dataSource.setPassword(YedomConfig.DB_PASSWORD);
 
         return dataSource;
     }

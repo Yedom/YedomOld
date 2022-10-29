@@ -18,6 +18,7 @@ import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.services.EmailService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
+import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
@@ -31,16 +32,18 @@ public class AuthController {
     private final EmailService emailService;
     private final LanguageUtil languageUtil;
     private final PasswordEncoder passwordEncoder;
+    private final TagsService tagsService;
 
     @Autowired
     public AuthController(UserRepository userRepository, UserValidator userValidator,
                           EmailService emailService, LanguageUtil languageUtil,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder, TagsService tagsService) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.emailService = emailService;
         this.languageUtil = languageUtil;
         this.passwordEncoder = passwordEncoder;
+        this.tagsService = tagsService;
     }
 
     @GetMapping("/reg")
@@ -188,7 +191,11 @@ public class AuthController {
 
         userEntity.setLastLogin(CommonUtils.getCurrentTimestamp());
         userRepository.save(userEntity);
-        session.setAttribute("user", new User(userEntity));
+
+        user = new User(userEntity);
+        session.setAttribute("user", user);
+        tagsService.createConnection(user);
+
         return "redirect:/";
     }
 
@@ -205,6 +212,7 @@ public class AuthController {
                     userRepository.save(new UserEntity(user));
                     session.setAttribute("user", user);
                     emailService.removeCode(user.getUsername());
+                    tagsService.createConnection(user);
                 } else bindingResult.rejectValue("code", "",
                         languageUtil.getLocalizedMessage("auth.confirm.deny"));
             } else bindingResult.rejectValue("code", "",

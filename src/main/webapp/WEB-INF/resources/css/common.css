@@ -6,6 +6,11 @@ form {
     display: inline-block;
 }
 
+.col {
+    flex: 0 0 auto;
+    width: 33.33%;
+}
+
 .bg {
     height: 100%;
     background-position: center;
@@ -82,6 +87,29 @@ div.editable {
     box-sizing: border-box;
     min-height: 100%;
     padding-bottom: 90px;
+}
+
+.stats {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.perspective {
+    display: block;
+    background-color: grey;
+    margin: 0 auto;
+    transition: box-shadow 0.1s, transform 0.1s;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.perspective:hover {
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(0,0,0, 0.6);
+}
+
+.courseImg:hover {
+    cursor: pointer;
 }
 
 footer {
