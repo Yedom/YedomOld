@@ -2,8 +2,8 @@ package ru.mralexeimk.yedom.config;
 
 public class YedomConfig {
     // Common config
-    public static final String HOST = "localhost";
-    public static final String DOMAIN = "http://"+HOST+":8080/";
+    public static final String HOST = "yedom";
+    public static final String DOMAIN = "http://"+HOST+".ru/";
 
     // Database config
     public static final String DB_URL = "jdbc:postgresql://89.223.66.51:5432/default_db";

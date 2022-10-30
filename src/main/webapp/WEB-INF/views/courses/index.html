@@ -110,6 +110,30 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container unselectable footer-container">
+            <nav class="float-left">
+                <ul>
+                    <!-- GitHub link -->
+                    <li>
+                        <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
+                            <i class="material-icons">code</i>
+                            <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
+                    </li>
+                    <li>
+                        <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCC4M-40ckU4sroMTxGprBNg">
+                            <i class="material-icons">subscriptions</i>
+                            <span th:text="#{common.youtube}" class="hot-bar"> Youtube</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="copyright float-right">
+                2022-<script>document.write(new Date().getFullYear())</script> © <text th:text="#{title}">Yedom</text>
+            </div>
+        </div>
+    </footer>
 <script th:inline="javascript">
     let search = $('#search');
     let els = $('.perspective');
@@ -167,8 +191,6 @@
         $('.tag').attr('hidden', 'hidden');
         window.location.href = "/courses?search=" + span.innerText;
     }
-
-
 </script>
 
 <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>

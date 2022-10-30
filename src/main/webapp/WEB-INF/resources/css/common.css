@@ -1,16 +1,45 @@
 body {
     text-align: center;
 }
+.header-container {
+    background-color: #3a8d08;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+.footer-container {
+    background-color: #47b00d;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+.banner {
+    width: 100%;
+    height: 100%;
+}
+.over-particles {
+    z-index: 3;
+}
+.copyright {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 20px;
+}
+.navbar-scroll {
+    -webkit-transition: all 0.6s ease-out;
+    -moz-transition: all 0.6s ease-out;
+    -o-transition: all 0.6s ease-out;
+    -ms-transition: all 0.6s ease-out;
+    transition: all 0.6s ease-out;
+}
 
+.navbar-scroll.scrolled {
+    color: #0a6ebd;
+}
 form {
     display: inline-block;
 }
-
 .col {
     flex: 0 0 auto;
     width: 33.33%;
 }
-
 .bg {
     height: 100%;
     background-position: center;
@@ -18,7 +47,6 @@ form {
     background-size: cover;
     background-color: #a6eae4;
 }
-
 #tagsToAdd span {
     display: inline-block;
     margin: 5px;
@@ -26,74 +54,53 @@ form {
     border: 1px solid #000;
     border-radius: 5px;
 }
-
 #tagsToAdd span:hover {
     cursor: pointer;
     background-color: #000;
     color: #fff;
 }
-
 div.editable {
     width: 300px;
     height: 200px;
     border: 1px solid #ccc;
     padding: 5px;
 }
-
 .section {
     opacity: .9;
 }
-
 .title {
     width: 50%;
 }
-
 .title p {
     font-size: 120px;
     opacity: .9;
 }
-
 .hot-bar {
     font-size: 13px;
 }
-
 #particles-container {
-    position: absolute;
     z-index: 2;
     width: 100%;
-    height: 100%;
+    height: 99%;
+    position: absolute;
+    user-select: none;
 }
-
-.unselectable {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none;   /* Chrome/Safari/Opera */
-    -khtml-user-select: none;    /* Konqueror */
-    -moz-user-select: none;      /* Firefox */
-    -ms-user-select: none;       /* Internet Explorer/Edge */
-    user-select: none;           /* Non-prefixed version, currently
-                                  not supported by any browser */
-}
-
 * {
     margin: 0;
     padding: 0;
 }
-
 .wrapper {
     height: 100%;
 }
-
 .content {
     box-sizing: border-box;
     min-height: 100%;
     padding-bottom: 90px;
 }
-
 .stats {
     margin-left: auto;
     margin-right: 0;
 }
-
 .perspective {
     display: block;
     background-color: grey;
@@ -102,48 +109,31 @@ div.editable {
     background-size: 100%;
     background-repeat: no-repeat;
 }
-
 .perspective:hover {
     cursor: pointer;
     box-shadow: 0 0 30px rgba(0,0,0, 0.6);
 }
-
 .courseImg:hover {
     cursor: pointer;
 }
-
 footer {
     height: 80px;
     background-color: #a6eae4;
 }
-
-.header-container {
-    background-color: #3a8d08;
-}
-
-.footer-container {
-    background-color: #47b00d;
-    z-index: 3;
-    width: 100%;
-}
-
 input[type=text], textarea {
     padding:5px;
     border:2px solid #ccc;
     -webkit-border-radius: 5px;
     border-radius: 6px;
 }
-
 #search {
     width: 100%;
     height: 50px;
     font-size: 15px;
 }
-
 #searchBtn {
     width: 30%;
 }
-
 input[type=submit]{
     padding: 7px;
     background: #3a8d08;
@@ -153,8 +143,16 @@ input[type=submit]{
     border-radius: 10px;
     color: white;
 }
-
 a:active, a:hover, a{
     text-decoration: none;
     color: #1b1e21;
+}
+.unselectable {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
 }

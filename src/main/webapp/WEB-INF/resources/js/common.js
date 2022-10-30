@@ -175,3 +175,13 @@ function isCommaExistFromEnd(string) {
     }
     return true;
 }
+
+function checkScroll(el){
+    let startY = el.height() * 2; //The point where the navbar changes in px
+
+    if($(window).scrollTop() > startY){
+        $('.navbar').addClass("scrolled");
+    }else{
+        $('.navbar').removeClass("scrolled");
+    }
+}

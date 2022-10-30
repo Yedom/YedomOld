@@ -15,13 +15,13 @@ import ru.mralexeimk.yedom.interfaces.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.RolesService;
 import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.validators.CourseValidator;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Controller
@@ -31,13 +31,17 @@ public class CoursesController {
     private final CourseValidator courseValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
+    private final RolesService rolesService;
+    private final LanguageUtil languageUtil;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService) {
+    public CoursesController(CourseRepository courseRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil) {
         this.courseRepository = courseRepository;
         this.courseValidator = courseValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
+        this.rolesService = rolesService;
+        this.languageUtil = languageUtil;
     }
 
     @GetMapping
@@ -84,6 +88,13 @@ public class CoursesController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
+
+        if(!rolesService.hasPermission(user, "course.add")) {
+            bindingResult.rejectValue("title",
+                    "",
+                    languageUtil.getLocalizedMessage("no.permission"));
+            return "courses/add";
+        }
 
         Course cloneCourse = new Course(course);
         cloneCourse.setTags(

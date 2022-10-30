@@ -12,8 +12,8 @@ import java.util.Locale;
 @Component
 public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
     private final List<Locale> LOCALES = Arrays.asList(
-            new Locale("en"),
-            new Locale("ru")
+            new Locale("ru"),
+            new Locale("en")
     );
 
     @Override
