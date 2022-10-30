@@ -49,7 +49,7 @@ public class CoursesController {
         User user = (User) session.getAttribute("user");
 
         if(search == null) {
-            model.addAttribute("courses", courseRepository.findTop10ByOrderByViewsDesc());
+            model.addAttribute("courses", courseRepository.findByOrderByViewsDesc());
         }
         else {
             String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
