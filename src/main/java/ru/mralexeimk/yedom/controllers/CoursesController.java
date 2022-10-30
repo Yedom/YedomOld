@@ -70,24 +70,6 @@ public class CoursesController {
         return "courses/index";
     }
 
-    @GetMapping("/{id}")
-    public String lkUserGet(@PathVariable("id") @NotBlank String strId, Model model,
-                            HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
-        int id;
-        try {
-            id = Integer.parseInt(strId);
-        } catch (NumberFormatException e) {
-            return "errors/invalid";
-        }
-        CourseEntity courseEntity = courseRepository.findById(id).orElse(null);
-        if(courseEntity == null) return "errors/notfound";
-        model.addAttribute("course", new Course(courseEntity));
-        return "courses/course";
-    }
-
     @GetMapping("/add")
     public String add(@ModelAttribute("course") Course course, HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);

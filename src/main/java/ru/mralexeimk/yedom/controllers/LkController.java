@@ -50,17 +50,15 @@ public class LkController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-
+        model.addAttribute("user", user);
 
         return "lk/profile";
     }
 
     @GetMapping("/courses")
-    public String coursesGet(Model model, HttpSession session) {
+    public String coursesGet(HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
-
-        User user = (User) session.getAttribute("user");
 
 
         return "lk/courses";

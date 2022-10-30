@@ -4,15 +4,29 @@
     <meta charset="UTF-8">
     <title th:text="#{title}">Yedom</title>
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
+
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
 <!-- Header -->
-<div class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="10">
+<header class="navbar fixed-top navbar-expand-lg navbar-transparent">
     <div class="container unselectable header-container">
         <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="material-icons">home</i>
+                        <span th:text="#{title}">Yedom</span>
+                    </a>
+                </li>
+            </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/courses">
@@ -35,12 +49,9 @@
             </ul>
         </div>
     </div>
-</div>
+</header>
 
-<div class="container">
-    <br />
-    <br />
-    <br />
+<div class="bg">
     <br />
     <br />
     <br />
@@ -49,74 +60,80 @@
     <br />
 </div>
 
-<div class="main main-raised col-md-4 mx-auto text-center section">
-    <div class="container">
-        <form id="form" action="/lk" method="POST" th:method="POST" th:action="@{/lk}" th:object="${user}">
-            <!-- Username -->
-            <label th:value="#{auth.username}" for="username">Ник</label>
-            <br />
-            <input th:field="*{username}" id="username" name="username" type="text" th:value="${user.username}" value="Username" />
-            <br />
-            <br />
+<div class="bg">
+    <div class="main main-raised col-md-4 mx-auto text-center section">
+        <div class="container">
+            <form id="form" action="/lk" method="POST" th:method="POST" th:action="@{/lk}" th:object="${user}">
+                <!-- Username -->
+                <br />
+                <label th:value="#{auth.username}" for="username">Ник</label>
+                <br />
+                <input th:field="*{username}" id="username" name="username" type="text" th:value="${user.username}" value="Username" />
+                <br />
+                <br />
 
-            <!-- Email -->
-            <label th:value="#{auth.email}" for="email">Email</label>
-            <br />
-            <input disabled="disabled" style="border: none; color: green; text-align: center;" value="email" th:value="${user.email}" id="email" name="email" />
-            <input th:field="*{email}" hidden="hidden" style="border: none; color: green; text-align: center;" value="email" th:value="${user.email}" />
-            <br />
-            <br />
+                <!-- Email -->
+                <label th:value="#{auth.email}" for="email">Email</label>
+                <br />
+                <input disabled="disabled" style="border: none; color: green; text-align: center; width: auto" value="email" th:value="${user.email}" id="email" name="email" />
+                <input th:field="*{email}" hidden="hidden" style="border: none; color: green; text-align: center;" value="email" th:value="${user.email}" />
+                <br />
+                <br />
 
-            <!-- Role -->
-            <label th:value="#{auth.lk.role}" for="role">Роль</label>
-            <br />
-            <input disabled="disabled" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" id="role" name="role" />
-            <input th:field="*{role}" hidden="hidden" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" />
-            <br />
-            <br />
+                <!-- Role -->
+                <label th:value="#{auth.lk.role}" for="role">Роль</label>
+                <br />
+                <input disabled="disabled" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" id="role" name="role" />
+                <input th:field="*{role}" hidden="hidden" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" />
+                <br />
+                <br />
 
-            <!-- New password -->
-            <label th:value="#{auth.lk.new_password.change}" for="password">Новый пароль</label>
-            <br />
-            <input th:field="*{newPassword}" th:placeholder="#{auth.lk.new_password.change}" type="text" id="newPassword" name="newPassword" />
-            <br />
-            <br />
-            <input th:field="*{newPasswordRepeat}" th:placeholder="#{auth.lk.new_password.change.repeat}" type="text" id="newPasswordRepeat" name="newPasswordRepeat" />
-            <br />
-            <br />
+                <!-- New password -->
+                <label th:value="#{auth.lk.new_password.change}" for="password">Новый пароль</label>
+                <br />
+                <input th:field="*{newPassword}" th:placeholder="#{auth.lk.new_password.change}" type="text" id="newPassword" name="newPassword" />
+                <br />
+                <br />
+                <input th:field="*{newPasswordRepeat}" th:placeholder="#{auth.lk.new_password.change.repeat}" type="text" id="newPasswordRepeat" name="newPasswordRepeat" />
+                <br />
+                <br />
 
-            <!-- Password -->
-            <label th:value="#{auth.password}" for="role">Ваш пароль</label>
-            <br />
-            <input th:field="*{password}" th:placeholder="#{auth.password}" id="password" name="password" />
-            <br />
-            <br />
+                <!-- Password -->
+                <label th:value="#{auth.password}" for="role">Ваш пароль</label>
+                <br />
+                <input type="text" th:field="*{password}" th:placeholder="#{auth.password}" id="password" name="password" />
+                <br />
+                <br />
 
-            <!-- Buttons -->
-            <input type="submit" name="edit" th:name="edit" value="Сохранить" th:value="#{auth.lk.save}"/>
-            <br />
-            <br />
-            <input type="submit" name="log_out" th:name="log_out" value="Выйти" th:value="#{auth.lk.log_out}"/>
-            <br />
-            <br />
-        </form>
+                <!-- Buttons -->
+                <input type="submit" name="edit" th:name="edit" value="Сохранить" th:value="#{auth.lk.save}"/>
+                <br />
+                <br />
+                <input type="submit" name="log_out" th:name="log_out" value="Выйти" th:value="#{auth.lk.log_out}"/>
+                <br />
+                <br />
+            </form>
 
-        <!-- Errors -->
-        <div th:if="${#fields.hasErrors('user.*')}">
-            <h4  th:text="#{common.errors}">Errors:</h4>
-            <ul>
-                <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
-            </ul>
+            <!-- Errors -->
+            <div th:if="${#fields.hasErrors('user.*')}">
+                <h4  th:text="#{common.errors}">Errors:</h4>
+                <ul>
+                    <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Footer -->
 <footer class="footer" data-background-color="black">
-    <div class="container">
+    <div class="container unselectable footer-container">
         <nav class="float-left">
             <ul>
                 <li>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom" th:text="#{common.developers}">Разработчики</a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
+                        <i class="material-icons">developer_board</i>
+                        <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
                 </li>
             </ul>
         </nav>
@@ -125,6 +142,12 @@
         </div>
     </div>
 </footer>
+
+<script>
+    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+        console.log('particles-js loaded!');
+    });
+</script>
 
 <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
 <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>

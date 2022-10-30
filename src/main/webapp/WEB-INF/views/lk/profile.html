@@ -4,15 +4,29 @@
     <meta charset="UTF-8">
     <title th:text="#{title}">Yedom</title>
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
+
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
 <!-- Header -->
-<div class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="10">
+<header class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="150">
     <div class="container unselectable header-container">
         <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="material-icons">home</i>
+                        <span th:text="#{title}">Yedom</span>
+                    </a>
+                </li>
+            </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/courses">
@@ -35,39 +49,102 @@
             </ul>
         </div>
     </div>
-</div>
+</header>
 
-<div class="container">
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
+<div class="bg">
     <br />
     <br />
     <br />
     <br />
 </div>
 
-<div class="main main-raised col-md-4 mx-auto text-center section">
-    <div class="container">
-
-        <!-- Errors -->
-        <div th:if="${#fields.hasErrors('user.*')}">
-            <h4  th:text="#{common.errors}">Errors:</h4>
-            <ul>
-                <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
-            </ul>
+<div class="bg page-header">
+    <div class="main main-raised col-md-4 mx-auto text-center section">
+        <div class="profile-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 ml-auto mr-auto">
+                        <div class="profile">
+                            <div class="avatar">
+                                <img src="../../resources/images/default.png" style="width: 200px;"
+                                     alt="..." class="img-raised rounded-circle img-fluid">
+                            </div>
+                            <div class="name">
+                                <h3 th:text="${user.username}">Username</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Completed courses list -->
+                <div class="row">
+                    <div class="ml-auto mr-auto">
+                        <div class="profile-tabs">
+                            <div class="nav-align-center">
+                                <ul class="nav nav-pills nav-pills-icons" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#completed" role="tab" data-toggle="tab">
+                                            <i class="material-icons">check</i>
+                                            <span th:text="#{profile.courses.completed}">Completed courses</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#in_progress" role="tab" data-toggle="tab">
+                                            <i class="material-icons">hourglass_empty</i>
+                                            <span th:text="#{profile.courses.inprogress}">Курсы в процессе</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="tab-content gallery">
+                            <div class="tab-pane active" id="completed" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-hover">
+                                            <th>
+                                                <span th:text="#{profile.courses.course}">Course</span>
+                                            </th>
+                                            <th>
+                                                <span th:text="#{profile.courses.date}">Date</span>
+                                            </th>
+                                            <th>
+                                                <span th:text="#{profile.courses.score}">Score</span>
+                                            </th>
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                    <a th:text="#{course.title}">Title</a>
+                                                </td>
+                                                <td>
+                                                    <span th:text="#{profile.courses.date}">Date</span>
+                                                </td>
+                                                <td>
+                                                    <span th:text="#{profile.courses.score}">Score</span>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Footer -->
 <footer class="footer" data-background-color="black">
-    <div class="container">
+    <div class="container unselectable footer-container">
         <nav class="float-left">
             <ul>
                 <li>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom" th:text="#{common.developers}">Разработчики</a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
+                        <i class="material-icons">developer_board</i>
+                        <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
                 </li>
             </ul>
         </nav>
@@ -76,6 +153,12 @@
         </div>
     </div>
 </footer>
+
+<script>
+    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+        console.log('particles-js loaded!');
+    });
+</script>
 
 <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
 <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
