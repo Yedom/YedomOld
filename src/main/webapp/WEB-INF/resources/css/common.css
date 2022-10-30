@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    background-color: #a6eae4;
 }
 
 form {
@@ -125,4 +126,23 @@ footer {
     background-color: #47b00d;
     z-index: 3;
     width: 100%;
+}
+input[type=text] {
+    padding:5px;
+    border:2px solid #ccc;
+    -webkit-border-radius: 5px;
+    border-radius: 6px;
+}
+input[type=submit]{
+    padding: 7px;
+    background: #3a8d08;
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 10px;
+    color: white;
+}
+a:active, a:hover, a{
+    text-decoration: none;
+    color: #1b1e21;
 }
