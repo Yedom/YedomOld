@@ -58,7 +58,8 @@ public class TagsService {
     public ClientSocket createConnection(User user) {
         ClientSocket clientSocket = null;
         try {
-            if (clientSocketByEmail.containsKey(user.getEmail())) {
+            if (clientSocketByEmail.containsKey(user.getEmail())
+            && clientSocketByEmail.get(user.getEmail()).isAlive()) {
                 clientSocket = clientSocketByEmail.get(user.getEmail());
             } else {
                 clientSocket = new ClientSocket();

@@ -3,137 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title}">Yedom</title>
+    <!-- Info -->
+    <meta name="description" content="Yedom education platform">
+    <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Styles -->
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
     <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
 
+    <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
 </head>
-<body class="index-page sidebar-collapse">
-    <!-- Header -->
-    <header class="navbar fixed-top navbar-expand-lg navbar-transparent">
-        <div class="container unselectable header-container">
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="material-icons">home</i>
-                            <span th:text="#{title}">Yedom</span>
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="clickAddCourse()">
-                            <i class="material-icons">add</i>
-                            <span th:text="#{course.add}" class="hot-bar">Добавить курс</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/courses">
-                            <i class="material-icons">list</i>
-                            <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
-                        </a>
-                    </li>
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown">
-                            <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
-                        <div class="dropdown-menu dropdown-with-icons">
-                            <a href="/lk/profile" class="dropdown-item"><i class="material-icons">login</i>
-                                <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
-                            <a href="/lk/account" class="dropdown-item"><i class="material-icons">account_box</i>
-                                <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
-                            <a href="/lk/courses" class="dropdown-item"><i class="material-icons">edit</i>
-                                <span class="hot-bar" th:text="#{common.my_courses}">Мои курсы</span></a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
+<body class="bg index-page sidebar-collapse">
 
-    <!-- Search -->
-    <section class="py-5 text-center container">
-        <div class="row py-lg-5">
-            <div class="col-lg-6 col-md-8 mx-auto">
-                <input type="text" id="search" name="search" placeholder="Поиск курсов"
-                       th:name="search" th:placeholder="#{courses.search}" />
-                <br />
-                <br />
-                <input type="submit" onclick="clickSearch()" id="searchBtn"
-                       value="Поиск" th:value="#{common.search}" />
-                <br />
-                <br />
-                <div id="tagsToAdd" class="unselectable">
+<!-- Header -->
+<header class="navbar fixed-top navbar-transparent">
+    <div class="container unselectable header-container over-particles">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    <i class="material-icons">home</i>
+                    <span th:text="#{title}">Yedom</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link" style="color: white;" href="/courses">
+                    <i class="material-icons">list</i>
+                    <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
+                </a>
+            </li>
+            <li class="dropdown-menu-show nav-item">
+                <a class="dropdown-toggle nav-link" style="color: white;" href="#" data-toggle="dropdown">
+                    <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
+                <div class="dropdown-menu dropdown-with-icons">
+                    <a href="/lk/profile" class="dropdown-item"><i class="material-icons">login</i>
+                        <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
+                    <a href="/lk/account" class="dropdown-item"><i class="material-icons">account_box</i>
+                        <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
+                    <a href="/lk/courses" class="dropdown-item"><i class="material-icons">edit</i>
+                        <span class="hot-bar" th:text="#{common.my_courses}">Мои курсы</span></a>
                 </div>
-                <br />
-            </div>
-        </div>
-    </section>
+            </li>
+        </ul>
+    </div>
+</header>
 
-    <!-- Courses -->
-    <div class="container">
-        <h1 class="unselectable" th:text="#{courses.list}">Courses List</h1>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col" th:each="course : ${courses}">
-                <div class="card-plain card-blog card">
-                    <h4 class="card-title card-content unselectable">
-                        <a href="#" th:text="${course.title}">Course Title</a>
-                    </h4>
-                    <div class="unselectable perspective card-content card-header card-header-image">
-                        <a href="#">
-                            <img class="courseImg" src="../../resources/images/screen.png"
-                                 th:src="@{/resources/images/screen.png}" alt="...">
-                        </a>
-                    </div>
-                    <div class="card-body card-content unselectable">
-                        <p class="card-description" th:text="${course.description}">
-                            Course Description
-                        </p>
-                        <div class="card-footer unselectable">
-                            <div class="author">
-                                <a href="#">
-                                    <img src="../../resources/images/screen.png"
-                                         th:src="@{/resources/images/screen.png}" alt="..." class="avatar img-raised">
-                                    <span class="authorName" th:text="${course.author}">Author</span>
-                                </a>
-                            </div>
-                            <div class="stats">
-                                <i class="material-icons">visibility</i> <span class="views" th:text="${course.views}">145</span>
-                                &nbsp;&nbsp;
-                                <i class="material-icons">thumb_up</i> <span class="likes" th:text="${course.likes}">965</span>
-                            </div>
+<!-- Search -->
+<section class="py-5 text-center container">
+    <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <input type="text" id="search" name="search" placeholder="Поиск курсов"
+                   th:name="search" th:placeholder="#{courses.search}" />
+            <br />
+            <br />
+            <input type="submit" onclick="clickSearch()" id="searchBtn"
+                   value="Поиск" th:value="#{common.search}" />
+            <br />
+            <br />
+            <div id="tagsToAdd" class="unselectable">
+            </div>
+            <br />
+        </div>
+    </div>
+</section>
+
+<!-- Courses -->
+<div class="container">
+    <h1 class="unselectable" th:text="#{courses.list}">Courses List</h1>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <div class="col" th:each="course : ${courses}">
+            <div class="card-plain card-blog card">
+                <h4 class="card-title card-content unselectable">
+                    <a href="#" th:text="${course.title}">Course Title</a>
+                </h4>
+                <div class="unselectable perspective card-content card-header card-header-image">
+                    <a href="#">
+                        <img class="courseImg" src="../../resources/images/screen.png"
+                             th:src="@{/resources/images/screen.png}" alt="...">
+                    </a>
+                </div>
+                <div class="card-body card-content unselectable">
+                    <p class="card-description" th:text="${course.description}">
+                        Course Description
+                    </p>
+                    <div class="card-footer unselectable">
+                        <div class="author">
+                            <a href="#">
+                                <img src="../../resources/images/screen.png"
+                                     th:src="@{/resources/images/screen.png}" alt="..." class="avatar img-raised">
+                                <span class="authorName" th:text="${course.author}">Author</span>
+                            </a>
+                        </div>
+                        <div class="stats">
+                            <i class="material-icons">visibility</i> <span class="views" th:text="${course.views}">145</span>
+                            &nbsp;&nbsp;
+                            <i class="material-icons">thumb_up</i> <span class="likes" th:text="${course.likes}">965</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container unselectable footer-container">
-            <nav class="float-left">
-                <ul>
-                    <!-- GitHub link -->
-                    <li>
-                        <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
-                            <i class="material-icons">code</i>
-                            <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
-                    </li>
-                    <li>
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCC4M-40ckU4sroMTxGprBNg">
-                            <i class="material-icons">subscriptions</i>
-                            <span th:text="#{common.youtube}" class="hot-bar"> Youtube</span></a>
-                    </li>
-                </ul>
-            </nav>
-            <div class="copyright float-right">
-                2022-<script>document.write(new Date().getFullYear())</script> © <text th:text="#{title}">Yedom</text>
-            </div>
+<!-- Footer -->
+<footer class="footer">
+    <div class="container unselectable footer-container over-particles">
+        <nav class="float-left">
+            <ul>
+                <!-- GitHub link -->
+                <li>
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
+                        <i class="material-icons">code</i>
+                        <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCC4M-40ckU4sroMTxGprBNg">
+                        <i class="material-icons">subscriptions</i>
+                        <span th:text="#{common.youtube}" class="hot-bar"> Youtube</span></a>
+                </li>
+            </ul>
+        </nav>
+        <div class="copyright float-right">
+            2022-<script>document.write(new Date().getFullYear())</script> ©
+            <text th:text="#{title}">Yedom</text>
         </div>
-    </footer>
+    </div>
+</footer>
+
 <script th:inline="javascript">
     let search = $('#search');
     let els = $('.perspective');
@@ -192,9 +198,5 @@
         window.location.href = "/courses?search=" + span.innerText;
     }
 </script>
-
-<script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-<script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-<script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
 </body>
 </html>
