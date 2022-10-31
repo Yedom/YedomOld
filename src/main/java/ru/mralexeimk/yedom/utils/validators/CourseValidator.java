@@ -19,7 +19,7 @@ public class CourseValidator implements Validator {
     }
 
     public void reject(String field, String msg, Errors errors) {
-        errors.rejectValue(field, "",
+        errors.rejectValue(field, msg,
                 languageUtil.getLocalizedMessage(msg));
     }
 

@@ -91,7 +91,7 @@ public class CoursesController {
 
         if(!rolesService.hasPermission(user, "course.add")) {
             bindingResult.rejectValue("title",
-                    "",
+                    "common.permission",
                     languageUtil.getLocalizedMessage("common.permission"));
             return "courses/add";
         }

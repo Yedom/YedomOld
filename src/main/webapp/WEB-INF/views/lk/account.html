@@ -11,7 +11,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-    <link rel="stylesheet" href="../../resources/css/icon.css" th:href="@{/resources/css/icon.css}">
+    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
 
     <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -124,10 +124,10 @@
             </form>
 
             <!-- Errors -->
-            <div class="errors container" th:if="${#fields.hasErrors('course.*')}">
+            <div class="errors container" th:if="${#fields.hasErrors('user.*')}">
                 <h4 th:text="#{common.errors}">Errors:</h4>
                 <ul>
-                    <li style="color: red;" th:each="err : ${#fields.errors('course.*')}" th:text="${err}" />
+                    <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
                 </ul>
             </div>
         </div>

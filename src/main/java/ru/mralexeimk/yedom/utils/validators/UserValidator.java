@@ -31,7 +31,7 @@ public class UserValidator implements Validator {
 
     public void reject(String field, String msg, Errors errors) {
         if(!errors.hasFieldErrors(field)) {
-            errors.rejectValue(field, "",
+            errors.rejectValue(field, msg,
                     languageUtil.getLocalizedMessage(msg));
         }
     }
