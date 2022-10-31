@@ -73,18 +73,19 @@ public class UserValidator implements Validator {
                 user.getUsername().length() > YedomConfig.maxUsernameLength) {
             reject("username", "auth.username.size", errors);
         }
-        else if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        else if (userRepository.findByUsername(user.getUsername()).isPresent()
+                && userRepository.findByEmail(user.getEmail()).isPresent()
+                && userRepository.findByUsername(user.getUsername()).get().getId() !=
+                userRepository.findByEmail(user.getEmail()).get().getId()) {
             reject("username", "auth.username.in_use", errors);
         }
-        if(user.getNewPassword() == null || user.getNewPassword().equals("")) {
-            reject("newPassword", "auth.lk.new_password.empty", errors);
-        }
-        else if(user.getNewPassword().length() < YedomConfig.minPasswordLength) {
-            reject("newPassword", "auth.lk.new_password.size", errors);
-        }
-        else if(user.getNewPasswordRepeat() == null ||
-                !user.getNewPassword().equals(user.getNewPasswordRepeat())) {
-            reject("newPassword", "auth.lk.new_password.different", errors);
+        if(user.getNewPassword() != null && !user.getNewPassword().equals("")) {
+            if (user.getNewPassword().length() < YedomConfig.minPasswordLength) {
+                reject("newPassword", "auth.lk.new_password.size", errors);
+            } else if (user.getNewPasswordRepeat() == null ||
+                    !user.getNewPassword().equals(user.getNewPasswordRepeat())) {
+                reject("newPassword", "auth.lk.new_password.different", errors);
+            }
         }
         UserEntity userEntity = userRepository.findByEmail(user.getEmail()).orElse(null);
         if(user.getPassword() == null || user.getPassword().equals("")) {

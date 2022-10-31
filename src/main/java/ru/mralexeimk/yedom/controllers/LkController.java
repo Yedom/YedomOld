@@ -22,14 +22,12 @@ public class LkController {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
-    private final LanguageUtil languageUtil;
 
     @Autowired
-    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, LanguageUtil languageUtil) {
+    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
-        this.languageUtil = languageUtil;
     }
 
     @GetMapping("/account")
@@ -94,10 +92,11 @@ public class LkController {
         if (bindingResult.hasErrors())
             return "lk/account";
 
-        user.setPassword(passwordEncoder.encode(user.getNewPassword()));
+        if(user.getNewPassword() != null && !user.getNewPassword().equals("")) {
+            userEntity.setPassword(passwordEncoder.encode(user.getNewPassword()));
+        }
 
         userEntity.setUsername(user.getUsername());
-        userEntity.setPassword(user.getPassword());
 
         userRepository.save(userEntity);
         session.setAttribute("user", user);
