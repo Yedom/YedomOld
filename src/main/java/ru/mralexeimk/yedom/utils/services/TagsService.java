@@ -32,19 +32,18 @@ public class TagsService {
 
     public String sendSocket(User user, SocketType socketType, String msg, boolean resending) {
         String response = "";
+        ClientSocket clientSocket = createConnection(user);
         try {
-            ClientSocket clientSocket = createConnection(user);
             if(!clientSocket.isActive()) {
                 clientSocket.activate();
                 clientSocket.getSocket().setSoTimeout(YedomConfig.REC_TIMEOUT);
 
-                clientSocket.sendMessage(socketType.toString() + ":" + msg);
+                clientSocket.sendMessage(socketType + ":" + msg);
                 response = clientSocket.receiveMessage();
                 clientSocket.deactivate();
             }
         } catch (Exception ex) {
-            if (clientSocketByEmail.containsKey(user.getEmail())) {
-                ClientSocket clientSocket = clientSocketByEmail.get(user.getEmail());
+            if (clientSocket != null) {
                 clientSocket.close();
                 clientSocketByEmail.remove(user.getEmail());
                 if(!resending)
@@ -58,8 +57,7 @@ public class TagsService {
     public ClientSocket createConnection(User user) {
         ClientSocket clientSocket = null;
         try {
-            if (clientSocketByEmail.containsKey(user.getEmail())
-            && clientSocketByEmail.get(user.getEmail()).isAlive()) {
+            if (clientSocketByEmail.containsKey(user.getEmail())) {
                 clientSocket = clientSocketByEmail.get(user.getEmail());
             } else {
                 clientSocket = new ClientSocket();

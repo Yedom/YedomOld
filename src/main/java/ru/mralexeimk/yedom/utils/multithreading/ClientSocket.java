@@ -51,10 +51,6 @@ public class ClientSocket {
         }
     }
 
-    public boolean isAlive() {
-        return socket.isConnected();
-    }
-
     public boolean isActive() {
         return isActive;
     }

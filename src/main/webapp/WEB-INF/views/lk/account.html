@@ -124,10 +124,10 @@
             </form>
 
             <!-- Errors -->
-            <div th:if="${#fields.hasErrors('user.*')}">
-                <h4  th:text="#{common.errors}">Errors:</h4>
+            <div class="errors container" th:if="${#fields.hasErrors('course.*')}">
+                <h4 th:text="#{common.errors}">Errors:</h4>
                 <ul>
-                    <li style="color: red;" th:each="err : ${#fields.errors('user.*')}" th:text="${err}" />
+                    <li style="color: red;" th:each="err : ${#fields.errors('course.*')}" th:text="${err}" />
                 </ul>
             </div>
         </div>

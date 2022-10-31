@@ -92,7 +92,7 @@ public class CoursesController {
         if(!rolesService.hasPermission(user, "course.add")) {
             bindingResult.rejectValue("title",
                     "",
-                    languageUtil.getLocalizedMessage("no.permission"));
+                    languageUtil.getLocalizedMessage("common.permission"));
             return "courses/add";
         }
 
@@ -137,7 +137,7 @@ public class CoursesController {
                 String search = CommonUtils.getLastN(
                         tags.split(" "),
                         YedomConfig.MAX_WORDS_IN_REQUEST);
-                String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search);
+                String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search.strip());
 
                 if (!response.equals("")) {
                     List<Integer> IDS = tagsService.responseIdsToList(response);

@@ -66,21 +66,24 @@
     <br />
     <br />
     <br />
+    <br />
 </div>
 
-<div class="bg page-header">
+<div class="bg">
     <div class="main main-raised col-md-4 mx-auto text-center section">
-        <div class="container">
+        <div class="container expanded-form">
             <form th:method="POST" th:action="@{/courses/add}" th:object="${course}">
                 <label th:for="title" th:text="#{course.title}">Название курса</label>:
                 <br/>
-                <textarea rows="2" cols="60" th:field="*{title}" id="title"></textarea>
-                <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
+                <textarea class="textarea-add" th:field="*{title}" id="title"></textarea>
+                <br />
+                <label th:for="title" th:text="#{course.description}">Описание курса</label>:
+                <br/>
+                <textarea class="textarea-add" th:field="*{description}" id="description"></textarea>
                 <br />
                 <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
                 <br/>
-                <textarea rows="8" cols="40" th:field="*{tags}" id="tags"></textarea>
-                <div style="color:red" th:if="${#fields.hasErrors('tags')}" th:errors="*{tags}">Tags Error</div>
+                <textarea class="textarea-add" rows="10" th:field="*{tags}" id="tags"></textarea>
                 <br />
                 <div id="tagsToAdd" class="unselectable">
                 </div>
@@ -89,6 +92,14 @@
                 <input type="submit" value="Сохранить курс" th:value="#{course.add}"/>
                 <br />
             </form>
+
+            <!-- Errors -->
+            <div class="errors container" th:if="${#fields.hasErrors('course.*')}">
+                <h4 th:text="#{common.errors}">Errors:</h4>
+                <ul>
+                    <li style="color: red;" th:each="err : ${#fields.errors('course.*')}" th:text="${err}" />
+                </ul>
+            </div>
         </div>
     </div>
 </div>

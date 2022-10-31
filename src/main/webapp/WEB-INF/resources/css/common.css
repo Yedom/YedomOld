@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    position: relative;
 }
 .header-container {
     background-color: #3a8d08;
@@ -14,6 +15,15 @@ body {
 .banner {
     width: 100%;
     height: 100%;
+}
+#particles-container {
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    user-select: none;
 }
 .over-particles {
     z-index: 3;
@@ -47,6 +57,15 @@ form {
     background-size: cover;
     background-color: #a6eae4;
 }
+.errors {
+    width: 80%;
+}
+.expanded-form form {
+    width: 90%;
+}
+.textarea-add {
+    width: 100%;
+}
 #tagsToAdd span {
     display: inline-block;
     margin: 5px;
@@ -77,13 +96,6 @@ div.editable {
 }
 .hot-bar {
     font-size: 13px;
-}
-#particles-container {
-    z-index: 2;
-    width: 100%;
-    height: 99%;
-    position: absolute;
-    user-select: none;
 }
 * {
     margin: 0;
