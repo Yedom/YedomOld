@@ -64,6 +64,7 @@
   <div class="main main-raised col-md-4 mx-auto text-center section">
     <input id="email" name="email" type="text" placeholder="email" />
     <br />
+    <br />
     <p id="label" hidden="hidden" style="color: green;" th:text="#{auth.password.restore.sent}"></p>
     <br />
     <p id="error" style="color:red"></p>
@@ -100,6 +101,12 @@
 <script th:inline="javascript">
   particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
     console.log('particles-js loaded!');
+  });
+
+  document.addEventListener("keypress", function(e) {
+    if(e.key === "Enter") {
+      clickRestore();
+    }
   });
 
   function clickRestore() {

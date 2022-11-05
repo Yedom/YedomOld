@@ -36,17 +36,50 @@ public class UserEntity {
     private String role = "user";
 
     @Column(name = "created_on")
-    private Timestamp createOn;
+    private Timestamp createdOn = CommonUtils.getCurrentTimestamp();
 
     @Column(name = "last_login")
-    private Timestamp lastLogin;
+    private Timestamp lastLogin = CommonUtils.getCurrentTimestamp();
 
+    @Column(name = "balance")
+    private int balance = 0;
+
+    @Column(name = "completed_courses_ids")
+    private String completedCoursesIds = "";
+
+
+    @Column(name = "current_courses_ids")
+    private String currentCoursesIds = "";
+
+
+    @Column(name = "courses_ids")
+    private String coursesIds = "";
+
+
+    @Column(name = "draft_courses_ids")
+    private String draftCoursesIds = "";
+
+
+    @Column(name = "friends_ids")
+    private String friendsIds = "";
+
+    @Column(name = "following_ids")
+    private String followingIds = "";
+
+    @Column(name = "followers_ids")
+    private String followersIds = "";
+
+    @Column(name = "organizations_ids")
+    private String organizationsIds = "";
+
+    @Column(name = "in_organizations_ids")
+    private String inOrganizationsIds = "";
+
+    // Add to database constructor
     public UserEntity(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();
-        this.createOn = CommonUtils.getCurrentTimestamp();
-        this.lastLogin = CommonUtils.getCurrentTimestamp();
     }
 
     @Override
@@ -55,11 +88,6 @@ public class UserEntity {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         UserEntity userEntity = (UserEntity) o;
         return Comparator.comparingInt(UserEntity::getId)
-                .thenComparing(UserEntity::getUsername)
-                .thenComparing(UserEntity::getPassword)
-                .thenComparing(UserEntity::getEmail)
-                .thenComparing(UserEntity::getCreateOn)
-                .thenComparing(UserEntity::getLastLogin)
                 .compare(this, userEntity) == 0;
     }
 
@@ -70,8 +98,22 @@ public class UserEntity {
 
     @Override
     public String toString() {
-        return "User [id: "+id+", username: "+username+
-                ", email: "+email+", createdOn: "+createOn+
-                ", lastLogin: "+lastLogin+"]";
+        return "UserEntity{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
+                ", createOn=" + createdOn +
+                ", lastLogin=" + lastLogin +
+                ", balance=" + balance +
+                ", completedCoursesIds='" + completedCoursesIds + '\'' +
+                ", currentCoursesIds='" + currentCoursesIds + '\'' +
+                ", coursesIds='" + coursesIds + '\'' +
+                ", draftCoursesIds='" + draftCoursesIds + '\'' +
+                ", friendsIds='" + friendsIds + '\'' +
+                ", followingIds='" + followingIds + '\'' +
+                ", followersIds='" + followersIds + '\'' +
+                '}';
     }
 }

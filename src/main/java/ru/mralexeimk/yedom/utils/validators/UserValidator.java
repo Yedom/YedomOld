@@ -7,7 +7,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 

@@ -10,8 +10,8 @@ import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.enums.SocketType;
-import ru.mralexeimk.yedom.interfaces.repositories.CourseRepository;
-import ru.mralexeimk.yedom.interfaces.repositories.TagRepository;
+import ru.mralexeimk.yedom.database.repositories.CourseRepository;
+import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
@@ -95,26 +95,6 @@ public class CoursesController {
                     languageUtil.getLocalizedMessage("common.permission"));
             return "courses/add";
         }
-
-        Course cloneCourse = new Course(course);
-        cloneCourse.setTags(
-                CommonUtils.clearSpacesAroundSymbol(
-                        cloneCourse.getTags().replaceAll(", ", "@"), "@")
-                        .trim());
-        courseValidator.validate(cloneCourse, bindingResult);
-
-        if(bindingResult.hasErrors()) {
-            return "courses/add";
-        }
-
-        cloneCourse.setAuthor(user.getUsername());
-        cloneCourse.setViews(0);
-        cloneCourse.setLikes(0);
-        cloneCourse.setSponsors("");
-
-        CourseEntity courseEntity = new CourseEntity(cloneCourse);
-
-        courseRepository.save(courseEntity);
 
         return "redirect:/courses";
     }

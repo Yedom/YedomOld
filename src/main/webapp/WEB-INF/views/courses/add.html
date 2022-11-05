@@ -69,7 +69,7 @@
     <br />
 </div>
 
-<div class="bg">
+<div class="bg unselectable">
     <div class="main main-raised col-md-4 mx-auto text-center section">
         <div class="container expanded-form">
             <form th:method="POST" th:action="@{/courses/add}" th:object="${course}">
@@ -77,9 +77,9 @@
                 <br/>
                 <textarea class="textarea-add" th:field="*{title}" id="title"></textarea>
                 <br />
-                <label th:for="title" th:text="#{course.description}">Описание курса</label>:
+                <label th:for="description" th:text="#{course.description}">Описание курса</label>:
                 <br/>
-                <textarea class="textarea-add" th:field="*{description}" id="description"></textarea>
+                <textarea class="textarea-add" rows="5" th:field="*{description}" id="description"></textarea>
                 <br />
                 <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
                 <br/>
@@ -89,7 +89,7 @@
                 </div>
                 <br />
                 <br />
-                <input type="submit" value="Сохранить курс" th:value="#{course.add}"/>
+                <input type="submit" value="Сохранить курс" th:value="#{course.save}"/>
                 <br />
             </form>
 

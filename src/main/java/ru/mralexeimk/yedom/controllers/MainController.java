@@ -21,4 +21,9 @@ public class MainController {
             response.getWriter().write("User-agent: *\nDisallow: /\n");
         } catch (IOException ignored) {}
     }
+
+    @RequestMapping("favicon.ico")
+    String favicon() {
+        return "forward:/resources/favicon.ico";
+    }
 }

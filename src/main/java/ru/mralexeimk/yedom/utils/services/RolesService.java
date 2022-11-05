@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.database.entities.RoleEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.repositories.RoleRepository;
+import ru.mralexeimk.yedom.database.repositories.RoleRepository;
 import ru.mralexeimk.yedom.models.User;
 
 import java.util.*;

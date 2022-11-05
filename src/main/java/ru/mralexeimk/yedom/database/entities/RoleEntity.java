@@ -33,9 +33,6 @@ public class RoleEntity {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         RoleEntity roleEntity = (RoleEntity) o;
         return Comparator.comparingInt(RoleEntity::getId)
-                .thenComparing(RoleEntity::getRole)
-                .thenComparing(RoleEntity::getInherits)
-                .thenComparing(RoleEntity::getPermissions)
                 .compare(this, roleEntity) == 0;
     }
 

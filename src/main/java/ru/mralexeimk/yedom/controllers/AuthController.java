@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.interfaces.validation.OrderedChecks;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;

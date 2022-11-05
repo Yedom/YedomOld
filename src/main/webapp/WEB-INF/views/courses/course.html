@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title th:text="#{title}">Yedom</title>
+
   <!-- Info -->
   <meta name="description" content="Yedom education platform">
   <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
@@ -19,7 +20,6 @@
   <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
   <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
   <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
@@ -60,15 +60,18 @@
   </div>
 </header>
 
-<div class="bg page-header">
+<div class="bg">
+  <br />
+  <br />
+  <br />
+  <br />
+</div>
+
+<div class="bg page-header unselectable">
   <div class="main main-raised col-md-4 mx-auto text-center section">
-    <input id="password" name="password" type="text" th:placeholder="#{auth.password}" placeholder="Пароль" />
-    <br />
-    <br />
-    <input id="restore" onclick="clickApply()" name="restore" type="submit" value="Подтвердить пароль" th:value="#{auth.password.apply}"/>
-    <br />
-    <p id="error" style="color:red"></p>
-    <br />
+    <div class="container">
+
+    </div>
   </div>
 </div>
 
@@ -97,34 +100,10 @@
   </div>
 </footer>
 
-<script th:inline="javascript">
+<script>
   particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
     console.log('particles-js loaded!');
   });
-
-  document.addEventListener("keypress", function(e) {
-    if(e.key === "Enter") {
-      clickApply();
-    }
-  });
-
-  function clickApply() {
-    let data = {operation: "newpassword", password: $('#password').val()};
-    const response = fetch("/auth/newpassword", {
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    response.then(function (response) {
-      if (response.status === 200) {
-        window.location.href = "/auth/login";
-      } else if(response.status === 500) {
-        $('#error').text([[#{common.error}]]);
-      } else if(response.status === 501) {
-        $('#error').text([[#{auth.password.size}]]);
-      }
-    });
-  }
 </script>
 </body>
 </html>

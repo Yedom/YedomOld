@@ -69,7 +69,7 @@
     <br />
 </div>
 
-<div class="bg">
+<div class="bg unselectable">
     <div class="main main-raised col-md-4 mx-auto text-center section">
         <div class="container">
             <form id="form" action="/lk" method="POST" th:method="POST" th:action="@{/lk}" th:object="${user}">
@@ -84,16 +84,16 @@
                 <!-- Email -->
                 <label th:value="#{auth.email}" for="email">Email</label>
                 <br />
-                <input disabled="disabled" style="border: none; color: green; text-align: center; width: auto" value="email" th:value="${user.email}" id="email" name="email" />
-                <input th:field="*{email}" hidden="hidden" style="border: none; color: green; text-align: center;" value="email" th:value="${user.email}" />
+                <input disabled="disabled" style="border: none; color: gray; text-align: center; width: auto" value="email" th:value="${user.email}" id="email" name="email" />
+                <input th:field="*{email}" hidden="hidden" value="email" th:value="${user.email}" />
                 <br />
                 <br />
 
                 <!-- Role -->
                 <label th:value="#{auth.lk.role}" for="role">Роль</label>
                 <br />
-                <input disabled="disabled" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" id="role" name="role" />
-                <input th:field="*{role}" hidden="hidden" style="border: none; color: green; text-align: center;" value="user" th:value="${user.role}" />
+                <input disabled="disabled" style="border: none; color: gray; text-align: center;" value="user" th:value="${user.role}" id="role" name="role" />
+                <input th:field="*{role}" hidden="hidden" value="user" th:value="${user.role}" />
                 <br />
                 <br />
 
@@ -159,10 +159,23 @@
     </div>
 </footer>
 
-<script>
+<script th:inline="javascript">
     particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
         console.log('particles-js loaded!');
     });
+
+    let role = $('#role');
+
+    if(role.val() === 'user') {
+        role.val([[#{auth.lk.user}]]);
+    }
+    else if(role.val() === 'moderator') {
+        role.css('color', 'green');
+        role.val([[#{auth.lk.moderator}]]);
+    } else if(role.val() === 'admin') {
+        role.css('color', 'red');
+        role.val([[#{auth.lk.admin}]]);
+    }
 
     let navbar = $('.navbar-scroll');
 

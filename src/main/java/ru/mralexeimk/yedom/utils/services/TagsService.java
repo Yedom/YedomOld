@@ -34,14 +34,9 @@ public class TagsService {
         String response = "";
         ClientSocket clientSocket = createConnection(user);
         try {
-            if(!clientSocket.isActive()) {
-                clientSocket.activate();
-                clientSocket.getSocket().setSoTimeout(YedomConfig.REC_TIMEOUT);
-
-                clientSocket.sendMessage(socketType + ":" + msg);
-                response = clientSocket.receiveMessage();
-                clientSocket.deactivate();
-            }
+            clientSocket.getSocket().setSoTimeout(YedomConfig.REC_TIMEOUT);
+            clientSocket.sendMessage(socketType + ":" + msg);
+            response = clientSocket.receiveMessage();
         } catch (Exception ex) {
             if (clientSocket != null) {
                 clientSocket.close();
@@ -65,7 +60,9 @@ public class TagsService {
                 clientSocket.sendMessage(user.getEmail());
                 clientSocketByEmail.put(user.getEmail(), clientSocket);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return clientSocket;
     }
 

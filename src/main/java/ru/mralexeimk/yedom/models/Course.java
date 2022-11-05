@@ -2,54 +2,43 @@ package ru.mralexeimk.yedom.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.validation.FirstOrder;
-import ru.mralexeimk.yedom.interfaces.validation.SecondOrder;
-import ru.mralexeimk.yedom.interfaces.validation.ThirdOrder;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class Course {
-    @Size(min = YedomConfig.minCourseLength, max = YedomConfig.maxCourseLength, message = "{course.title.size}")
-    private String title;
-    private String author;
-    private String description;
-    private String tags;
-    private int views;
-    private int likes;
-    private String sponsors;
+@NoArgsConstructor
+public class Course extends DraftCourse {
+    protected int views = 0;
+    protected int likes = 0;
+    protected int investments = 0;
+    protected boolean acceptTasks = false;
 
-
-    public Course(String title, String description, String author, String tags) {
-        this.title = title;
-        this.author = author;
-        this.description = description;
-        this.tags = tags;
-        this.views = 0;
-        this.likes = 0;
-        this.sponsors = "";
+    public Course(String title, boolean byOrganization, int creatorId,
+                  String description, String tags, int views, int likes,
+                  int investments, boolean acceptTasks) {
+        super(title, byOrganization, creatorId, description, tags);
+        this.views = views;
+        this.likes = likes;
+        this.investments = investments;
+        this.acceptTasks = acceptTasks;
     }
 
+    // Course by CourseEntity
     public Course(CourseEntity courseEntity) {
-        this(courseEntity.getTitle(), courseEntity.getAuthor(), courseEntity.getDescription(),
-                courseEntity.getTags(), courseEntity.getViews(),
-                courseEntity.getLikes(), courseEntity.getSponsors());
+        this(courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
+                courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
+                courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks());
     }
 
     public Course(Course a) {
-        this(a.getTitle(), a.getDescription(), a.getAuthor(),
-                a.getTags(), a.getViews(), a.getLikes(),
-                a.getSponsors());
-    }
-
-    public Course() {
-
+        this(a.getTitle(), a.isByOrganization(), a.getCreatorId(),
+                a.getDescription(), a.getTags(), a.getViews(),
+                a.getLikes(), a.getInvestments(), a.isAcceptTasks());
     }
 }

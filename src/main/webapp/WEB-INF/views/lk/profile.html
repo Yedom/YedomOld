@@ -67,7 +67,7 @@
     <br />
 </div>
 
-<div class="bg page-header">
+<div class="bg page-header unselectable">
     <div class="main main-raised col-md-4 mx-auto text-center section">
         <div class="profile-content">
             <div class="container">
@@ -81,61 +81,17 @@
                             <div class="name">
                                 <h3 th:text="${user.username}">Username</h3>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Completed courses list -->
-                <div class="row">
-                    <div class="ml-auto mr-auto">
-                        <div class="profile-tabs">
-                            <div class="nav-align-center">
-                                <ul class="nav nav-pills nav-pills-icons" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#completed" role="tab" data-toggle="tab">
-                                            <i class="material-icons">check</i>
-                                            <span th:text="#{profile.courses.completed}">Completed courses</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#in_progress" role="tab" data-toggle="tab">
-                                            <i class="material-icons">hourglass_empty</i>
-                                            <span th:text="#{profile.courses.inprogress}">Courses in progress</span>
-                                        </a>
-                                    </li>
-                                </ul>
+
+                            <!-- Created on -->
+                            <div class="created-on">
+                                <h6 th:text="#{profile.last_login}">Last login</h6>
+                                <h6 th:text="${T(ru.mralexeimk.yedom.utils.CommonUtils).calculateTimeLoginAgo(user.lastLogin)}"></h6>
                             </div>
-                        </div>
-                        <br />
-                        <div class="tab-content gallery">
-                            <div class="tab-pane active" id="completed" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <table class="table table-hover">
-                                            <th>
-                                                <span th:text="#{profile.courses.course}">Course</span>
-                                            </th>
-                                            <th>
-                                                <span th:text="#{profile.courses.date}">Date</span>
-                                            </th>
-                                            <th>
-                                                <span th:text="#{profile.courses.score}">Score</span>
-                                            </th>
-                                            <tbody>
-                                            <tr>
-                                                <td>
-                                                    <a th:text="#{course.title}">Title</a>
-                                                </td>
-                                                <td>
-                                                    <span th:text="#{profile.courses.date}">Date</span>
-                                                </td>
-                                                <td>
-                                                    <span th:text="#{profile.courses.score}">Score</span>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+
+                            <!-- Last login -->
+                            <div class="last-login">
+                                <h6 th:text="#{profile.created_on}">Created on</h6>
+                                <h6 th:text="${T(ru.mralexeimk.yedom.utils.CommonUtils).getCreatedOnDate(user.createdOn)}"></h6>
                             </div>
                         </div>
                     </div>

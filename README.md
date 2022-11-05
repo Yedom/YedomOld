@@ -1,5 +1,9 @@
 # Yedom
- Yedom education platform
- <hr />
- <p align="center"><b>Database architecture:</b></p>  
- <p align="center"><img src="https://user-images.githubusercontent.com/25348980/200096807-0a50a561-ffb8-451b-b687-e48e3cd6ec1c.png" width="800"></img></p>  
+Yedom education platform
+<hr />
+<h1>Links:</h1>
+<ul>
+    <li>
+        <a href="https://dbdesigner.page.link/Z3VkkUbzMkNAPp4f8"><b>Database architecture:</b></a>
+    </li>
+</ul>

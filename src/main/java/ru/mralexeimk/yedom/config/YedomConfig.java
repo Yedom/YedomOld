@@ -23,6 +23,10 @@ public class YedomConfig {
     public static final int minCourseLength = 10;
     public static final int maxCourseLength = 100;
 
+    // Organization config
+    public static final int minOrganizationNameLength = 3;
+    public static final int maxOrganizationNameLength = 40;
+
     // Smart Search config
     public static final String REC_HOST = "127.0.0.1";
     public static final int REC_PORT = 2003;

@@ -7,14 +7,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotBlank;
 
 @Controller
 @RequestMapping("/lk")
@@ -49,6 +47,18 @@ public class LkController {
 
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
+
+        return "lk/profile";
+    }
+
+    @GetMapping("/profile/{username}")
+    public String profileGetAny(Model model, HttpSession session, @PathVariable String username) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+        if(userEntity == null) return "redirect:/errors/notfound";
+        model.addAttribute("user", new User(userEntity));
 
         return "lk/profile";
     }
