@@ -89,12 +89,17 @@ public class CoursesController {
 
         User user = (User) session.getAttribute("user");
 
-        if(!rolesService.hasPermission(user, "course.add")) {
+        if(!rolesService.hasPermission(user, "courses.add")) {
             bindingResult.rejectValue("title",
                     "common.permission",
                     languageUtil.getLocalizedMessage("common.permission"));
             return "courses/add";
         }
+
+        course.setByOrganization(false);
+        course.setCreatorId(user.getId());
+        CourseEntity courseEntity = new CourseEntity(course);
+        courseRepository.save(courseEntity);
 
         return "redirect:/courses";
     }

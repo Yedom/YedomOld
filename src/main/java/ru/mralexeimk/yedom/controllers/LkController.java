@@ -7,23 +7,29 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/lk")
 public class LkController {
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LkController(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(UserRepository userRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
     }
@@ -41,27 +47,90 @@ public class LkController {
     }
 
     @GetMapping("/profile")
-    public String profileGet(Model model, HttpSession session) {
+    public String profileGet(Model model,
+                                 @RequestParam(required = false, name = "username") String username,
+                                 HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        User user = (User) session.getAttribute("user");
-        model.addAttribute("user", user);
+        if(username == null) {
+            User user = (User) session.getAttribute("user");
+            model.addAttribute("user", user);
+            model.addAttribute("my_profile", true);
+        }
+        else {
+            UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+            if(userEntity == null) return "redirect:/errors/notfound";
+            model.addAttribute("user", new User(userEntity));
+            model.addAttribute("my_profile", false);
+        }
 
         return "lk/profile";
     }
 
-    @GetMapping("/profile/{username}")
-    public String profileGetAny(Model model, HttpSession session, @PathVariable String username) {
+    @GetMapping("/profile/courses")
+    public String profileCoursesGet(Model model,
+                             @RequestParam(required = false, name = "username") String username,
+                             HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
-        if(userEntity == null) return "redirect:/errors/notfound";
-        model.addAttribute("user", new User(userEntity));
-        model.addAttribute("my_profile", false);
+        List<Integer> completedCoursesIds = new ArrayList<>();
+        List<Integer> currentCoursesIds = new ArrayList<>();
 
-        return "lk/profile";
+        try {
+            if (username == null) {
+                User user = (User) session.getAttribute("user");
+                completedCoursesIds = Arrays.stream(user.getCompletedCoursesIds().split(","))
+                        .map(Integer::parseInt).toList();
+                currentCoursesIds = Arrays.stream(user.getCurrentCoursesIds().split(","))
+                        .map(Integer::parseInt).toList();
+            } else {
+                UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+                if (userEntity == null) return "redirect:/errors/notfound";
+
+                completedCoursesIds = Arrays.stream(userEntity.getCompletedCoursesIds().split(","))
+                        .map(Integer::parseInt).toList();
+                currentCoursesIds = Arrays.stream(userEntity.getCurrentCoursesIds().split(","))
+                        .map(Integer::parseInt).toList();
+            }
+        } catch (Exception ignored) {}
+
+        model.addAttribute("completedCourses",
+                courseRepository.findAllById(completedCoursesIds));
+        model.addAttribute("currentCourses",
+                courseRepository.findAllById(currentCoursesIds));
+
+        return "lk/profile/courses";
+    }
+
+    @GetMapping("/profile/friends")
+    public String profileFriendsGet(Model model,
+                                    @RequestParam(required = false, name = "username") String username,
+                                    HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        List<Integer> friendsIds = new ArrayList<>();
+
+        try {
+            if (username == null) {
+                User user = (User) session.getAttribute("user");
+                friendsIds = Arrays.stream(user.getFriendsIds().split(","))
+                        .map(Integer::parseInt).toList();
+            } else {
+                UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+                if (userEntity == null) return "redirect:/errors/notfound";
+
+                friendsIds = Arrays.stream(userEntity.getFriendsIds().split(","))
+                        .map(Integer::parseInt).toList();
+            }
+        } catch (Exception ignored) {}
+
+        model.addAttribute("friends",
+                userRepository.findAllById(friendsIds));
+
+        return "lk/profile/friends";
     }
 
     @GetMapping("/courses")
