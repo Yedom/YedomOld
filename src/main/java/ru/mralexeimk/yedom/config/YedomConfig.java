@@ -6,9 +6,13 @@ public class YedomConfig {
     public static final String DOMAIN = "http://"+HOST+".ru/";
 
     // Database config
-    public static final String DB_URL = "jdbc:postgresql://89.223.66.51:5432/default_db";
-    public static final String DB_USERNAME = "gen_user";
-    public static final String DB_PASSWORD = "2001mk2001";
+    //public static final String DB_URL = "jdbc:postgresql://89.223.66.51:5432/default_db";
+    //public static final String DB_USERNAME = "gen_user";
+    //public static final String DB_PASSWORD = "2001mk2001";
+
+    public static final String DB_URL = "jdbc:postgresql://localhost/yedom";
+    public static final String DB_USERNAME = "postgres";
+    public static final String DB_PASSWORD = "root";
 
     // Email Service config
     public static final int confirmCodeTimeout = 600;

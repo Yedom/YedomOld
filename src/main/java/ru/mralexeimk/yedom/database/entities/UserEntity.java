@@ -2,16 +2,12 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -23,13 +19,13 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "role")
@@ -47,18 +43,14 @@ public class UserEntity {
     @Column(name = "completed_courses_ids")
     private String completedCoursesIds = "";
 
-
     @Column(name = "current_courses_ids")
     private String currentCoursesIds = "";
-
 
     @Column(name = "courses_ids")
     private String coursesIds = "";
 
-
     @Column(name = "draft_courses_ids")
     private String draftCoursesIds = "";
-
 
     @Column(name = "friends_ids")
     private String friendsIds = "";

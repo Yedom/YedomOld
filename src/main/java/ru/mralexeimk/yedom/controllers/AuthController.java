@@ -182,7 +182,6 @@ public class AuthController {
         if (bindingResult.hasErrors() && userEntity == null)
             return "auth/login";
 
-
         if(userEntity == null) {
             userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
         }

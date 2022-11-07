@@ -59,6 +59,7 @@ public class LkController {
         UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
         if(userEntity == null) return "redirect:/errors/notfound";
         model.addAttribute("user", new User(userEntity));
+        model.addAttribute("my_profile", false);
 
         return "lk/profile";
     }

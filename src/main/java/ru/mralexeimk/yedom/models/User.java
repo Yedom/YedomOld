@@ -1,23 +1,14 @@
 package ru.mralexeimk.yedom.models;
 
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.interfaces.validation.*;
 import ru.mralexeimk.yedom.utils.CommonUtils;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import ru.mralexeimk.yedom.utils.services.RolesService;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 
