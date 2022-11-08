@@ -1,6 +1,8 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.models.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
+import ru.mralexeimk.yedom.utils.services.FriendsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
@@ -21,13 +26,15 @@ import java.util.List;
 @Controller
 @RequestMapping("/lk")
 public class LkController {
+    private final FriendsService friendsService;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LkController(UserRepository userRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(FriendsService friendsService, UserRepository userRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+        this.friendsService = friendsService;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.userValidator = userValidator;
@@ -53,19 +60,61 @@ public class LkController {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        if(username == null) {
-            User user = (User) session.getAttribute("user");
-            model.addAttribute("user", user);
-            model.addAttribute("my_profile", true);
+        Pair<String, String> pair = friendsService.DEFAULT_FOLLOW_BTN;
+        User user = (User) session.getAttribute("user");
+
+        if(username == null || username.equals(user.getUsername())) {
+            UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+            if(userEntity == null) return "redirect:/errors/notfound";
+
+            model.addAttribute("user", new User(userEntity));
+            model.addAttribute("friends_count",
+                    friendsService.getFriendsCount(userEntity));
         }
         else {
             UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
             if(userEntity == null) return "redirect:/errors/notfound";
+
             model.addAttribute("user", new User(userEntity));
-            model.addAttribute("my_profile", false);
+            model.addAttribute("friends_count",
+                    friendsService.getFriendsCount(userEntity));
+            pair = friendsService.updateFollowBtn(user, userEntity);
         }
 
+        model.addAttribute("action", pair.getFirst());
+        model.addAttribute("color", pair.getSecond());
+
         return "lk/profile";
+    }
+
+    @GetMapping("/profile/friends")
+    public String profileFriendsGet(Model model,
+                                    @RequestParam(required = false, name = "username") String username,
+                                    HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        List<Integer> friendsIds;
+
+        UserEntity userEntity;
+        if(username == null || username.equals(user.getUsername())) {
+            userEntity = userRepository.findById(user.getId()).orElse(null);
+        }
+        else {
+            userEntity = userRepository.findByUsername(username).orElse(null);
+        }
+
+        if(userEntity == null) return "redirect:/errors/notfound";
+        friendsIds = friendsService.splitToListInt(userEntity.getFriendsIds());
+
+        model.addAttribute("friends_count",
+                friendsService.getFriendsCount(userEntity));
+
+        model.addAttribute("friends",
+                userRepository.findAllById(friendsIds));
+
+        return "lk/profile/friends";
     }
 
     @GetMapping("/profile/courses")
@@ -104,42 +153,29 @@ public class LkController {
         return "lk/profile/courses";
     }
 
-    @GetMapping("/profile/friends")
-    public String profileFriendsGet(Model model,
-                                    @RequestParam(required = false, name = "username") String username,
-                                    HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
-        List<Integer> friendsIds = new ArrayList<>();
-
-        try {
-            if (username == null) {
-                User user = (User) session.getAttribute("user");
-                friendsIds = Arrays.stream(user.getFriendsIds().split(","))
-                        .map(Integer::parseInt).toList();
-            } else {
-                UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
-                if (userEntity == null) return "redirect:/errors/notfound";
-
-                friendsIds = Arrays.stream(userEntity.getFriendsIds().split(","))
-                        .map(Integer::parseInt).toList();
-            }
-        } catch (Exception ignored) {}
-
-        model.addAttribute("friends",
-                userRepository.findAllById(friendsIds));
-
-        return "lk/profile/friends";
-    }
-
     @GetMapping("/courses")
     public String coursesGet(HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-
         return "lk/courses";
+    }
+
+    @PostMapping("/profile/follow")
+    public @ResponseBody ResponseEntity<Object> followBtn(@RequestParam(name = "username") String username,
+                                                          HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+
+        if(user.getUsername().equals(username) || userEntity == null)
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        friendsService.followPress(user, userEntity);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
     @PostMapping
@@ -181,7 +217,6 @@ public class LkController {
         userRepository.save(userEntity);
         session.setAttribute("user", user);
 
-        session.removeAttribute("user");
         return "redirect:/lk/account";
     }
 }

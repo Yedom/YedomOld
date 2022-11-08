@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.enums.SocketType;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.TagRepository;
@@ -28,6 +30,7 @@ import java.util.*;
 @RequestMapping("/courses")
 public class CoursesController {
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     private final CourseValidator courseValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
@@ -35,8 +38,9 @@ public class CoursesController {
     private final LanguageUtil languageUtil;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil) {
+    public CoursesController(CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil) {
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
         this.courseValidator = courseValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
@@ -52,25 +56,39 @@ public class CoursesController {
 
         User user = (User) session.getAttribute("user");
 
+        List<Course> courses = new ArrayList<>();
         if(search == null) {
-            model.addAttribute("courses", courseRepository.findByOrderByViewsDesc());
+            courses = courseRepository.findByOrderByViewsDesc().stream()
+                    .map(Course::new)
+                    .peek(course -> {
+                        if(!course.isByOrganization()) {
+                            Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
+                            userEntity.ifPresent(entity -> course.setCreatorName(userEntity.get().getUsername()));
+                        }
+                    })
+                    .toList();
         }
         else {
             String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
-            if(response.equals("")) {
-                model.addAttribute("courses", new ArrayList<CourseEntity>());
-            }
-            else {
+            if(!response.equals("")) {
                 List<Integer> IDS = tagsService.responseIdsToList(response);
-                List<CourseEntity> courses = new ArrayList<>();
 
                 for (Integer id : IDS) {
-                    courses.add(courseRepository.findById(id).orElse(null));
+                    CourseEntity courseEntity = courseRepository.findById(id).orElse(null);
+                    if(courseEntity != null) {
+                        Course course = new Course(courseEntity);
+                        if(!course.isByOrganization()) {
+                            Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
+                            userEntity.ifPresent(entity -> course.setCreatorName(userEntity.get().getUsername()));
+                        }
+                        courses.add(course);
+                    }
                 }
-
-                model.addAttribute("courses", courses);
             }
         }
+
+        model.addAttribute("courses", courses);
+
         return "courses/index";
     }
 

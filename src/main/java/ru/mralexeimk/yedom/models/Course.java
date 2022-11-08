@@ -19,6 +19,9 @@ public class Course extends DraftCourse {
     protected int investments = 0;
     protected boolean acceptTasks = false;
 
+    // Model fields
+    protected String creatorName = "";
+
     public Course(String title, boolean byOrganization, int creatorId,
                   String description, String tags, int views, int likes,
                   int investments, boolean acceptTasks) {
@@ -34,11 +37,5 @@ public class Course extends DraftCourse {
         this(courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks());
-    }
-
-    public Course(Course a) {
-        this(a.getTitle(), a.isByOrganization(), a.getCreatorId(),
-                a.getDescription(), a.getTags(), a.getViews(),
-                a.getLikes(), a.getInvestments(), a.isAcceptTasks());
     }
 }

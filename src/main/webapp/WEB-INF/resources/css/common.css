@@ -159,6 +159,16 @@ a:active, a:hover, a{
     text-decoration: none;
     color: #1b1e21;
 }
+.btn-green {
+    background-color: #3a8d08;
+}
+.btn-red {
+    background-color: #a60000;
+}
+.pre-scrollable {
+    max-height: 500px;
+    overflow-y: scroll;
+}
 .unselectable {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none;   /* Chrome/Safari/Opera */

@@ -72,10 +72,10 @@
         <hr />
         <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
                id="profile" class="btn btn-primary" value="Профиль" th:value="#{profile.profile}" />
+        <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
+               id="friends" class="btn" value="Друзья" th:value="#{profile.friends} + ' (' + ${friends_count} +')'" />
         <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
                id="courses" class="btn" value="Курсы" th:value="#{profile.courses}" />
-        <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
-               id="friends" class="btn" value="Друзья" th:value="#{profile.friends}" />
         <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
                id="organizations" class="btn" value="Организации" th:value="#{profile.organizations}" />
         <input type="button" onclick="window.location='/lk/profile/balance';"
@@ -94,8 +94,8 @@
                                 <img src="../../resources/images/default.png" style="width: 200px;"
                                      alt="..." class="img-raised rounded-circle img-fluid">
                             </div>
-
                             <br />
+
                             <!-- Last login -->
                             <div class="created-on">
                                 <h6 th:text="#{profile.last_login}">Last login</h6>
@@ -108,6 +108,12 @@
                                 <h6 th:text="${T(ru.mralexeimk.yedom.utils.CommonUtils).getCreatedOnDate(user.createdOn)}"></h6>
                             </div>
 
+                            <!-- Add to friends -->
+                            <div class="add-to-friends" id="add_friend">
+                                <input type="button" onclick="follow()"
+                                       class="btn" th:classappend="${color}" value="Подписаться"
+                                       th:value="${action}" />
+                            </div>
                             <br />
                         </div>
                     </div>
@@ -146,10 +152,27 @@
     particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
         console.log('particles-js loaded!');
     });
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    if(urlParams.get('username') != null) {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlUsername = urlParams.get('username');
+
+    // Another profile
+    if(urlUsername != null) {
         $('#balance').hide();
+    }
+    // Our profile
+    else {
+        $('#add_friend').hide();
+    }
+
+    function follow() {
+        fetch("/lk/profile/follow" + window.location.search, {
+            method: 'POST'
+        }).then(response => {
+            if(response.ok) {
+                window.location.reload();
+            }
+        });
     }
 </script>
 </body>

@@ -21,7 +21,7 @@
     <script src="../../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
 </head>
-<body class="index-page sidebar-collapse">
+<body class="index-page sidebar-collapse bg">
 
 <!-- Particles Container -->
 <div id="particles-container"></div>
@@ -67,35 +67,36 @@
     <br />
 </div>
 
-<div class="bg page-header unselectable">
-    <div class="main main-raised col-md-6 mx-auto text-center">
-        <hr />
-        <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
-               id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
-        <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
-               id="courses" class="btn" value="Курсы" th:value="#{profile.courses}" />
-        <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
-               id="friends" class="btn btn-primary" value="Друзья" th:value="#{profile.friends}" />
-        <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
-               id="organizations" class="btn" value="Организации" th:value="#{profile.organizations}" />
-        <input type="button" onclick="window.location='/lk/profile/balance';"
-               id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
-        <hr />
-        <br />
+<div class="container">
+    <div class="page-header unselectable">
+        <div class="main main-raised col-md-8 mx-auto text-center">
+            <hr />
+            <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
+                   id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
+            <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
+                   id="friends" class="btn btn-primary" value="Друзья" th:value="#{profile.friends} + ' (' + ${friends_count} +')'" />
+            <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
+                   id="courses" class="btn" value="Курсы" th:value="#{profile.courses}" />
+            <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
+                   id="organizations" class="btn" value="Организации" th:value="#{profile.organizations}" />
+            <input type="button" onclick="window.location='/lk/profile/balance';"
+                   id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
+            <hr />
+            <br />
 
-        <div class="container">
-            <div class="row" th:each="friend : ${friends}">
-                <div class="col-md-4">
-                    <div class="card card-profile">
+            <!-- Friends -->
+            <div class="row pre-scrollable">
+                <div class="col col-3" th:each="friend : ${friends}">
+                    <div class="card-plain card-blog card">
                         <div class="card-avatar">
                             <a href="#">
                                 <img class="img-raised rounded-circle img-fluid" src="../../../resources/images/default.png"
-                                     th:src="@{/resources/images/default.png}" />
+                                     th:src="@{/resources/images/default.png}"  alt="..."/>
                             </a>
                         </div>
                         <div class="card-body">
                             <h6 class="card-category text-gray" th:text="${friend.username}">Username</h6>
-                            <a th:href="@{'/lk/profile?' + ${friend.username}}" th:text="#{profile.profile}" class="btn btn-primary btn-round">Profile</a>
+                            <a th:href="@{'/lk/profile?username=' + ${friend.username}}" th:text="#{profile.profile}" class="btn btn-primary btn-round">Profile</a>
                         </div>
                     </div>
                 </div>
@@ -130,7 +131,7 @@
 </footer>
 
 <script th:inline="javascript">
-    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+    particlesJS.load('particles-container', '../../../resources/assets/particles.json', function () {
         console.log('particles-js loaded!');
     });
     const queryString = window.location.search;

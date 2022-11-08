@@ -72,10 +72,10 @@
     <hr />
     <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
            id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
+    <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
+           id="friends" class="btn" value="Друзья" th:value="#{profile.friends} + ' (' + ${friends_count} +')'" />
     <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
            id="courses" class="btn btn-primary" value="Курсы" th:value="#{profile.courses}" />
-    <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
-           id="friends" class="btn" value="Друзья" th:value="#{profile.friends}" />
     <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
            id="organizations" class="btn" value="Организации" th:value="#{profile.organizations}" />
     <input type="button" onclick="window.location='/lk/profile/balance';"
