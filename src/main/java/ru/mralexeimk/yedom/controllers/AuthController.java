@@ -208,8 +208,9 @@ public class AuthController {
                         emailService.getCodeByUser()
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
                     user.setEmailConfirmed(true);
-                    userRepository.save(new UserEntity(user));
-                    session.setAttribute("user", user);
+                    UserEntity userEntity = new UserEntity(user);
+                    userRepository.save(userEntity);
+                    session.setAttribute("user", new User(userEntity));
                     emailService.removeCode(user.getUsername());
                     tagsService.createConnection(user);
                 } else bindingResult.rejectValue("code", "",

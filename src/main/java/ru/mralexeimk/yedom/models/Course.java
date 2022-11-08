@@ -38,4 +38,10 @@ public class Course extends DraftCourse {
                 courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks());
     }
+
+    public Course(Course course) {
+        this(course.getTitle(), course.isByOrganization(), course.getCreatorId(),
+                course.getDescription(), course.getTags(), course.getViews(),
+                course.getLikes(), course.getInvestments(), course.isAcceptTasks());
+    }
 }

@@ -114,15 +114,21 @@ public class CoursesController {
             return "courses/add";
         }
 
-        courseValidator.validate(course, bindingResult);
+        Course cloneCourse = new Course(course);
+        cloneCourse.setTags(
+                CommonUtils.clearSpacesAroundSymbol(
+                                cloneCourse.getTags().replaceAll(", ", "@"), "@")
+                        .trim());
+        courseValidator.validate(cloneCourse, bindingResult);
 
         if(bindingResult.hasErrors()) {
             return "courses/add";
         }
 
-        course.setByOrganization(false);
-        course.setCreatorId(user.getId());
-        CourseEntity courseEntity = new CourseEntity(course);
+        cloneCourse.setCreatorId(user.getId());
+
+        CourseEntity courseEntity = new CourseEntity(cloneCourse);
+
         courseRepository.save(courseEntity);
 
         return "redirect:/courses";
