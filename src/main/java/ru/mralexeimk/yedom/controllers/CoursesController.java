@@ -114,6 +114,12 @@ public class CoursesController {
             return "courses/add";
         }
 
+        courseValidator.validate(course, bindingResult);
+
+        if(bindingResult.hasErrors()) {
+            return "courses/add";
+        }
+
         course.setByOrganization(false);
         course.setCreatorId(user.getId());
         CourseEntity courseEntity = new CourseEntity(course);
