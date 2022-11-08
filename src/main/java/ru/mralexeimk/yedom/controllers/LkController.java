@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
@@ -124,31 +125,29 @@ public class LkController {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        List<Integer> completedCoursesIds = new ArrayList<>();
-        List<Integer> currentCoursesIds = new ArrayList<>();
+        User user = (User) session.getAttribute("user");
+        List<CourseEntity> completedCourses, currentCourses;
 
-        try {
-            if (username == null) {
-                User user = (User) session.getAttribute("user");
-                completedCoursesIds = Arrays.stream(user.getCompletedCoursesIds().split(","))
-                        .map(Integer::parseInt).toList();
-                currentCoursesIds = Arrays.stream(user.getCurrentCoursesIds().split(","))
-                        .map(Integer::parseInt).toList();
-            } else {
-                UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
-                if (userEntity == null) return "redirect:/errors/notfound";
+        UserEntity userEntity;
+        if(username == null || username.equals(user.getUsername())) {
+            userEntity = userRepository.findById(user.getId()).orElse(null);
+        }
+        else {
+            userEntity = userRepository.findByUsername(username).orElse(null);
+        }
 
-                completedCoursesIds = Arrays.stream(userEntity.getCompletedCoursesIds().split(","))
-                        .map(Integer::parseInt).toList();
-                currentCoursesIds = Arrays.stream(userEntity.getCurrentCoursesIds().split(","))
-                        .map(Integer::parseInt).toList();
-            }
-        } catch (Exception ignored) {}
+        if(userEntity == null) return "redirect:/errors/notfound";
 
-        model.addAttribute("completedCourses",
-                courseRepository.findAllById(completedCoursesIds));
-        model.addAttribute("currentCourses",
-                courseRepository.findAllById(currentCoursesIds));
+        completedCourses = courseRepository.findAllById(
+                friendsService.splitToListInt(userEntity.getCompletedCoursesIds()));
+        currentCourses = courseRepository.findAllById(
+                friendsService.splitToListInt(userEntity.getCurrentCoursesIds()));
+
+        model.addAttribute("friends_count",
+                friendsService.getFriendsCount(userEntity));
+
+        model.addAttribute("completed_courses", completedCourses);
+        model.addAttribute("current_courses", currentCourses);
 
         return "lk/profile/courses";
     }

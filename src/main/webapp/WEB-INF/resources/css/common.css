@@ -169,6 +169,13 @@ a:active, a:hover, a{
     max-height: 500px;
     overflow-y: scroll;
 }
+.clickable-tr:hover {
+    cursor: pointer;
+}
+.clickable-tr {
+    background-color: white;
+    border: 2px solid black;
+}
 .unselectable {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none;   /* Chrome/Safari/Opera */

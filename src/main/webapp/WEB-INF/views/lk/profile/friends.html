@@ -89,15 +89,12 @@
                 <div class="col col-3" th:each="friend : ${friends}">
                     <div class="card-plain card-blog card">
                         <div class="card-avatar">
-                            <a href="#">
+                            <a href="#" th:href="@{'/lk/profile?username=' + ${friend.username}}">
                                 <img class="img-raised rounded-circle img-fluid" src="../../../resources/images/default.png"
                                      th:src="@{/resources/images/default.png}"  alt="..."/>
                             </a>
                         </div>
-                        <div class="card-body">
-                            <h6 class="card-category text-gray" th:text="${friend.username}">Username</h6>
-                            <a th:href="@{'/lk/profile?username=' + ${friend.username}}" th:text="#{profile.profile}" class="btn btn-primary btn-round">Profile</a>
-                        </div>
+                        <h5 th:text="${friend.username}">Username</h5>
                     </div>
                 </div>
             </div>
