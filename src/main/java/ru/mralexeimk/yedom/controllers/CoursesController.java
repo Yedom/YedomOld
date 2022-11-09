@@ -97,7 +97,10 @@ public class CoursesController {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
+        CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
+        if(courseEntity == null) return "redirect:/courses";
 
+        model.addAttribute("course", new Course(courseEntity));
 
         return "courses/course";
     }
@@ -138,6 +141,7 @@ public class CoursesController {
         cloneCourse.setCreatorId(user.getId());
 
         CourseEntity courseEntity = new CourseEntity(cloneCourse);
+        courseEntity.setHash(CommonUtils.hashInt(courseEntity.getId()));
 
         courseRepository.save(courseEntity);
 

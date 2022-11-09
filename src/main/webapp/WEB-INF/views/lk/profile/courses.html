@@ -100,7 +100,7 @@
                   </tr>
                   <tbody>
                   <tr class="clickable-tr" th:each="course : ${completed_courses}"
-                      th:href="@{'/courses/' + ${course.getHash()}}">
+                      th:onclick="'window.location.href=\'/courses/' + ${course.hash} + '\''">
                     <td class="text-center" th:text="${course.completedOn}">09.11.2022</td>
                     <td class="text-center" th:text="${course.title}">Основы программирования на Python</td>
                     <td class="text-center" th:text="${course.tags}">программирование, python, для новичков</td>

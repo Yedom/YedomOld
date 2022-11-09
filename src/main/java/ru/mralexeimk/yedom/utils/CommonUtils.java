@@ -123,7 +123,14 @@ public class CommonUtils {
         return createdOn.toString().substring(0, 10);
     }
 
-    //decode hash to int id
-
+    //hash int to sha-256
+    public static String hashInt(int id) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.update(String.valueOf(id).getBytes(), 0, String.valueOf(id).length());
+            return new BigInteger(1, messageDigest.digest()).toString(16);
+        } catch (Exception ignored) {};
+        return null;
+    }
 
 }

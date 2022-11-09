@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Course extends DraftCourse {
+    protected String hash = "";
     protected int views = 0;
     protected int likes = 0;
     protected int investments = 0;
@@ -25,10 +26,11 @@ public class Course extends DraftCourse {
     private String creatorName = "";
     private Timestamp completedOn = null;
 
-    public Course(int id, String title, boolean byOrganization, int creatorId,
+    public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
                   String description, String tags, int views, int likes,
                   int investments, boolean acceptTasks, String completeRequestsUsersIds) {
         super(id, title, byOrganization, creatorId, description, tags);
+        this.hash = hash;
         this.views = views;
         this.likes = likes;
         this.investments = investments;
@@ -38,14 +40,16 @@ public class Course extends DraftCourse {
 
     // Course by CourseEntity
     public Course(CourseEntity courseEntity) {
-        this(courseEntity.getId(), courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
+        this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
+                courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks(),
                 courseEntity.getCompleteRequestsUsersIds());
     }
 
     public Course(Course course) {
-        this(course.getId(), course.getTitle(), course.isByOrganization(), course.getCreatorId(),
+        this(course.getId(), course.getHash(), course.getTitle(),
+                course.isByOrganization(), course.getCreatorId(),
                 course.getDescription(), course.getTags(), course.getViews(),
                 course.getLikes(), course.getInvestments(), course.isAcceptTasks(),
                 course.getCompleteRequestsUsersIds());

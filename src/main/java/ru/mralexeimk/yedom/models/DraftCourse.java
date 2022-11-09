@@ -34,8 +34,4 @@ public class DraftCourse {
         this(a.getId(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
                 a.getDescription(), a.getTags());
     }
-
-    public String getHash() {
-        return String.valueOf(id);
-    }
 }

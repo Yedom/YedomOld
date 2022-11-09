@@ -20,6 +20,9 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "hash", unique = true)
+    private String hash;
+
     @Column(name = "title")
     private String title;
 
