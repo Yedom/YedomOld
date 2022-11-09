@@ -114,7 +114,7 @@ public class CommonUtils {
         } else if (minutes > 0) {
             return numeralCorrect("minute", minutes);
         } else {
-            return "только что";
+            return languageUtil.getLocalizedMessage("time.right.now");
         }
     }
 
@@ -122,4 +122,8 @@ public class CommonUtils {
     public static String getCreatedOnDate(Timestamp createdOn) {
         return createdOn.toString().substring(0, 10);
     }
+
+    //decode hash to int id
+
+
 }

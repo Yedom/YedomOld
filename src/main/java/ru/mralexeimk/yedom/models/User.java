@@ -4,8 +4,9 @@ import lombok.*;
 import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.interfaces.validation.*;
 import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.interfaces.validation.*;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -36,8 +37,8 @@ public class User {
     private Timestamp createdOn = CommonUtils.getCurrentTimestamp();
     private Timestamp lastLogin = CommonUtils.getCurrentTimestamp();
     private int balance = 0;
-    private String completedCoursesIds = "";
-    private String currentCoursesIds = "";
+
+    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
     private String coursesIds = "";
     private String draftCoursesIds = "";
     private String friendsIds = "";
@@ -65,10 +66,10 @@ public class User {
 
     // Model all fields constructor
     public User(int id, String username, String password, String email, String role,
-                Timestamp createdOn, Timestamp lastLogin, int balance,
-                String completedCoursesIds, String currentCoursesIds, String coursesIds,
-                String draftCoursesIds, String friendsIds, String followingIds, String followersIds,
-                String organizationsIds, String inOrganizationsIds) {
+                Timestamp createdOn, Timestamp lastLogin, int balance, String avatar,
+                String coursesIds, String draftCoursesIds, String friendsIds,
+                String followingIds, String followersIds, String organizationsIds,
+                String inOrganizationsIds) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -77,8 +78,7 @@ public class User {
         this.createdOn = createdOn;
         this.lastLogin = lastLogin;
         this.balance = balance;
-        this.completedCoursesIds = completedCoursesIds;
-        this.currentCoursesIds = currentCoursesIds;
+        this.avatar = avatar;
         this.coursesIds = coursesIds;
         this.draftCoursesIds = draftCoursesIds;
         this.friendsIds = friendsIds;
@@ -90,21 +90,22 @@ public class User {
 
     // User by UserEntity constructor
     public User(UserEntity userEntity) {
-        this(userEntity.getId(), userEntity.getUsername(), userEntity.getPassword(), userEntity.getEmail(), userEntity.getRole(),
-                userEntity.getCreatedOn(), userEntity.getLastLogin(), userEntity.getBalance(),
-                userEntity.getCompletedCoursesIds(), userEntity.getCurrentCoursesIds(), userEntity.getCoursesIds(),
-                userEntity.getDraftCoursesIds(), userEntity.getFriendsIds(), userEntity.getFollowingIds(), userEntity.getFollowersIds(),
-                userEntity.getOrganizationsIds(), userEntity.getInOrganizationsIds());
+        this(userEntity.getId(), userEntity.getUsername(), userEntity.getPassword(),
+                userEntity.getEmail(), userEntity.getRole(), userEntity.getCreatedOn(),
+                userEntity.getLastLogin(), userEntity.getBalance(), userEntity.getAvatar(),
+                userEntity.getCoursesIds(), userEntity.getDraftCoursesIds(), userEntity.getFriendsIds(),
+                userEntity.getFollowingIds(), userEntity.getFollowersIds(), userEntity.getOrganizationsIds(),
+                userEntity.getInOrganizationsIds());
         emailConfirmed = true;
     }
 
     public User(User cp) {
         this(cp.getId(), cp.getUsername(), cp.getPassword(), cp.getEmail(), cp.getRole(),
-                cp.getCreatedOn(), cp.getLastLogin(), cp.getBalance(),
-                cp.getCompletedCoursesIds(), cp.getCurrentCoursesIds(), cp.getCoursesIds(),
-                cp.getDraftCoursesIds(), cp.getFriendsIds(), cp.getFollowingIds(), cp.getFollowersIds(),
-                cp.getOrganizationsIds(), cp.getInOrganizationsIds(),
-                cp.isEmailConfirmed(), cp.getNewPassword(), cp.getNewPasswordRepeat(), cp.getArgs(), cp.getVals());
+                cp.getCreatedOn(), cp.getLastLogin(), cp.getBalance(), cp.getAvatar(),
+                cp.getCoursesIds(), cp.getDraftCoursesIds(), cp.getFriendsIds(),
+                cp.getFollowingIds(), cp.getFollowersIds(), cp.getOrganizationsIds(),
+                cp.getInOrganizationsIds(), cp.isEmailConfirmed(), cp.getNewPassword(),
+                cp.getNewPasswordRepeat(), cp.getArgs(), cp.getVals());
     }
 
     public User withArgs(String... args) {

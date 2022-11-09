@@ -1,18 +1,11 @@
 package ru.mralexeimk.yedom.utils.services;
 
-import ch.qos.logback.core.net.server.Client;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.YedomConfig;
-import ru.mralexeimk.yedom.enums.SocketType;
-import ru.mralexeimk.yedom.models.Code;
+import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.multithreading.ClientSocket;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

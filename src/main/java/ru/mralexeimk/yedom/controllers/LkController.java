@@ -8,35 +8,42 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.database.entities.CompletedCoursesEntity;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.CompletedCoursesRepository;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.models.Pair;
+import ru.mralexeimk.yedom.models.Course;
+import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.FriendsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/lk")
 public class LkController {
     private final FriendsService friendsService;
     private final UserRepository userRepository;
+    private final OrganizationRepository organizationRepository;
+    private final CompletedCoursesRepository completedCoursesRepository;
     private final CourseRepository courseRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LkController(FriendsService friendsService, UserRepository userRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.friendsService = friendsService;
         this.userRepository = userRepository;
+        this.organizationRepository = organizationRepository;
+        this.completedCoursesRepository = completedCoursesRepository;
         this.courseRepository = courseRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
@@ -96,7 +103,6 @@ public class LkController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        List<Integer> friendsIds;
 
         UserEntity userEntity;
         if(username == null || username.equals(user.getUsername())) {
@@ -107,7 +113,7 @@ public class LkController {
         }
 
         if(userEntity == null) return "redirect:/errors/notfound";
-        friendsIds = friendsService.splitToListInt(userEntity.getFriendsIds());
+        List<Integer> friendsIds = friendsService.splitToListInt(userEntity.getFriendsIds());
 
         model.addAttribute("friends_count",
                 friendsService.getFriendsCount(userEntity));
@@ -126,7 +132,6 @@ public class LkController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        List<CourseEntity> completedCourses, currentCourses;
 
         UserEntity userEntity;
         if(username == null || username.equals(user.getUsername())) {
@@ -138,16 +143,32 @@ public class LkController {
 
         if(userEntity == null) return "redirect:/errors/notfound";
 
-        completedCourses = courseRepository.findAllById(
-                friendsService.splitToListInt(userEntity.getCompletedCoursesIds()));
-        currentCourses = courseRepository.findAllById(
-                friendsService.splitToListInt(userEntity.getCurrentCoursesIds()));
+        List<CompletedCoursesEntity> completedCoursesEntities =
+                completedCoursesRepository.findAllByUserIdOrderByCompletedOnDesc(userEntity.getId());
+
+        List<Course> completedCourses = new ArrayList<>();
+
+        for(CompletedCoursesEntity completedCoursesEntity : completedCoursesEntities) {
+            CourseEntity courseEntity = courseRepository.findById(completedCoursesEntity.getCourseId()).orElse(null);
+            if(courseEntity == null) continue;
+            Course course = new Course(courseEntity);
+            course.setCompletedOn(completedCoursesEntity.getCompletedOn());
+            course.setTags(course.getTags().replaceAll("@", ", "));
+            if(!course.isByOrganization()) {
+                course.setCreatorName(Objects.requireNonNull(
+                        userRepository.findById(courseEntity.getCreatorId()).orElse(null)).getUsername());
+            }
+            else {
+                course.setCreatorName(Objects.requireNonNull(
+                        organizationRepository.findById(courseEntity.getCreatorId()).orElse(null)).getName());
+            }
+            completedCourses.add(course);
+        }
 
         model.addAttribute("friends_count",
                 friendsService.getFriendsCount(userEntity));
 
         model.addAttribute("completed_courses", completedCourses);
-        model.addAttribute("current_courses", currentCourses);
 
         return "lk/profile/courses";
     }

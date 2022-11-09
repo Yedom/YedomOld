@@ -96,10 +96,11 @@
         <div class="col" th:each="course : ${courses}">
             <div class="card-plain card-blog card">
                 <h4 class="card-title card-content unselectable">
-                    <a class="titles" href="#" th:text="${course.title}">Course Title aw awf aw awf awaf 22r1 2r1 2r 12r 12r12r12r</a>
+                    <a class="titles" href="#" th:href="@{'/courses/' + ${course.getHash()}}"
+                       th:text="${course.title}">Course Title aw awf aw awf awaf 22r1 2r1 2r 12r 12r12r12r</a>
                 </h4>
                 <div class="unselectable perspective card-content card-header card-header-image">
-                    <a href="#">
+                    <a href="#" th:href="@{'/courses/' + ${course.getHash()}}">
                         <img class="courseImg" src="../../resources/images/screen.png"
                              th:src="@{/resources/images/screen.png}" alt="...">
                     </a>

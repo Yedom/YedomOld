@@ -2,6 +2,7 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 
@@ -40,11 +41,8 @@ public class UserEntity {
     @Column(name = "balance")
     private int balance = 0;
 
-    @Column(name = "completed_courses_ids")
-    private String completedCoursesIds = "";
-
-    @Column(name = "current_courses_ids")
-    private String currentCoursesIds = "";
+    @Column(name = "avatar")
+    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
 
     @Column(name = "courses_ids")
     private String coursesIds = "";
@@ -96,16 +94,17 @@ public class UserEntity {
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
-                ", createOn=" + createdOn +
+                ", createdOn=" + createdOn +
                 ", lastLogin=" + lastLogin +
                 ", balance=" + balance +
-                ", completedCoursesIds='" + completedCoursesIds + '\'' +
-                ", currentCoursesIds='" + currentCoursesIds + '\'' +
+                ", avatar='" + avatar + '\'' +
                 ", coursesIds='" + coursesIds + '\'' +
                 ", draftCoursesIds='" + draftCoursesIds + '\'' +
                 ", friendsIds='" + friendsIds + '\'' +
                 ", followingIds='" + followingIds + '\'' +
                 ", followersIds='" + followersIds + '\'' +
+                ", organizationsIds='" + organizationsIds + '\'' +
+                ", inOrganizationsIds='" + inOrganizationsIds + '\'' +
                 '}';
     }
 }

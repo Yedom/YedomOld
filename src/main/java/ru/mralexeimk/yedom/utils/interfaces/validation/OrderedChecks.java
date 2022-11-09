@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.interfaces.validation;
+package ru.mralexeimk.yedom.utils.interfaces.validation;
 
 import javax.validation.GroupSequence;
 

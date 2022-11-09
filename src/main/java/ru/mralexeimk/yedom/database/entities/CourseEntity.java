@@ -47,6 +47,9 @@ public class CourseEntity {
     @Column(name = "accept_tasks")
     private boolean acceptTasks = false;
 
+    @Column(name = "complete_requests_users_ids")
+    private String completeRequestsUsersIds = "";
+
     // Add to database constructor
     public CourseEntity(Course course) {
         this.title = course.getTitle();
@@ -82,6 +85,8 @@ public class CourseEntity {
                 "views = " + views + ", " +
                 "likes = " + likes + ", " +
                 "investments = " + investments + ", " +
-                "acceptTasks = " + acceptTasks + ")";
+                "acceptTasks = " + acceptTasks + ", " +
+                "completeRequestsUsersIds = " + completeRequestsUsersIds +
+                ")";
     }
 }

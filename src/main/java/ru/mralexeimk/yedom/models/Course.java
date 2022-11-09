@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -18,30 +19,37 @@ public class Course extends DraftCourse {
     protected int likes = 0;
     protected int investments = 0;
     protected boolean acceptTasks = false;
+    protected String completeRequestsUsersIds = "";
 
     // Model fields
-    protected String creatorName = "";
+    private String creatorName = "";
+    private Timestamp completedOn = null;
 
-    public Course(String title, boolean byOrganization, int creatorId,
+    public Course(int id, String title, boolean byOrganization, int creatorId,
                   String description, String tags, int views, int likes,
-                  int investments, boolean acceptTasks) {
-        super(title, byOrganization, creatorId, description, tags);
+                  int investments, boolean acceptTasks, String completeRequestsUsersIds) {
+        super(id, title, byOrganization, creatorId, description, tags);
         this.views = views;
         this.likes = likes;
         this.investments = investments;
         this.acceptTasks = acceptTasks;
+        this.completeRequestsUsersIds = completeRequestsUsersIds;
     }
 
     // Course by CourseEntity
     public Course(CourseEntity courseEntity) {
-        this(courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
+        this(courseEntity.getId(), courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
-                courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks());
+                courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks(),
+                courseEntity.getCompleteRequestsUsersIds());
     }
 
     public Course(Course course) {
-        this(course.getTitle(), course.isByOrganization(), course.getCreatorId(),
+        this(course.getId(), course.getTitle(), course.isByOrganization(), course.getCreatorId(),
                 course.getDescription(), course.getTags(), course.getViews(),
-                course.getLikes(), course.getInvestments(), course.isAcceptTasks());
+                course.getLikes(), course.getInvestments(), course.isAcceptTasks(),
+                course.getCompleteRequestsUsersIds());
+        this.setCreatorName(course.getCreatorName());
+        this.setCompletedOn(course.getCompletedOn());
     }
 }

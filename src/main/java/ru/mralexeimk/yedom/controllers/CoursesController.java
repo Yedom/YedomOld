@@ -11,7 +11,7 @@ import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.enums.SocketType;
+import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
@@ -90,6 +90,16 @@ public class CoursesController {
         model.addAttribute("courses", courses);
 
         return "courses/index";
+    }
+
+    @GetMapping("/{hash}")
+    public String course(Model model, @PathVariable String hash, HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+
+
+        return "courses/course";
     }
 
     @GetMapping("/add")

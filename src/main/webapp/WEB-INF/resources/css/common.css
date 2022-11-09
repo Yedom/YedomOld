@@ -183,6 +183,7 @@ a:active, a:hover, a{
 }
 .clickable-tr:hover {
     cursor: pointer;
+    background-color: lime;
 }
 .clickable-tr {
     background-color: white;

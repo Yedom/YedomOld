@@ -14,6 +14,8 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DraftCourse {
+    private int id;
+
     @Size(min = YedomConfig.minCourseLength, max = YedomConfig.maxCourseLength, message = "{course.title.size}")
     protected String title;
 
@@ -24,12 +26,16 @@ public class DraftCourse {
 
     // DraftCourse by DraftCourseEntity
     public DraftCourse(DraftCourseEntity courseEntity) {
-        this(courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
+        this(courseEntity.getId(), courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags());
     }
 
     public DraftCourse(DraftCourse a) {
-        this(a.getTitle(), a.isByOrganization(), a.getCreatorId(),
+        this(a.getId(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
                 a.getDescription(), a.getTags());
+    }
+
+    public String getHash() {
+        return String.valueOf(id);
     }
 }

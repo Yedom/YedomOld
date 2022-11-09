@@ -3,12 +3,10 @@ package ru.mralexeimk.yedom.utils.services;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.models.Pair;
+import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

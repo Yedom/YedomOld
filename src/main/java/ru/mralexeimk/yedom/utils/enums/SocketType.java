@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.enums;
+package ru.mralexeimk.yedom.utils.enums;
 
 public enum SocketType {
     SEARCH_COURSES("search_courses"),

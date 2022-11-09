@@ -93,38 +93,18 @@
               <div class="table-responsive">
                 <table class="table">
                   <tr>
-                    <th class="text-center">#</th>
+                    <th class="text-center" th:text="#{course.completed_on}">Completed On</th>
                     <th class="text-center" th:text="#{course.title}">Title</th>
                     <th class="text-center" th:text="#{course.tags.title}">Tags</th>
+                    <th class="text-center" th:text="#{course.author}">Author</th>
                   </tr>
                   <tbody>
-                  <tr class="clickable-tr" th:each="course : ${completed_courses}">
-                    <td class="text-center">1</td>
-                    <td class="text-center" th:value="${course.title}">Основы программирования на Python</td>
-                    <td class="text-center" th:value="${course.tags}">программирование, python, для новичков</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Current Courses -->
-          <h2 th:text="#{profile.courses.inprogress}">Current Courses</h2>
-          <div class="card">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table">
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center" th:text="#{course.title}">Title</th>
-                    <th class="text-center" th:text="#{course.tags.title}">Tags</th>
-                  </tr>
-                  <tbody>
-                  <tr class="clickable-tr" th:each="course : ${current_courses}">
-                    <td class="text-center">1</td>
-                    <td class="text-center" th:value="${course.title}">Основы программирования на Python</td>
-                    <td class="text-center" th:value="${course.tags}">программирование, python, для новичков</td>
+                  <tr class="clickable-tr" th:each="course : ${completed_courses}"
+                      th:href="@{'/courses/' + ${course.getHash()}}">
+                    <td class="text-center" th:text="${course.completedOn}">09.11.2022</td>
+                    <td class="text-center" th:text="${course.title}">Основы программирования на Python</td>
+                    <td class="text-center" th:text="${course.tags}">программирование, python, для новичков</td>
+                    <td class="text-center" th:text="${course.creatorName}">Автор</td>
                   </tr>
                   </tbody>
                 </table>

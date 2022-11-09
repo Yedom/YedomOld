@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.models;
+package ru.mralexeimk.yedom.utils.custom;
 
 import lombok.Data;
 
