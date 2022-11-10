@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
@@ -12,10 +12,12 @@ import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 @Component
 public class CourseValidator implements Validator {
     private final LanguageUtil languageUtil;
+    private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CourseValidator(LanguageUtil languageUtil) {
+    public CourseValidator(LanguageUtil languageUtil, CoursesConfig coursesConfig) {
         this.languageUtil = languageUtil;
+        this.coursesConfig = coursesConfig;
     }
 
     public void reject(String field, String msg, Errors errors) {
@@ -31,17 +33,24 @@ public class CourseValidator implements Validator {
     @Override
     public void validate(Object o, Errors errors) {
         if(o instanceof Course course) {
-            if(!CommonUtils.regexMatch(course.getTags(), YedomConfig.REGEX_TAGS)
+            if(course.getTitle().length() < coursesConfig.getMinTitleLength() ||
+                    course.getTitle().length() > coursesConfig.getMaxTitleLength()) {
+                reject("title", "course.title.size", errors);
+            }
+            if(course.getDescription().length() > coursesConfig.getMaxDescriptionLength()) {
+                reject("description", "course.description.size", errors);
+            }
+            if(!CommonUtils.regexMatch(coursesConfig.getRegexp(), course.getTags())
                     || course.getTags().contains("@ ") || course.getTags().contains(" @")) {
                 reject("tags", "course.tags.pattern", errors);
             }
-            if(CommonUtils.containsSymbols(course.getTags(), YedomConfig.TAGS_DISABLED_SYMBOLS)) {
+            if(CommonUtils.containsSymbols(course.getTags(), coursesConfig.getTagsDisabledSymbols())) {
                 reject("tags", "course.tags.disabled_symbols", errors);
             }
-            if(course.getTags().split("@").length < YedomConfig.MIN_TAGS_COUNT) {
+            if(course.getTags().split("@").length < coursesConfig.getMinTagsCount()) {
                 reject("tags", "course.tags.count", errors);
             }
-            if(course.getTags().split("@").length > YedomConfig.MAX_TAGS_COUNT) {
+            if(course.getTags().split("@").length > coursesConfig.getMaxTagsCount()) {
                 reject("tags", "course.tags.max_count", errors);
             }
         }

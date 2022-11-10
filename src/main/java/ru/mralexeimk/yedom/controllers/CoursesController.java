@@ -6,7 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
@@ -23,7 +24,6 @@ import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.validators.CourseValidator;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.*;
 
 @Controller
@@ -36,9 +36,11 @@ public class CoursesController {
     private final TagsService tagsService;
     private final RolesService rolesService;
     private final LanguageUtil languageUtil;
+    private final SmartSearchConfig smartSearchConfig;
+    private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil) {
+    public CoursesController(CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.courseValidator = courseValidator;
@@ -46,6 +48,8 @@ public class CoursesController {
         this.tagsService = tagsService;
         this.rolesService = rolesService;
         this.languageUtil = languageUtil;
+        this.smartSearchConfig = smartSearchConfig;
+        this.coursesConfig = coursesConfig;
     }
 
     @GetMapping
@@ -119,7 +123,7 @@ public class CoursesController {
     }
 
     @PostMapping("/add")
-    public String addPost(@Valid @ModelAttribute("course") Course course,
+    public String addPost(@ModelAttribute("course") Course course,
                           BindingResult bindingResult, HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
@@ -145,9 +149,10 @@ public class CoursesController {
         }
 
         cloneCourse.setCreatorId(user.getId());
+        cloneCourse.setAvatar(coursesConfig.getBaseAvatarDefault());
+        cloneCourse.setHash(CommonUtils.hashInt(cloneCourse.getId()));
 
         CourseEntity courseEntity = new CourseEntity(cloneCourse);
-        courseEntity.setHash(CommonUtils.hashInt(courseEntity.getId()));
 
         courseRepository.save(courseEntity);
 
@@ -171,7 +176,7 @@ public class CoursesController {
                         .replaceAll("@", " ");
                 String search = CommonUtils.getLastN(
                         tags.split(" "),
-                        YedomConfig.MAX_WORDS_IN_REQUEST);
+                        smartSearchConfig.getMaxWordsInRequest());
                 String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search.strip());
 
                 if (!response.equals("")) {
@@ -180,7 +185,7 @@ public class CoursesController {
                     int c = 0;
                     for (int id : IDS) {
                         TagEntity tagEntity = tagRepository.findById(id).orElse(null);
-                        if (c > YedomConfig.MAX_TAGS_SUGGESTIONS) break;
+                        if (c > smartSearchConfig.getMaxTagsSuggestions()) break;
                         if (tagEntity == null || tagsSet.contains(tagEntity.getTag())) continue;
                         htmlResponse
                                 .append("<span onclick=\"spanClick(this)\">")
@@ -210,7 +215,7 @@ public class CoursesController {
             int c = 0;
             for (int id : IDS) {
                 TagEntity tagEntity = tagRepository.findById(id).orElse(null);
-                if (c > YedomConfig.MAX_TAGS_SUGGESTIONS) break;
+                if (c > smartSearchConfig.getMaxTagsSuggestions()) break;
                 if (tagEntity == null) continue;
                 htmlResponse
                         .append("<span class=\"tag\" onclick=\"spanClick(this)\">")

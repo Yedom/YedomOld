@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.config.configs.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.Course;
@@ -34,9 +35,10 @@ public class LkController {
     private final DraftCourseRepository draftCourseRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileConfig profileConfig;
 
     @Autowired
-    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, ProfileConfig profileConfig) {
         this.friendsService = friendsService;
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
@@ -45,6 +47,7 @@ public class LkController {
         this.draftCourseRepository = draftCourseRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
+        this.profileConfig = profileConfig;
     }
 
     @GetMapping("/account")
@@ -278,6 +281,12 @@ public class LkController {
             JSONObject json = new JSONObject(data);
 
             String baseImg = json.getString("baseImg");
+
+            if(baseImg.length() > profileConfig.getBaseAvatarMaxSize() ||
+                    !baseImg.split(",")[0].split("/")[0].equals("data:image")) {
+                return new ResponseEntity<>(HttpStatus.valueOf(500));
+            }
+
             userEntity.setAvatar(baseImg);
             userRepository.save(userEntity);
         } catch (Exception ex) {

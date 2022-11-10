@@ -4,11 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -16,15 +12,13 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class Organization {
     private int id;
-    @NotEmpty(message = "{organization.name.not.empty}")
-    @Size(min = YedomConfig.minOrganizationNameLength, max = YedomConfig.maxOrganizationNameLength, message = "{organization.name.size}")
     private String name;
     private int adminId;
     private String moderatorsIds = "";
     private String membersIds = "";
 
     private int balance = 0;
-    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
+    private String avatar = "";
     private String coursesIds = "";
     private String draftCoursesIds = "";
 

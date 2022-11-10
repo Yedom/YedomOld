@@ -38,6 +38,9 @@ public class CourseEntity {
     @Column(name = "tags")
     private String tags;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @Column(name = "views")
     private int views = 0;
 
@@ -60,6 +63,8 @@ public class CourseEntity {
         this.creatorId = course.getCreatorId();
         this.description = course.getDescription();
         this.tags = course.getTags();
+        this.avatar = course.getAvatar();
+        this.hash = course.getHash();
     }
 
     @Override

@@ -2,14 +2,9 @@ package ru.mralexeimk.yedom.models;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
-import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.utils.CommonUtils;
-import ru.mralexeimk.yedom.utils.interfaces.validation.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -18,19 +13,10 @@ import java.util.*;
 @Component
 @NoArgsConstructor
 public class User {
-
     // UserEntity fields
     private int id;
-    @NotEmpty(message = "{auth.username.empty}", groups = FirstOrder.class)
-    @Size(min = YedomConfig.minUsernameLength, max = YedomConfig.maxUsernameLength, message = "{auth.username.size}", groups = SecondOrder.class)
     private String username;
-
-    @NotEmpty(message = "{auth.password.empty}", groups = ThirdOrder.class)
-    @Size(min = YedomConfig.minPasswordLength, message = "{auth.password.size}", groups = FourthOrder.class)
     private String password;
-
-    @NotEmpty(message = "{auth.email.empty}", groups = FifthOrder.class)
-    @Email(message = "{auth.email.incorrect}", groups = SixthOrder.class)
     private String email;
 
     private String role = "user";
@@ -38,7 +24,7 @@ public class User {
     private Timestamp lastLogin = CommonUtils.getCurrentTimestamp();
     private int balance = 0;
 
-    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
+    private String avatar = "";
     private String coursesIds = "";
     private String draftCoursesIds = "";
     private String friendsIds = "";

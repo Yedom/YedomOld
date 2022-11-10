@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
-import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.models.Organization;
 
 import javax.persistence.*;
@@ -36,7 +35,7 @@ public class OrganizationEntity {
     private int balance = 0;
 
     @Column(name = "avatar")
-    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
+    private String avatar = "";
 
     @Column(name = "courses_ids")
     private String coursesIds = "";

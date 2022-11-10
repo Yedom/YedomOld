@@ -2,7 +2,6 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 
@@ -42,7 +41,7 @@ public class UserEntity {
     private int balance = 0;
 
     @Column(name = "avatar")
-    private String avatar = YedomConfig.DEFAULT_BASE64_AVATAR;
+    private String avatar = "";
 
     @Column(name = "courses_ids")
     private String coursesIds = "";

@@ -5,10 +5,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.config.configs.AuthConfig;
+import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 @Component
@@ -16,12 +18,16 @@ public class UserValidator implements Validator {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final LanguageUtil languageUtil;
+    private final AuthConfig authConfig;
+    private final EmailConfig emailConfig;
 
     @Autowired
-    public UserValidator(UserRepository userRepository, PasswordEncoder encoder, LanguageUtil languageUtil) {
+    public UserValidator(UserRepository userRepository, PasswordEncoder encoder, LanguageUtil languageUtil, AuthConfig authConfig, EmailConfig emailConfig) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.languageUtil = languageUtil;
+        this.authConfig = authConfig;
+        this.emailConfig = emailConfig;
     }
 
     @Override
@@ -36,7 +42,33 @@ public class UserValidator implements Validator {
         }
     }
 
+    public void commonValidator(User user, Errors errors) {
+        if(user.getUsername() == null || user.getUsername().isEmpty()) {
+            reject("username", "auth.username.empty", errors);
+        }
+        else if(user.getUsername().length() < authConfig.getMinUsernameLength() ||
+                user.getUsername().length() > authConfig.getMaxUsernameLength()) {
+            reject("username", "auth.username.size", errors);
+        }
+        if(user.getPassword() == null || user.getPassword().isEmpty()) {
+            reject("password", "auth.password.empty", errors);
+        }
+        else if(user.getPassword().length() < authConfig.getMinPasswordLength()) {
+            reject("password", "auth.password.size", errors);
+        }
+        else if(user.getPassword().length() > authConfig.getMaxPasswordLength()) {
+            reject("password", "auth.password.large", errors);
+        }
+        if(user.getEmail() == null || user.getEmail().isEmpty()) {
+            reject("email", "auth.email.empty", errors);
+        }
+        else if(!CommonUtils.regexMatch(emailConfig.getRegexp(), user.getEmail())) {
+            reject("email", "auth.email.incorrect", errors);
+        }
+    }
+
     public void regValidator(User user, Errors errors) {
+        commonValidator(user, errors);
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             reject("email", "auth.email.in_use", errors);
         }
@@ -69,8 +101,8 @@ public class UserValidator implements Validator {
         if(user.getUsername() == null || user.getUsername().isEmpty()) {
             reject("username", "auth.username.empty", errors);
         }
-        else if(user.getUsername().length() < YedomConfig.minUsernameLength ||
-                user.getUsername().length() > YedomConfig.maxUsernameLength) {
+        else if(user.getUsername().length() < authConfig.getMinUsernameLength() ||
+                user.getUsername().length() > authConfig.getMaxUsernameLength()) {
             reject("username", "auth.username.size", errors);
         }
         else if (userRepository.findByUsername(user.getUsername()).isPresent()
@@ -80,9 +112,13 @@ public class UserValidator implements Validator {
             reject("username", "auth.username.in_use", errors);
         }
         if(user.getNewPassword() != null && !user.getNewPassword().equals("")) {
-            if (user.getNewPassword().length() < YedomConfig.minPasswordLength) {
+            if (user.getNewPassword().length() < authConfig.getMinPasswordLength()) {
                 reject("newPassword", "auth.lk.new_password.size", errors);
-            } else if (user.getNewPasswordRepeat() == null ||
+            }
+            else if(user.getNewPassword().length() > authConfig.getMaxPasswordLength()) {
+                reject("newPassword", "auth.lk.new_password.large", errors);
+            }
+            else if (user.getNewPasswordRepeat() == null ||
                     !user.getNewPassword().equals(user.getNewPasswordRepeat())) {
                 reject("newPassword", "auth.lk.new_password.different", errors);
             }
@@ -91,8 +127,11 @@ public class UserValidator implements Validator {
         if(user.getPassword() == null || user.getPassword().equals("")) {
             reject("password", "auth.password.empty", errors);
         }
-        else if(user.getPassword().length() < YedomConfig.minPasswordLength) {
+        else if(user.getPassword().length() < authConfig.getMinPasswordLength()) {
             reject("password", "auth.password.size", errors);
+        }
+        else if(user.getPassword().length() > authConfig.getMaxPasswordLength()) {
+            reject("password", "auth.password.large", errors);
         }
         else if (userEntity != null && !encoder.matches(user.getPassword(), userEntity.getPassword())) {
             reject("password", "auth.password.incorrect", errors);

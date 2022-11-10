@@ -37,8 +37,8 @@
 
 <!-- Search -->
 <section class="py-5 text-center container">
-    <div class="row py-lg-5">
-        <div class="col-lg-6 col-md-8 mx-auto">
+    <div class="row py-lg-8">
+        <div class="col-lg-8 col-md-8 mx-auto">
             <input type="text" id="search" name="search" placeholder="Поиск курсов"
                    th:name="search" th:placeholder="#{courses.search}" />
             <br />
@@ -134,14 +134,14 @@
             const yRotation = 4 * ((xVal - width / 2) / width)
             const xRotation = -4 * ((yVal - height / 2) / height)
             this.style.transform =
-                'perspective(500px) scale(1.1) rotateX(' + xRotation + 'deg) rotateY(' + yRotation + 'deg)'
+                'perspective(500px) scale(1.01) rotateX(' + xRotation + 'deg) rotateY(' + yRotation + 'deg)'
         });
         $(this).on('mouseout', function() {
             this.style.transform = ' perspective(500px) scale(1) rotateX(0) rotateY(0) ';
             this.style.transition = 'all 3s ease-out';
         });
         $(this).on('mouseover', function() {
-            this.style.transform = ' perspective(500px) scale(1.1) rotateX(0) rotateY(0) ';
+            this.style.transform = ' perspective(500px) scale(1.03) rotateX(0) rotateY(0) ';
             this.style.transition = 'all 3s ease-out';
         });
         $(this).on('hover', function() {

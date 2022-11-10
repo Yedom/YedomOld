@@ -1,15 +1,13 @@
 package ru.mralexeimk.yedom.utils.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.models.Code;
-import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import java.util.HashMap;
@@ -18,10 +16,12 @@ import java.util.HashMap;
 public class EmailService {
     private final HashMap<String, Code> codeByUsername = new HashMap<>();
     private final JavaMailSender emailSender;
+    private final EmailConfig emailConfig;
 
     @Autowired
-    public EmailService(JavaMailSender emailSender) {
+    public EmailService(JavaMailSender emailSender, EmailConfig emailConfig) {
         this.emailSender = emailSender;
+        this.emailConfig = emailConfig;
     }
 
     public void sendMessage(String to, String subject, String text) {
@@ -41,7 +41,7 @@ public class EmailService {
         new Thread(() -> {
             while(true) {
                 try {
-                    Thread.sleep(1000* YedomConfig.confirmCodeTimeout);
+                    Thread.sleep(1000L * emailConfig.getConfirmCodeTimeout());
                 } catch(Exception ignored) {}
                 for(String userName : codeByUsername.keySet()) {
                     long current_time = System.currentTimeMillis();
@@ -72,8 +72,8 @@ public class EmailService {
     public boolean isCorrectCode(String code) {
         try {
             int num = Integer.parseInt(code);
-            if(num >= Math.pow(10, YedomConfig.confirmCodeLength - 1) &&
-                    num < Math.pow(10, YedomConfig.confirmCodeLength)) return true;
+            if(num >= Math.pow(10, emailConfig.getConfirmCodeLength() - 1) &&
+                    num < Math.pow(10, emailConfig.getConfirmCodeLength())) return true;
         } catch(Exception ignored) {}
         return false;
     }

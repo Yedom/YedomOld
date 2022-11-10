@@ -1,7 +1,5 @@
 package ru.mralexeimk.yedom.utils.multithreading;
 
-import ru.mralexeimk.yedom.config.YedomConfig;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -12,9 +10,9 @@ public class ClientSocket {
     private DataInputStream din;
     private boolean isActive = false;
 
-    public ClientSocket() {
+    public ClientSocket(String host, int port) {
         try {
-            socket = new Socket(YedomConfig.REC_HOST, YedomConfig.REC_PORT);
+            socket = new Socket(host, port);
             dout = new DataOutputStream(socket.getOutputStream());
             din = new DataInputStream(socket.getInputStream());
         } catch (Exception ex) {

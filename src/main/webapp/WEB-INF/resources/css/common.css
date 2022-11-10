@@ -160,10 +160,12 @@ input[type=text], textarea {
 #search {
     width: 100%;
     height: 50px;
-    font-size: 15px;
+    font-size: 20px;
 }
 #searchBtn {
-    width: 30%;
+    width: 50%;
+    height: 30%;
+    font-size: 30px;
 }
 input[type=submit]{
     padding: 7px;
@@ -246,10 +248,24 @@ a:active, a:hover, a{
     color: #1b1e21;
 }
 .btn-green {
-    background-color: #3a8d08;
+    background-color: #3a8d08 !important;
 }
 .btn-red {
-    background-color: #a60000;
+    background-color: #a60000 !important;
+}
+.btn {
+    background-color: darkgray;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid black;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+}
+.btn-primary {
+    background-color: darkgray !important;
+    border: 4px solid black !important;
 }
 .pre-scrollable {
     max-height: 500px;

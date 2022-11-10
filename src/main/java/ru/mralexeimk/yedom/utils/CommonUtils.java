@@ -69,7 +69,7 @@ public class CommonUtils {
         return Stream.of(array).skip(array.length - n).collect(Collectors.joining(" "));
     }
 
-    public static boolean regexMatch(String str, String regex) {
+    public static boolean regexMatch(String regex, String str) {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(str);
         return m.find();

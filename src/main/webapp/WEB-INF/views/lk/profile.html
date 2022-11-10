@@ -69,7 +69,7 @@
                                 </div>
                                 <input id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
                             </div>
-
+                            <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
                             <br />
 
                             <!-- Last login -->
@@ -152,6 +152,10 @@
         }).then(response => {
             if(response.ok) {
                 window.location.reload();
+                $('#error').attr('hidden', 'hidden');
+            }
+            else {
+                $('#error').removeAttr('hidden');
             }
         });
     }

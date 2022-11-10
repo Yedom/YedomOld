@@ -24,9 +24,9 @@ public class Course extends DraftCourse {
     private Timestamp completedOn = null;
 
     public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
-                  String description, String tags, int views, int likes,
+                  String description, String tags, String avatar, int views, int likes,
                   int investments, boolean acceptTasks, String completeRequestsUsersIds) {
-        super(id, hash, title, byOrganization, creatorId, description, tags);
+        super(id, hash, title, byOrganization, creatorId, description, tags, avatar);
         this.views = views;
         this.likes = likes;
         this.investments = investments;
@@ -38,7 +38,8 @@ public class Course extends DraftCourse {
     public Course(CourseEntity courseEntity) {
         this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
                 courseEntity.isByOrganization(), courseEntity.getCreatorId(),
-                courseEntity.getDescription(), courseEntity.getTags(), courseEntity.getViews(),
+                courseEntity.getDescription(), courseEntity.getTags(),
+                courseEntity.getAvatar(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks(),
                 courseEntity.getCompleteRequestsUsersIds());
     }
@@ -46,7 +47,8 @@ public class Course extends DraftCourse {
     public Course(Course course) {
         this(course.getId(), course.getHash(), course.getTitle(),
                 course.isByOrganization(), course.getCreatorId(),
-                course.getDescription(), course.getTags(), course.getViews(),
+                course.getDescription(), course.getTags(),
+                course.getAvatar(), course.getViews(),
                 course.getLikes(), course.getInvestments(), course.isAcceptTasks(),
                 course.getCompleteRequestsUsersIds());
         this.setCreatorName(course.getCreatorName());

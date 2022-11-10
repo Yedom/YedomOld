@@ -7,12 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.config.YedomConfig;
+import ru.mralexeimk.yedom.config.configs.AuthConfig;
+import ru.mralexeimk.yedom.config.configs.HostConfig;
+import ru.mralexeimk.yedom.config.configs.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.utils.interfaces.validation.OrderedChecks;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
@@ -33,17 +33,23 @@ public class AuthController {
     private final LanguageUtil languageUtil;
     private final PasswordEncoder passwordEncoder;
     private final TagsService tagsService;
+    private final HostConfig hostConfig;
+    private final AuthConfig authConfig;
+    private final ProfileConfig profileConfig;
 
     @Autowired
     public AuthController(UserRepository userRepository, UserValidator userValidator,
                           EmailService emailService, LanguageUtil languageUtil,
-                          PasswordEncoder passwordEncoder, TagsService tagsService) {
+                          PasswordEncoder passwordEncoder, HostConfig hostConfig, TagsService tagsService, AuthConfig authConfig, ProfileConfig profileConfig) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.emailService = emailService;
         this.languageUtil = languageUtil;
         this.passwordEncoder = passwordEncoder;
+        this.hostConfig = hostConfig;
         this.tagsService = tagsService;
+        this.authConfig = authConfig;
+        this.profileConfig = profileConfig;
     }
 
     @GetMapping("/reg")
@@ -103,8 +109,10 @@ public class AuthController {
         String operation = json.getString("operation");
         if(operation.equalsIgnoreCase("newpassword")) {
             String password = json.getString("password");
-            if(password.length() < YedomConfig.minPasswordLength) {
+            if(password.length() < authConfig.getMinPasswordLength()) {
                 return new ResponseEntity<>(HttpStatus.valueOf(501));
+            }if(password.length() > authConfig.getMaxPasswordLength()) {
+                return new ResponseEntity<>(HttpStatus.valueOf(502));
             }
             try {
                 String email = (String) session.getAttribute("email");
@@ -134,7 +142,7 @@ public class AuthController {
                 UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
                 if(userEntity != null) {
                     emailService.saveCode(userEntity.getUsername(), emailService.getRandomCode());
-                    String link = YedomConfig.DOMAIN + "auth/restore/" +
+                    String link = hostConfig.getLink() + "auth/restore/" +
                             CommonUtils.hashEncoder(
                                     emailService.getCodeByUser().get(userEntity.getUsername()).getCode());
                     session.setAttribute("email", email);
@@ -152,7 +160,7 @@ public class AuthController {
     }
 
     @PostMapping("/reg")
-    public String registerUser(@ModelAttribute("user") @Validated(OrderedChecks.class) User user,
+    public String registerUser(@ModelAttribute("user") User user,
                                BindingResult bindingResult, HttpSession session) {
         userValidator.validate(user.withArgs("onReg"), bindingResult);
 
@@ -209,6 +217,7 @@ public class AuthController {
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
                     user.setEmailConfirmed(true);
                     UserEntity userEntity = new UserEntity(user);
+                    userEntity.setAvatar(profileConfig.getBaseAvatarDefault());
                     userRepository.save(userEntity);
                     session.setAttribute("user", new User(userEntity));
                     emailService.removeCode(user.getUsername());

@@ -39,6 +39,9 @@ public class DraftCourseEntity {
     @Column(name = "tags")
     private String tags;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     // Add to database constructor
     public DraftCourseEntity(DraftCourse draftCourse) {
         this.title = draftCourse.getTitle();
@@ -46,6 +49,8 @@ public class DraftCourseEntity {
         this.creatorId = draftCourse.getCreatorId();
         this.description = draftCourse.getDescription();
         this.tags = draftCourse.getTags();
+        this.avatar = draftCourse.getAvatar();
+        this.hash = draftCourse.getHash();
     }
 
     @Override
