@@ -63,7 +63,10 @@ public class CoursesController {
                     .peek(course -> {
                         if(!course.isByOrganization()) {
                             Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
-                            userEntity.ifPresent(entity -> course.setCreatorName(userEntity.get().getUsername()));
+                            userEntity.ifPresent(entity -> {
+                                course.setCreatorName(userEntity.get().getUsername());
+                                course.setCreatorAvatar(userEntity.get().getAvatar());
+                            });
                         }
                     })
                     .toList();
@@ -79,7 +82,10 @@ public class CoursesController {
                         Course course = new Course(courseEntity);
                         if(!course.isByOrganization()) {
                             Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
-                            userEntity.ifPresent(entity -> course.setCreatorName(userEntity.get().getUsername()));
+                            userEntity.ifPresent(entity -> {
+                                course.setCreatorName(userEntity.get().getUsername());
+                                course.setCreatorAvatar(userEntity.get().getAvatar());
+                            });
                         }
                         courses.add(course);
                     }

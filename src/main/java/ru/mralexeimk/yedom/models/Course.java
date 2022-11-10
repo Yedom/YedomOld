@@ -20,6 +20,7 @@ public class Course extends DraftCourse {
 
     // Model fields
     private String creatorName = "";
+    private String creatorAvatar = "";
     private Timestamp completedOn = null;
 
     public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
@@ -49,6 +50,7 @@ public class Course extends DraftCourse {
                 course.getLikes(), course.getInvestments(), course.isAcceptTasks(),
                 course.getCompleteRequestsUsersIds());
         this.setCreatorName(course.getCreatorName());
+        this.setCreatorAvatar(course.getCreatorAvatar());
         this.setCompletedOn(course.getCompletedOn());
     }
 }

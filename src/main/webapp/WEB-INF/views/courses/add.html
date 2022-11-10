@@ -47,15 +47,15 @@
             <form th:method="POST" th:action="@{/courses/add}" th:object="${course}">
                 <label th:for="title" th:text="#{course.title}">Название курса</label>:
                 <br/>
-                <textarea class="textarea-add" th:field="*{title}" id="title"></textarea>
+                <textarea th:placeholder="#{course.add.title}" class="textarea-add" th:field="*{title}" id="title"></textarea>
                 <br />
                 <label th:for="description" th:text="#{course.description}">Описание курса</label>:
                 <br/>
-                <textarea class="textarea-add" rows="5" th:field="*{description}" id="description"></textarea>
+                <textarea th:placeholder="#{course.add.description}" class="textarea-add" rows="5" th:field="*{description}" id="description"></textarea>
                 <br />
                 <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
                 <br/>
-                <textarea class="textarea-add" rows="10" th:field="*{tags}" id="tags"></textarea>
+                <textarea th:placeholder="#{course.add.tags}" class="textarea-add" rows="10" th:field="*{tags}" id="tags"></textarea>
                 <br />
                 <div id="tagsToAdd" class="unselectable">
                 </div>

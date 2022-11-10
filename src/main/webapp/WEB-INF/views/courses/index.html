@@ -80,7 +80,7 @@
                         <div class="author">
                             <a href="#" th:href="@{'/lk/profile?username=' + ${course.creatorName}}">
                                 <img src="../../resources/images/screen.png"
-                                     th:src="@{/resources/images/screen.png}" alt="..." class="avatar img-raised">
+                                     th:src="${course.creatorAvatar}" alt="..." class="avatar img-raised">
                                 <span class="authorName" th:text="${course.creatorName}">Author</span>
                             </a>
                         </div>
