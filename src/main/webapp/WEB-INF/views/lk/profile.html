@@ -21,6 +21,7 @@
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -43,12 +44,31 @@
         <hr />
         <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
                id="profile" class="btn btn-primary" value="Профиль" th:value="#{profile.profile}" />
-        <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
-               id="friends" class="btn" value="Друзья" th:value="#{profile.friends} + ' (' + ${friends_count} +')'" />
+
+        <button id="friends" type="button"
+                class="btn dropdown-toggle"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                th:value="#{profile.friends}">
+            Друзья
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="friends">
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/friends'+window.location.search;"
+                   th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/followers'+window.location.search;"
+                   th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/following'+window.location.search;"
+                   th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
+        </ul>
+
         <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
-               id="courses" class="btn" value="Курсы" th:value="#{profile.courses}" />
+               id="courses" class="btn" value="Завершенные курсы"
+               th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
         <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
-               id="organizations" class="btn" value="Организации" th:value="#{profile.organizations}" />
+               id="organizations" class="btn" value="Организации"
+               th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
         <input type="button" onclick="window.location='/lk/profile/balance';"
                id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
         <hr />
@@ -87,8 +107,8 @@
                             <!-- Add to friends -->
                             <div class="add-to-friends" id="add_friend">
                                 <input type="button" onclick="follow()"
-                                       class="btn" th:classappend="${color}" value="Подписаться"
-                                       th:value="${action}" />
+                                       class="btn" th:classappend="${btn_properties.second}" value="Подписаться"
+                                       th:value="${btn_properties.first}" />
                             </div>
                             <br />
                         </div>

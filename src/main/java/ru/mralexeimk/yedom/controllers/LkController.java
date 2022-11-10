@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
-import ru.mralexeimk.yedom.models.Course;
-import ru.mralexeimk.yedom.models.DraftCourse;
-import ru.mralexeimk.yedom.models.Organization;
+import ru.mralexeimk.yedom.models.*;
 import ru.mralexeimk.yedom.utils.custom.Pair;
-import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.services.FriendsService;
+import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
@@ -30,6 +28,7 @@ public class LkController {
     private final FriendsService friendsService;
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
+    private final OrganizationsService organizationsService;
     private final CompletedCoursesRepository completedCoursesRepository;
     private final CourseRepository courseRepository;
     private final DraftCourseRepository draftCourseRepository;
@@ -38,10 +37,11 @@ public class LkController {
     private final ProfileConfig profileConfig;
 
     @Autowired
-    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, ProfileConfig profileConfig) {
+    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationsService organizationsService, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, ProfileConfig profileConfig) {
         this.friendsService = friendsService;
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
+        this.organizationsService = organizationsService;
         this.completedCoursesRepository = completedCoursesRepository;
         this.courseRepository = courseRepository;
         this.draftCourseRepository = draftCourseRepository;
@@ -75,6 +75,17 @@ public class LkController {
         return new Pair<>(userEntity, isSelf);
     }
 
+    private Amounts getAmounts(UserEntity userEntity) {
+        Amounts amounts = new Amounts();
+        amounts.setFriendsCount(friendsService.getFriendsCount(userEntity));
+        amounts.setFollowersCount(friendsService.getFollowersCount(userEntity));
+        amounts.setFollowingCount(friendsService.getFollowingCount(userEntity));
+        amounts.setCompletedCoursesCount(completedCoursesRepository.countAllByUserId(userEntity.getId()));
+        amounts.setOrganizationsCount(organizationsService.getOrganizationsCount(userEntity));
+
+        return amounts;
+    }
+
     @GetMapping("/profile")
     public String profileGet(Model model,
                                  @RequestParam(required = false, name = "username") String username,
@@ -93,21 +104,21 @@ public class LkController {
         if(userEntity == null) return "redirect:/errors/notfound";
 
         model.addAttribute("user", new User(userEntity));
-        model.addAttribute("friends_count",
-                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity));
 
         if(!isSelf) {
             pair = friendsService.updateFollowBtn(user, userEntity);
         }
 
-        model.addAttribute("action", pair.getFirst());
-        model.addAttribute("color", pair.getSecond());
+        model.addAttribute("btn_properties", pair);
 
         return "lk/profile";
     }
 
-    @GetMapping("/profile/friends")
+    @GetMapping("/profile/{type}")
     public String profileFriendsGet(Model model,
+                                    @PathVariable String type,
                                     @RequestParam(required = false, name = "username") String username,
                                     HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
@@ -119,13 +130,18 @@ public class LkController {
         UserEntity userEntity = profile.getFirst();
 
         if(userEntity == null) return "redirect:/errors/notfound";
-        List<Integer> friendsIds = CommonUtils.splitToListInt(userEntity.getFriendsIds());
 
-        model.addAttribute("friends_count",
-                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity));
 
-        model.addAttribute("friends",
-                userRepository.findAllById(friendsIds));
+        switch (type) {
+            case "friends" -> model.addAttribute("users",
+                    userRepository.findAllById(CommonUtils.splitToListInt(userEntity.getFriendsIds())));
+            case "followers" -> model.addAttribute("users",
+                    userRepository.findAllById(CommonUtils.splitToListInt(userEntity.getFollowersIds())));
+            case "following" -> model.addAttribute("users",
+                    userRepository.findAllById(CommonUtils.splitToListInt(userEntity.getFollowingIds())));
+        }
 
         return "lk/profile/friends";
     }
@@ -166,8 +182,8 @@ public class LkController {
             completedCourses.add(course);
         }
 
-        model.addAttribute("friends_count",
-                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity));
 
         model.addAttribute("completed_courses", completedCourses);
 
@@ -196,8 +212,8 @@ public class LkController {
             organizations.add(new Organization(organizationEntity));
         }
 
-        model.addAttribute("friends_count",
-                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity));
         model.addAttribute("organizations", organizations);
 
         return "lk/profile/organizations";
@@ -218,8 +234,8 @@ public class LkController {
 
         if(userEntity == null || !isSelf) return "redirect:/errors/notfound";
 
-        model.addAttribute("friends_count",
-                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity));
         model.addAttribute("user",
                 new User(userEntity));
 

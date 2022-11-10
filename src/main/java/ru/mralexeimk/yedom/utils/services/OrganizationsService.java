@@ -20,4 +20,8 @@ public class OrganizationsService {
     public boolean isMember(UserEntity userEntity, int organizationId) {
         return CommonUtils.splitToListInt(userEntity.getInOrganizationsIds()).contains(organizationId);
     }
+
+    public int getOrganizationsCount(UserEntity userEntity) {
+        return CommonUtils.splitToListInt(userEntity.getInOrganizationsIds()).size();
+    }
 }

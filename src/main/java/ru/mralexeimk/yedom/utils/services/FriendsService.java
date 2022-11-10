@@ -57,6 +57,14 @@ public class FriendsService {
         return CommonUtils.splitToListString(userEntity.getFriendsIds()).size();
     }
 
+    public int getFollowersCount(UserEntity userEntity) {
+        return CommonUtils.splitToListString(userEntity.getFollowersIds()).size();
+    }
+
+    public int getFollowingCount(UserEntity userEntity) {
+        return CommonUtils.splitToListString(userEntity.getFollowingIds()).size();
+    }
+
     public void followPress(UserEntity userEntity, UserEntity userEntity2) {
         String id = String.valueOf(userEntity.getId()),
                 id2 = String.valueOf(userEntity2.getId());

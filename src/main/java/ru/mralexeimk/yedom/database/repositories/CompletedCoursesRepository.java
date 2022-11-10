@@ -13,4 +13,5 @@ public interface CompletedCoursesRepository
         extends JpaRepository<CompletedCoursesEntity, Integer> {
     List<CompletedCoursesEntity> findAllByUserId(int id);
     List<CompletedCoursesEntity> findAllByUserIdOrderByCompletedOnDesc(int id);
+    int countAllByUserId(int id);
 }

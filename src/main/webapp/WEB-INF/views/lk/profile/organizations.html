@@ -21,6 +21,7 @@
     <script src="../../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script src="../../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse bg">
 
@@ -41,35 +42,52 @@
     <br />
 </div>
 
-<div class="container">
-    <div class="unselectable">
-        <div class="main main-raised col-md-8 mx-auto text-center">
-            <hr />
-            <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
-                   id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
-            <input type="button" onclick="window.location='/lk/profile/friends'+window.location.search;"
-                   id="friends" class="btn" value="Друзья" th:value="#{profile.friends} + ' (' + ${friends_count} +')'" />
-            <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
-                   id="courses" class="btn" value="Курсы" th:value="#{profile.courses}" />
-            <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
-                   id="organizations" class="btn btn-primary" value="Организации" th:value="#{profile.organizations}" />
-            <input type="button" onclick="window.location='/lk/profile/balance';"
-                   id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
-            <hr />
-            <br />
+<div class="bg unselectable">
+    <div class="main main-raised col-md-8 mx-auto text-center">
+        <hr />
+        <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
+               id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
 
-            <!-- Organizations in -->
-            <div class="row">
-                <div class="col col-3" th:each="organization : ${organizations}">
-                    <div class="card-plain card-blog card">
-                        <div class="card-avatar">
-                            <a href="#" th:href="@{'/organizations/' + ${organization.name}}">
-                                <img class="img-raised rounded-circle img-fluid" src="../../../resources/images/default.png"
-                                     th:src="@{/resources/images/default.png}"  alt="..."/>
-                            </a>
-                        </div>
-                        <h5 th:text="${organization.name}">Organization</h5>
+        <button id="friends" type="button"
+                class="btn dropdown-toggle"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                th:value="#{profile.friends}">
+            Друзья
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="friends">
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/friends'+window.location.search;"
+                   th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/followers'+window.location.search;"
+                   th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
+            <li><a class="dropdown-item" href="#"
+                   onclick="window.location='/lk/profile/following'+window.location.search;"
+                   th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
+        </ul>
+
+        <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
+               id="courses" class="btn" value="Завершенные курсы"
+               th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
+        <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
+               id="organizations" class="btn btn-primary" value="Организации"
+               th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
+        <input type="button" onclick="window.location='/lk/profile/balance';"
+               id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
+        <hr />
+        <br />
+
+        <!-- Organizations in -->
+        <div class="row">
+            <div class="col col-3" th:each="organization : ${organizations}">
+                <div class="card-plain card-blog card">
+                    <div class="card-avatar">
+                        <a href="#" th:href="@{'/organizations/' + ${organization.name}}">
+                            <img class="img-raised rounded-circle img-fluid" src="../../../resources/images/default.png"
+                                 th:src="${organization.avatar}"  alt="..."/>
+                        </a>
                     </div>
+                    <h5 th:text="${organization.name}">Organization</h5>
                 </div>
             </div>
         </div>
