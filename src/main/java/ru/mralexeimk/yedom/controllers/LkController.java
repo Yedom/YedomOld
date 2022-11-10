@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.controllers;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,14 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.database.entities.CompletedCoursesEntity;
-import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.CompletedCoursesRepository;
-import ru.mralexeimk.yedom.database.repositories.CourseRepository;
-import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.entities.*;
+import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.Course;
+import ru.mralexeimk.yedom.models.DraftCourse;
+import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.CommonUtils;
@@ -23,9 +21,7 @@ import ru.mralexeimk.yedom.utils.services.FriendsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 @RequestMapping("/lk")
@@ -35,16 +31,18 @@ public class LkController {
     private final OrganizationRepository organizationRepository;
     private final CompletedCoursesRepository completedCoursesRepository;
     private final CourseRepository courseRepository;
+    private final DraftCourseRepository draftCourseRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public LkController(FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.friendsService = friendsService;
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.completedCoursesRepository = completedCoursesRepository;
         this.courseRepository = courseRepository;
+        this.draftCourseRepository = draftCourseRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
     }
@@ -61,6 +59,19 @@ public class LkController {
         return "lk/account";
     }
 
+    private Pair<UserEntity, Boolean> getUserEntity(String username, User user) {
+        UserEntity userEntity;
+        boolean isSelf = false;
+        if(username == null || username.equals(user.getUsername())) {
+            userEntity = userRepository.findById(user.getId()).orElse(null);
+            isSelf = true;
+        }
+        else {
+            userEntity = userRepository.findByUsername(username).orElse(null);
+        }
+        return new Pair<>(userEntity, isSelf);
+    }
+
     @GetMapping("/profile")
     public String profileGet(Model model,
                                  @RequestParam(required = false, name = "username") String username,
@@ -68,24 +79,21 @@ public class LkController {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        Pair<String, String> pair = friendsService.DEFAULT_FOLLOW_BTN;
         User user = (User) session.getAttribute("user");
 
-        if(username == null || username.equals(user.getUsername())) {
-            UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
-            if(userEntity == null) return "redirect:/errors/notfound";
+        Pair<String, String> pair = friendsService.DEFAULT_FOLLOW_BTN;
 
-            model.addAttribute("user", new User(userEntity));
-            model.addAttribute("friends_count",
-                    friendsService.getFriendsCount(userEntity));
-        }
-        else {
-            UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
-            if(userEntity == null) return "redirect:/errors/notfound";
+        Pair<UserEntity, Boolean> profile = getUserEntity(username, user);
+        UserEntity userEntity = profile.getFirst();
+        boolean isSelf = profile.getSecond();
 
-            model.addAttribute("user", new User(userEntity));
-            model.addAttribute("friends_count",
-                    friendsService.getFriendsCount(userEntity));
+        if(userEntity == null) return "redirect:/errors/notfound";
+
+        model.addAttribute("user", new User(userEntity));
+        model.addAttribute("friends_count",
+                friendsService.getFriendsCount(userEntity));
+
+        if(!isSelf) {
             pair = friendsService.updateFollowBtn(user, userEntity);
         }
 
@@ -104,16 +112,11 @@ public class LkController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity;
-        if(username == null || username.equals(user.getUsername())) {
-            userEntity = userRepository.findById(user.getId()).orElse(null);
-        }
-        else {
-            userEntity = userRepository.findByUsername(username).orElse(null);
-        }
+        Pair<UserEntity, Boolean> profile = getUserEntity(username, user);
+        UserEntity userEntity = profile.getFirst();
 
         if(userEntity == null) return "redirect:/errors/notfound";
-        List<Integer> friendsIds = friendsService.splitToListInt(userEntity.getFriendsIds());
+        List<Integer> friendsIds = CommonUtils.splitToListInt(userEntity.getFriendsIds());
 
         model.addAttribute("friends_count",
                 friendsService.getFriendsCount(userEntity));
@@ -133,13 +136,8 @@ public class LkController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity;
-        if(username == null || username.equals(user.getUsername())) {
-            userEntity = userRepository.findById(user.getId()).orElse(null);
-        }
-        else {
-            userEntity = userRepository.findByUsername(username).orElse(null);
-        }
+        Pair<UserEntity, Boolean> profile = getUserEntity(username, user);
+        UserEntity userEntity = profile.getFirst();
 
         if(userEntity == null) return "redirect:/errors/notfound";
 
@@ -173,12 +171,79 @@ public class LkController {
         return "lk/profile/courses";
     }
 
-    @GetMapping("/courses")
-    public String coursesGet(HttpSession session) {
+    @GetMapping("/profile/organizations")
+    public String profileOrganizationsGet(Model model,
+                                    @RequestParam(required = false, name = "username") String username,
+                                    HttpSession session) {
         String check = CommonUtils.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
-        return "lk/courses";
+        User user = (User) session.getAttribute("user");
+
+        Pair<UserEntity, Boolean> profile = getUserEntity(username, user);
+        UserEntity userEntity = profile.getFirst();
+
+        if(userEntity == null) return "redirect:/errors/notfound";
+
+        List<Organization> organizations = new ArrayList<>();
+
+        for(Integer id : CommonUtils.splitToListInt(userEntity.getOrganizationsIds())) {
+            OrganizationEntity organizationEntity = organizationRepository.findById(id).orElse(null);
+            if(organizationEntity == null) continue;
+            organizations.add(new Organization(organizationEntity));
+        }
+
+        model.addAttribute("friends_count",
+                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("organizations", organizations);
+
+        return "lk/profile/organizations";
+    }
+
+    @GetMapping("/profile/balance")
+    public String profileBalanceGet(Model model,
+                                          @RequestParam(required = false, name = "username") String username,
+                                          HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+
+        Pair<UserEntity, Boolean> profile = getUserEntity(username, user);
+        UserEntity userEntity = profile.getFirst();
+        boolean isSelf = profile.getSecond();
+
+        if(userEntity == null || !isSelf) return "redirect:/errors/notfound";
+
+        model.addAttribute("friends_count",
+                friendsService.getFriendsCount(userEntity));
+        model.addAttribute("user",
+                new User(userEntity));
+
+        return "lk/profile/balance";
+    }
+
+    @GetMapping("/draftCourses")
+    public String coursesGet(Model model, HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        List<DraftCourse> draftCourses = new ArrayList<>();
+
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return "redirect:/errors/notfound";
+
+        for(Integer id : CommonUtils.splitToListInt(userEntity.getDraftCoursesIds())) {
+            DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);
+            if(draftCourseEntity == null) continue;
+            draftCourses.add(new DraftCourse(draftCourseEntity));
+        }
+
+        model.addAttribute("draft_courses", draftCourses);
+
+        return "lk/draftCourses";
     }
 
     @PostMapping("/profile/follow")
@@ -194,6 +259,31 @@ public class LkController {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         friendsService.followPress(user, userEntity);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    @PostMapping("/profile/uploadAvatar")
+    public @ResponseBody ResponseEntity<Object> uploadAvatar(@RequestBody String data,
+                                                          HttpSession session) {
+        String check = CommonUtils.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        try {
+            JSONObject json = new JSONObject(data);
+
+            String baseImg = json.getString("baseImg");
+            userEntity.setAvatar(baseImg);
+            userRepository.save(userEntity);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }

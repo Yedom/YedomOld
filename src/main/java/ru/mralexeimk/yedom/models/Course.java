@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import ru.mralexeimk.yedom.config.YedomConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Data
@@ -15,7 +12,6 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Course extends DraftCourse {
-    protected String hash = "";
     protected int views = 0;
     protected int likes = 0;
     protected int investments = 0;
@@ -29,8 +25,7 @@ public class Course extends DraftCourse {
     public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
                   String description, String tags, int views, int likes,
                   int investments, boolean acceptTasks, String completeRequestsUsersIds) {
-        super(id, title, byOrganization, creatorId, description, tags);
-        this.hash = hash;
+        super(id, hash, title, byOrganization, creatorId, description, tags);
         this.views = views;
         this.likes = likes;
         this.investments = investments;

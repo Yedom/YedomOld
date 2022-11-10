@@ -19,47 +19,12 @@
     <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
     <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
-<header class="navbar fixed-top navbar-transparent">
-    <div class="container-fluid unselectable header-container over-particles p-0">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/">
-                    <img class="banner1" src="../../resources/images/home.png">
-                </a>
-            </li>
-        </ul>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" style="color: #3a8d08;" href="/courses/add">
-                    <i class="material-icons">add</i>
-                    <span th:text="#{course.add}" class="hot-bar">Добавить курс</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" style="color: #3a8d08;" href="/courses">
-                    <i class="material-icons">list</i>
-                    <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
-                </a>
-            </li>
-            <li class="dropdown-menu-show nav-item">
-                <a class="dropdown-toggle nav-link" style="color: #3a8d08;" href="#" data-toggle="dropdown">
-                    <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
-                <div class="dropdown-menu dropdown-with-icons">
-                    <a href="/lk/profile" class="dropdown-item"><i class="material-icons">login</i>
-                        <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
-                    <a href="/lk/account" class="dropdown-item"><i class="material-icons">account_box</i>
-                        <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
-                    <a href="/lk/courses" class="dropdown-item"><i class="material-icons">edit</i>
-                        <span class="hot-bar" th:text="#{common.my_courses}">Мои курсы</span></a>
-                </div>
-            </li>
-        </ul>
-    </div>
-</header>
+<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
 
 <div>
     <br />
@@ -100,7 +65,7 @@
                        th:text="${course.title}">Course Title aw awf aw awf awaf 22r1 2r1 2r 12r 12r12r12r</a>
                 </h4>
                 <div class="unselectable perspective card-content card-header card-header-image">
-                    <a href="#" th:href="@{'/courses/' + ${course.getHash()}}">
+                    <a href="#" th:href="@{'/courses/' + ${course.hash}}">
                         <img class="courseImg" src="../../resources/images/screen.png"
                              th:src="@{/resources/images/screen.png}" alt="...">
                     </a>
@@ -131,30 +96,12 @@
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="footer">
-    <div class="container-fluid unselectable footer-container over-particles">
-        <nav class="float-left">
-            <ul>
-                <!-- GitHub link -->
-                <li>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
-                        <i class="material-icons">code</i>
-                        <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
-                </li>
-                <li>
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCC4M-40ckU4sroMTxGprBNg">
-                        <i class="material-icons">subscriptions</i>
-                        <span th:text="#{common.youtube}" class="hot-bar"> Youtube</span></a>
-                </li>
-            </ul>
-        </nav>
-        <div class="copyright float-right">
-            2022-<script>document.write(new Date().getFullYear())</script> ©
-            <text th:text="#{title}">Yedom</text>
-        </div>
-    </div>
-</footer>
+<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+
+<script>
+    w3.includeHTML();
+</script>
+
 <script th:inline="javascript">
     let search = $('#search');
     let els = $('.perspective');

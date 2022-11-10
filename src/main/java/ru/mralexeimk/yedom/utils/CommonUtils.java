@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -118,12 +120,10 @@ public class CommonUtils {
         }
     }
 
-    //createdOn to date without time
     public static String getCreatedOnDate(Timestamp createdOn) {
         return createdOn.toString().substring(0, 10);
     }
 
-    //hash int to sha-256
     public static String hashInt(int id) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -133,4 +133,17 @@ public class CommonUtils {
         return null;
     }
 
+
+    public static List<String> splitToListString(String s) {
+        return Arrays.stream(s.split(","))
+                .filter(i -> !i.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    public static List<Integer> splitToListInt(String s) {
+        return Arrays.stream(s.split(","))
+                .filter(i -> !i.isEmpty())
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
 }

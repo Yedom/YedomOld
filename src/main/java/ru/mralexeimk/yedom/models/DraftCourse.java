@@ -15,23 +15,26 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class DraftCourse {
     private int id;
+    protected String hash = "";
 
     @Size(min = YedomConfig.minCourseLength, max = YedomConfig.maxCourseLength, message = "{course.title.size}")
     protected String title;
 
     protected boolean byOrganization;
     protected int creatorId;
+
+    @Size(max = YedomConfig.maxDescriptionLength, message = "{course.description.size}")
     protected String description;
     protected String tags;
 
     // DraftCourse by DraftCourseEntity
     public DraftCourse(DraftCourseEntity courseEntity) {
-        this(courseEntity.getId(), courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
+        this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(), courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags());
     }
 
     public DraftCourse(DraftCourse a) {
-        this(a.getId(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
+        this(a.getId(), a.getHash(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
                 a.getDescription(), a.getTags());
     }
 }

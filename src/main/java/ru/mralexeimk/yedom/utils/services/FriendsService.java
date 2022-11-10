@@ -3,6 +3,7 @@ package ru.mralexeimk.yedom.utils.services;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
@@ -53,32 +54,19 @@ public class FriendsService {
     }
 
     public int getFriendsCount(UserEntity userEntity) {
-        return splitToListString(userEntity.getFriendsIds()).size();
-    }
-
-    public List<String> splitToListString(String s) {
-        return Arrays.stream(s.split(","))
-                .filter(i -> !i.isEmpty())
-                .collect(Collectors.toList());
-    }
-
-    public List<Integer> splitToListInt(String s) {
-        return Arrays.stream(s.split(","))
-                .filter(i -> !i.isEmpty())
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        return CommonUtils.splitToListString(userEntity.getFriendsIds()).size();
     }
 
     public void followPress(UserEntity userEntity, UserEntity userEntity2) {
         String id = String.valueOf(userEntity.getId()),
                 id2 = String.valueOf(userEntity2.getId());
 
-        List<String> friendsIds = splitToListString(userEntity.getFriendsIds()),
-                followersIds = splitToListString(userEntity.getFollowersIds()),
-                followingIds = splitToListString(userEntity.getFollowingIds()),
-                friendsIds2 = splitToListString(userEntity2.getFriendsIds()),
-                followersIds2 = splitToListString(userEntity2.getFollowersIds()),
-                followingIds2 = splitToListString(userEntity2.getFollowingIds());
+        List<String> friendsIds = CommonUtils.splitToListString(userEntity.getFriendsIds()),
+                followersIds = CommonUtils.splitToListString(userEntity.getFollowersIds()),
+                followingIds = CommonUtils.splitToListString(userEntity.getFollowingIds()),
+                friendsIds2 = CommonUtils.splitToListString(userEntity2.getFriendsIds()),
+                followersIds2 = CommonUtils.splitToListString(userEntity2.getFollowersIds()),
+                followingIds2 = CommonUtils.splitToListString(userEntity2.getFollowingIds());
 
         if(friendsIds.contains(id2)) {
             friendsIds.remove(id2);

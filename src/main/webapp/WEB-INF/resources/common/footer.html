@@ -1,0 +1,24 @@
+<!-- Footer -->
+<footer th:fragment="footer-fragment" class="footer">
+  <div class="container-fluid unselectable footer-container over-particles">
+    <nav class="float-left">
+      <ul>
+        <!-- GitHub link -->
+        <li>
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/Yedom">
+            <i class="material-icons">code</i>
+            <span th:text="#{common.developers}" class="hot-bar"> Разработчики</span></a>
+        </li>
+        <li>
+          <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCC4M-40ckU4sroMTxGprBNg">
+            <i class="material-icons">subscriptions</i>
+            <span th:text="#{common.youtube}" class="hot-bar"> Youtube</span></a>
+        </li>
+      </ul>
+    </nav>
+    <div class="copyright float-right">
+      2022-<script>document.write(new Date().getFullYear())</script> ©
+      <text th:text="#{title}">Yedom</text>
+    </div>
+  </div>
+</footer>

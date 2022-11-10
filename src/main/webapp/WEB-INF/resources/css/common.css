@@ -8,7 +8,6 @@ body {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     width: 100%;
-    height: 70px;
 }
 .footer-container {
     background-color: #ffffff;
@@ -63,7 +62,7 @@ form {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    background-color: #a6eae4;
+    background-color: #1b1e21;
 }
 .errors {
     width: 80%;
@@ -92,13 +91,10 @@ div.editable {
     border: 1px solid #ccc;
     padding: 5px;
 }
-.section {
-    opacity: .9;
-}
-.title {
+.title-img {
     width: 50%;
 }
-.title p {
+.title-img p {
     font-size: 120px;
     opacity: .9;
 }
@@ -136,13 +132,24 @@ div.editable {
 .courseImg:hover {
     cursor: pointer;
 }
-footer {
-    height: 80px;
+.footer {
     background-color: #a6eae4;
     width: 100%;
+    padding: 0;
+}
+footer {
+    padding: 0.9375rem 0;
+    text-align: center;
+}
+.index-page .page-header {
+    height: 93vh
 }
 header {
     width: 100%;
+}
+.nav-link {
+    color: green;
+    font-size: 30px;
 }
 input[type=text], textarea {
     padding:5px;
@@ -166,6 +173,73 @@ input[type=submit]{
     -webkit-border-radius: 5px;
     border-radius: 10px;
     color: white;
+}
+.avatar {
+    border: 1px solid #ddd;
+    width: 100%;
+    height: 100%;
+}
+.avatar-wrapper {
+    position: relative;
+    height: 200px;
+    width: 200px;
+    margin: 50px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 1px 1px 15px -5px black;
+    transition: all .3s ease;
+}
+.avatar-wrapper:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+.avatar-wrapper:hover .profile-pic {
+    opacity: .5;
+}
+.profile-pic {
+    height: 100%;
+    width: 100%;
+    transition: all .3s ease;
+}
+.profile-pic:after {
+    font-family: FontAwesome, serif;
+    content: "\f007";
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    font-size: 190px;
+    background: #ecf0f1;
+    color: #34495e;
+    text-align: center;
+}
+.upload-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+.upload-button .fa-arrow-circle-up {
+    position: absolute;
+    font-size: 234px;
+    top: -17px;
+    left: 0;
+    text-align: center;
+    opacity: 0;
+    transition: all .3s ease;
+    color: #34495e;
+}
+.profile-username {
+    margin: -120px auto;
+    color: red;
+    width: 80%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+}
+.upload-button .fa-arrow-circle-up:hover {
+    opacity: .9;
 }
 a:active, a:hover, a{
     text-decoration: none;
@@ -204,16 +278,8 @@ a:active, a:hover, a{
 .nav {
     color: #3a8d08;
 }
-footer {
-    padding: 0;
-}
-@media screen and (max-width: 480px) {
-
-    .header {
-        font-size: 7px;
+@media only screen and (max-width: 600px) {
+    .title-img {
+        width: 100%;
     }
-    .footer {
-        font-size: 7px;
-    }
-
 }

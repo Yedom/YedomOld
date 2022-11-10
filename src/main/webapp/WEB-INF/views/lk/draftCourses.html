@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{title}">Yedom</title>
+
+  <!-- Info -->
+  <meta name="description" content="Yedom education platform">
+  <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+
+  <!-- Scripts -->
+  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+</head>
+<body class="index-page sidebar-collapse">
+
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
+<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
+
+<div class="bg section">
+  <div class="row py-lg-5">
+    <div class="col-lg-6 col-md-8 mx-auto over-particles">
+      <input type="submit" onclick="clickAdd()" style="width: 100%; height: 100%; font-size: 25px;" id="addBtn"
+             value="Добавить курс" th:value="#{course.add}" />
+      <br />
+      <br />
+      <br />
+    </div>
+  </div>
+</div>
+<div class="bg unselectable">
+  <div class="main main-raised col-md-10 mx-auto text-center">
+    <div class="container pre-scrollable">
+      <div class="row">
+        <div class="col-md-12">
+
+          <!-- My Courses -->
+          <h2 th:text="#{common.my_courses}">Courses Constructor</h2>
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <tr>
+                    <th class="text-center" th:text="#{course.title}">Title</th>
+                    <th class="text-center" th:text="#{course.description}">Description</th>
+                    <th class="text-center" th:text="#{course.tags.title}">Tags</th>
+                  </tr>
+                  <tbody>
+
+                  <!-- Draft Course -->
+                  <tr class="clickable-tr" th:each="course : ${draft_courses}"
+                      th:attr="onclick=|clickCourse('${course.hash}')|">
+                    <td class="text-center" th:text="${course.title}">Основы программирования на Python</td>
+                    <td class="text-center" th:text="${course.description}">описание</td>
+                    <td class="text-center" th:text="${course.tags}">программирование, python, для новичков</td>
+                  </tr>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <br />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bg">
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+</div>
+
+<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+
+<script>
+  w3.includeHTML();
+
+  particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+    console.log('particles-js loaded!');
+  });
+</script>
+
+<script th:inline="javascript">
+  function clickAdd() {
+    window.location.href = '/courses/add';
+  }
+  function clickCourse(hash) {
+    window.location.href = '/constructor/' + hash;
+  }
+</script>
+</body>
+</html>
