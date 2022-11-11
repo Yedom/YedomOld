@@ -10,25 +10,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-  <link rel="stylesheet" href="../../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
 
   <!-- Scripts -->
-  <script src="../../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
-  <script src="../../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse bg">
 
 <!-- Particles Container -->
 <div id="particles-container"></div>
 
-<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../../resources/common/header.html"></div>
+<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
 
 <div class="bg">
   <br />
@@ -45,7 +45,8 @@
 <div class="bg unselectable">
   <div class="main main-raised col-md-6 mx-auto text-center">
     <hr />
-    <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
+
+    <input type="button" onclick="window.location='/profile/' + [[${user.username}]]"
            id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
 
     <button id="friends" type="button"
@@ -56,24 +57,25 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="friends">
       <li><a class="dropdown-item" href="#"
-             onclick="window.location='/lk/profile/friends'+window.location.search;"
+             onclick="window.location='/profile/'+[[${user.username}]]+'/friends'"
              th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
       <li><a class="dropdown-item" href="#"
-             onclick="window.location='/lk/profile/followers'+window.location.search;"
+             onclick="window.location='/profile/'+[[${user.username}]]+'/followers'"
              th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
       <li><a class="dropdown-item" href="#"
-             onclick="window.location='/lk/profile/following'+window.location.search;"
+             onclick="window.location='/profile/'+[[${user.username}]]+'/following'"
              th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
     </ul>
 
-    <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
+    <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/courses'"
            id="courses" class="btn btn-primary" value="Завершенные курсы"
            th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
-    <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
+    <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/organizations'"
            id="organizations" class="btn" value="Организации"
            th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
-    <input type="button" onclick="window.location='/lk/profile/balance';"
+    <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/balance';"
            id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
+
     <hr />
     <br />
 
@@ -128,12 +130,12 @@
   <br />
 </div>
 
-<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../../resources/common/footer.html"></div>
+<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script>
   w3.includeHTML();
 
-  particlesJS.load('particles-container', '../../../resources/assets/particles.json', function () {
+  particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
     console.log('particles-js loaded!');
   });
 </script>
@@ -141,7 +143,8 @@
 <script th:inline="javascript">
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  if(urlParams.get('username') != null) {
+  // Another profile
+  if(urlUsername != null && urlUsername !== [[${user.username}]]) {
     $('#balance').hide();
   }
 

@@ -10,11 +10,12 @@ import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 @Component
 public class UserValidator implements Validator {
+    private final UtilsService utilsService;
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final LanguageUtil languageUtil;
@@ -22,7 +23,8 @@ public class UserValidator implements Validator {
     private final EmailConfig emailConfig;
 
     @Autowired
-    public UserValidator(UserRepository userRepository, PasswordEncoder encoder, LanguageUtil languageUtil, AuthConfig authConfig, EmailConfig emailConfig) {
+    public UserValidator(UtilsService utilsService, UserRepository userRepository, PasswordEncoder encoder, LanguageUtil languageUtil, AuthConfig authConfig, EmailConfig emailConfig) {
+        this.utilsService = utilsService;
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.languageUtil = languageUtil;
@@ -62,7 +64,7 @@ public class UserValidator implements Validator {
         if(user.getEmail() == null || user.getEmail().isEmpty()) {
             reject("email", "auth.email.empty", errors);
         }
-        else if(!CommonUtils.regexMatch(emailConfig.getRegexp(), user.getEmail())) {
+        else if(!utilsService.regexMatch(emailConfig.getRegexp(), user.getEmail())) {
             reject("email", "auth.email.incorrect", errors);
         }
     }

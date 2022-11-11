@@ -1,8 +1,10 @@
-package ru.mralexeimk.yedom.utils;
+package ru.mralexeimk.yedom.utils.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 import javax.annotation.PostConstruct;
@@ -18,40 +20,34 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
-public class CommonUtils {
-    private static LanguageUtil languageUtil;
-    private final LanguageUtil tmpLanguageUtil;
+@Service
+public class UtilsService {
+    private final LanguageUtil languageUtil;
 
     @Autowired
-    public CommonUtils(LanguageUtil tmpLanguageUtil) {
-        this.tmpLanguageUtil = tmpLanguageUtil;
+    public UtilsService(LanguageUtil tmpLanguageUtil) {
+        this.languageUtil = tmpLanguageUtil;
     }
 
-    @PostConstruct
-    public void init() {
-        languageUtil = tmpLanguageUtil;
-    }
-
-    public static int getRandomNumber(int min, int max) {
+    /**
+     * @return random int number in range [min, max]
+     */
+    public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
-    public static Timestamp getCurrentTimestamp() {
+    /**
+     * @return current timestamp
+     */
+    public Timestamp getCurrentTimestamp() {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    public static String hashEncoder(String code) throws NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        messageDigest.update(code.getBytes(),0, code.length());
-        String hash = new BigInteger(1, messageDigest.digest()).toString(16);
-        if (hash.length() < 32) {
-            hash = "0" + hash;
-        }
-        return hash;
-    }
-
-    public static String preventUnauthorizedAccess(HttpSession session) {
+    /**
+     * Prevent unauthorised access to pages
+     * @return redirect to login page or null if authorised
+     */
+    public String preventUnauthorizedAccess(HttpSession session) {
         if(session.getAttribute("user") == null)
             return "redirect:/auth/login";
 
@@ -62,20 +58,68 @@ public class CommonUtils {
         return null;
     }
 
-    public static String getLastN(String[] array, int n) {
+    private String hashSHA256(String str) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.update(str.getBytes(), 0, str.length());
+            return new BigInteger(1, messageDigest.digest()).toString(16);
+        } catch (Exception ignored) {};
+        return null;
+    }
+
+    private String hashMD5(String str) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(str.getBytes(), 0, str.length());
+            String hash = new BigInteger(1, messageDigest.digest()).toString(16);
+            if (hash.length() < 32) {
+                hash = "0" + hash;
+            }
+            return hash;
+        } catch (Exception ignored) {};
+        return null;
+    }
+
+    /**
+     * @return hash of string
+     */
+    public String hash(String str, HashAlg hashAlg) {
+        return switch (hashAlg) {
+            case SHA256 -> hashSHA256(str);
+            case MD5 -> hashMD5(str);
+        };
+    }
+
+    /**
+     * @return hash of int
+     */
+    public String hash(int num, HashAlg hashAlg) {
+        return hash(String.valueOf(num), hashAlg);
+    }
+
+    /**
+     * Join last N elements of String[] by space delimiter
+     */
+    public String getLastN(String[] array, int n) {
         if (array.length - n < 0) {
             return String.join(" ", array);
         }
         return Stream.of(array).skip(array.length - n).collect(Collectors.joining(" "));
     }
 
-    public static boolean regexMatch(String regex, String str) {
+    /**
+     * Check if string match regex
+     */
+    public boolean regexMatch(String regex, String str) {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(str);
         return m.find();
     }
 
-    public static boolean containsSymbols(String str, String symbols) {
+    /**
+     * Check if string contains any symbols from another string
+     */
+    public boolean containsSymbols(String str, String symbols) {
         for (int i = 0; i < symbols.length(); i++) {
             if (str.contains(String.valueOf(symbols.charAt(i)))) {
                 return true;
@@ -84,11 +128,14 @@ public class CommonUtils {
         return false;
     }
 
-    public static String clearSpacesAroundSymbol(String str, String symbol) {
+    /**
+     * Clear all spaces in string around symbol
+     */
+    public String clearSpacesAroundSymbol(String str, String symbol) {
         return str.replaceAll(" *"+symbol+" *", "@");
     }
 
-    public static String numeralCorrect(String type, long count) {
+    private String numeralCorrect(String type, long count) {
         return count + " " + (count == 1 ?
                 languageUtil.getLocalizedMessage("time."+type) :
                 count <= 4 ? languageUtil.getLocalizedMessage("time."+type+"s_to4") :
@@ -97,8 +144,10 @@ public class CommonUtils {
                 " " + languageUtil.getLocalizedMessage("time.ago");
     }
 
-    //user was online N minutes/hours/days/month ago
-    public static String calculateTimeLoginAgo(Timestamp lastLogin) {
+    /**
+     * Function for "User was online N minutes/hours/days/month ago"
+     */
+    public String calculateTimeLoginAgo(Timestamp lastLogin) {
         long time = System.currentTimeMillis() - lastLogin.getTime();
         long minutes = time / 1000 / 60;
         long hours = minutes / 60;
@@ -120,27 +169,27 @@ public class CommonUtils {
         }
     }
 
-    public static String getCreatedOnDate(Timestamp createdOn) {
+    /**
+     * Timestamp to date
+     */
+    public String getCreatedOnDate(Timestamp createdOn) {
         return createdOn.toString().substring(0, 10);
     }
 
-    public static String hashInt(int id) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            messageDigest.update(String.valueOf(id).getBytes(), 0, String.valueOf(id).length());
-            return new BigInteger(1, messageDigest.digest()).toString(16);
-        } catch (Exception ignored) {};
-        return null;
-    }
 
-
-    public static List<String> splitToListString(String s) {
+    /**
+     * Split string by comma and add to list of string
+     */
+    public List<String> splitToListString(String s) {
         return Arrays.stream(s.split(","))
                 .filter(i -> !i.isEmpty())
                 .collect(Collectors.toList());
     }
 
-    public static List<Integer> splitToListInt(String s) {
+    /**
+     * Split string by comma and add to list of integer
+     */
+    public List<Integer> splitToListInt(String s) {
         return Arrays.stream(s.split(","))
                 .filter(i -> !i.isEmpty())
                 .map(Integer::parseInt)

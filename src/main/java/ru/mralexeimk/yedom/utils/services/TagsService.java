@@ -30,6 +30,9 @@ public class TagsService {
         return sendSocket(user, socketType, msg, false);
     }
 
+    /**
+     * Send socket to SmartSearchServer and get response
+     */
     public String sendSocket(User user, SocketType socketType, String msg, boolean resending) {
         String response = "";
         ClientSocket clientSocket = createConnection(user);
@@ -49,6 +52,9 @@ public class TagsService {
         return response;
     }
 
+    /**
+     * Create connection between Java client and Python server with multithreading sockets
+     */
     public ClientSocket createConnection(User user) {
         ClientSocket clientSocket = null;
         try {
@@ -64,10 +70,5 @@ public class TagsService {
             ex.printStackTrace();
         }
         return clientSocket;
-    }
-
-    public List<Integer> responseIdsToList(String response) {
-        return Stream.of(response.split(","))
-                .map(Integer::parseInt).toList();
     }
 }

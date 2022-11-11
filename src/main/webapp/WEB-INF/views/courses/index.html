@@ -78,7 +78,7 @@
                     </p>
                     <div class="card-footer unselectable">
                         <div class="author">
-                            <a href="#" th:href="@{'/lk/profile?username=' + ${course.creatorName}}">
+                            <a href="#" th:href="@{'/profile/' + ${course.creatorName}}">
                                 <img src="../../resources/images/screen.png"
                                      th:src="${course.creatorAvatar}" alt="..." class="avatar img-raised">
                                 <span class="authorName" th:text="${course.creatorName}">Author</span>

@@ -15,7 +15,8 @@ import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.Code;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.services.EmailService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.TagsService;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
+    private final UtilsService utilsService;
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final EmailService emailService;
@@ -38,9 +40,10 @@ public class AuthController {
     private final ProfileConfig profileConfig;
 
     @Autowired
-    public AuthController(UserRepository userRepository, UserValidator userValidator,
+    public AuthController(UtilsService utilsService, UserRepository userRepository, UserValidator userValidator,
                           EmailService emailService, LanguageUtil languageUtil,
                           PasswordEncoder passwordEncoder, HostConfig hostConfig, TagsService tagsService, AuthConfig authConfig, ProfileConfig profileConfig) {
+        this.utilsService = utilsService;
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.emailService = emailService;
@@ -52,26 +55,41 @@ public class AuthController {
         this.profileConfig = profileConfig;
     }
 
+    /**
+     * User registration page
+     */
     @GetMapping("/reg")
     public String newPerson(@ModelAttribute("user") User user) {
         return "auth/reg";
     }
 
+    /**
+     * User login page
+     */
     @GetMapping("/login")
     public String authPerson(@ModelAttribute("user") User user) {
         return "auth/login";
     }
 
+    /**
+     * User confirm email page
+     */
     @GetMapping("/confirm")
     public String confirmPerson(@ModelAttribute("code") Code code) {
         return "auth/confirm";
     }
 
+    /**
+     * User restore password by email page
+     */
     @GetMapping("/restore")
     public String restorePassword() {
         return "auth/restore";
     }
 
+    /**
+     * User change password page (after restore)
+     */
     @GetMapping("/newpassword")
     public String newPassword(HttpSession session) {
         if(session.getAttribute("newpassword") != null) {
@@ -80,28 +98,34 @@ public class AuthController {
         return "auth/restore";
     }
 
-    @GetMapping("/restore/{baseCode}")
-    public String confirmChangePassword(@PathVariable String baseCode, HttpSession session) {
+    /**
+     * Restore password link from email
+     */
+    @GetMapping("/restore/{hashedCode}")
+    public String confirmChangePassword(@PathVariable(value = "hashedCode") String hashedCode, HttpSession session) {
         if (session.getAttribute("email") != null) {
             String email = (String) session.getAttribute("email");
             UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
             if(userEntity != null) {
                 if (emailService.getCodeByUser().containsKey(userEntity.getUsername())) {
                     try {
-                        String baseCodeActual = CommonUtils.hashEncoder(
-                                emailService.getCodeByUser().get(userEntity.getUsername()).getCode());
-                        if (baseCodeActual.equals(baseCode)) {
+                        String hashedCodeActual = utilsService.hash(
+                                emailService.getCodeByUser().get(userEntity.getUsername()).getCode(),
+                                HashAlg.SHA256);
+                        if (hashedCodeActual.equals(hashedCode)) {
                             session.setAttribute("newpassword", true);
                             return "auth/newpassword";
                         }
-                    } catch (Exception ignored) {
-                    }
+                    } catch (Exception ignored) {}
                 }
             }
         }
-        return "redirect:auth/restore";
+        return "redirect:/auth/restore";
     }
 
+    /**
+     * Apply new password
+     */
     @PostMapping("/newpassword")
     public @ResponseBody ResponseEntity<Object> newPasswordApply(@RequestBody String data,
                                                                                   HttpSession session) {
@@ -131,6 +155,9 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    /**
+     * Generate restore password link and send it to email
+     */
     @PostMapping("/restore")
     public @ResponseBody ResponseEntity<Object> changePassword(@RequestBody String data,
                                                                HttpSession session) {
@@ -143,8 +170,9 @@ public class AuthController {
                 if(userEntity != null) {
                     emailService.saveCode(userEntity.getUsername(), emailService.getRandomCode());
                     String link = hostConfig.getLink() + "auth/restore/" +
-                            CommonUtils.hashEncoder(
-                                    emailService.getCodeByUser().get(userEntity.getUsername()).getCode());
+                            utilsService.hash(
+                                    emailService.getCodeByUser().get(userEntity.getUsername()).getCode(),
+                                    HashAlg.SHA256);
                     session.setAttribute("email", email);
                     emailService.sendMessage(email,
                             languageUtil.getLocalizedMessage("auth.mail.restore.title"),
@@ -159,6 +187,9 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    /**
+     * Send code to confirm email
+     */
     @PostMapping("/reg")
     public String registerUser(@ModelAttribute("user") User user,
                                BindingResult bindingResult, HttpSession session) {
@@ -181,6 +212,9 @@ public class AuthController {
         return "redirect:confirm";
     }
 
+    /**
+     * User login
+     */
     @PostMapping("/login")
     public String loginUser(@ModelAttribute("user") User user,
                             BindingResult bindingResult, HttpSession session) {
@@ -196,7 +230,7 @@ public class AuthController {
 
         if(userEntity == null) return "auth/login";
 
-        userEntity.setLastLogin(CommonUtils.getCurrentTimestamp());
+        userEntity.setLastLogin(utilsService.getCurrentTimestamp());
         userRepository.save(userEntity);
 
         user = new User(userEntity);
@@ -206,6 +240,9 @@ public class AuthController {
         return "redirect:/";
     }
 
+    /**
+     * User email confirmation to complete registration
+     */
     @PostMapping("/confirm")
     public String confirmUser(@ModelAttribute("code") @Valid Code code,
                               BindingResult bindingResult, HttpSession session) {
@@ -216,8 +253,11 @@ public class AuthController {
                         emailService.getCodeByUser()
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
                     user.setEmailConfirmed(true);
+
                     UserEntity userEntity = new UserEntity(user);
                     userEntity.setAvatar(profileConfig.getBaseAvatarDefault());
+                    userEntity.setLastLogin(utilsService.getCurrentTimestamp());
+
                     userRepository.save(userEntity);
                     session.setAttribute("user", new User(userEntity));
                     emailService.removeCode(user.getUsername());

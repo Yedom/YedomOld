@@ -12,12 +12,13 @@ import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.RolesService;
 import ru.mralexeimk.yedom.utils.services.TagsService;
@@ -29,6 +30,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/courses")
 public class CoursesController {
+    private final UtilsService utilsService;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final CourseValidator courseValidator;
@@ -40,7 +42,8 @@ public class CoursesController {
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CoursesController(CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
+    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
+        this.utilsService = utilsService;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.courseValidator = courseValidator;
@@ -52,10 +55,14 @@ public class CoursesController {
         this.coursesConfig = coursesConfig;
     }
 
+    /**
+     * Open courses list page
+     * @param search user search query
+     */
     @GetMapping
     public String index(Model model, @RequestParam(required = false, name = "search") String search,
                         HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
@@ -78,7 +85,7 @@ public class CoursesController {
         else {
             String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
             if(!response.equals("")) {
-                List<Integer> IDS = tagsService.responseIdsToList(response);
+                List<Integer> IDS = utilsService.splitToListInt(response);
 
                 for (Integer id : IDS) {
                     CourseEntity courseEntity = courseRepository.findById(id).orElse(null);
@@ -102,9 +109,12 @@ public class CoursesController {
         return "courses/index";
     }
 
+    /**
+     * Get course page by hash
+     */
     @GetMapping("/{hash}")
     public String course(Model model, @PathVariable String hash, HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
@@ -115,17 +125,24 @@ public class CoursesController {
         return "courses/course";
     }
 
+    /**
+     * Open create course page
+     */
     @GetMapping("/add")
     public String add(@ModelAttribute("course") Course course, HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
+
         return "courses/add";
     }
 
+    /**
+     * Save course in user's draft courses
+     */
     @PostMapping("/add")
     public String addPost(@ModelAttribute("course") Course course,
                           BindingResult bindingResult, HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
@@ -139,7 +156,7 @@ public class CoursesController {
 
         Course cloneCourse = new Course(course);
         cloneCourse.setTags(
-                CommonUtils.clearSpacesAroundSymbol(
+                utilsService.clearSpacesAroundSymbol(
                                 cloneCourse.getTags().replaceAll(", ", "@"), "@")
                         .trim());
         courseValidator.validate(cloneCourse, bindingResult);
@@ -150,20 +167,23 @@ public class CoursesController {
 
         cloneCourse.setCreatorId(user.getId());
         cloneCourse.setAvatar(coursesConfig.getBaseAvatarDefault());
-        cloneCourse.setHash(CommonUtils.hashInt(cloneCourse.getId()));
+        cloneCourse.setHash(utilsService.hash(cloneCourse.getId(), HashAlg.SHA256));
 
         CourseEntity courseEntity = new CourseEntity(cloneCourse);
 
         courseRepository.save(courseEntity);
 
-        return "redirect:/courses";
+        return "redirect:/constructor";
     }
 
+    /**
+     * Update tags recommendations when user typing
+     */
     @GetMapping(value = "/add/tagsUpdate", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public String tagsUpdate(@RequestParam(required = false, name = "tags") String tags,
                              HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         StringBuilder htmlResponse = new StringBuilder();
@@ -174,13 +194,13 @@ public class CoursesController {
                 tags = tags
                         .replaceAll(",", "")
                         .replaceAll("@", " ");
-                String search = CommonUtils.getLastN(
+                String search = utilsService.getLastN(
                         tags.split(" "),
                         smartSearchConfig.getMaxWordsInRequest());
                 String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search.strip());
 
                 if (!response.equals("")) {
-                    List<Integer> IDS = tagsService.responseIdsToList(response);
+                    List<Integer> IDS = utilsService.splitToListInt(response);
 
                     int c = 0;
                     for (int id : IDS) {
@@ -199,10 +219,13 @@ public class CoursesController {
         return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
     }
 
+    /**
+     * Get popular tags
+     */
     @GetMapping(value = "/popularTags", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public String popularTags(HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         StringBuilder htmlResponse = new StringBuilder();
@@ -210,7 +233,7 @@ public class CoursesController {
         String response = tagsService.sendSocket(user, SocketType.GET_POPULAR_TAGS);
 
         if (!response.equals("")) {
-            List<Integer> IDS = tagsService.responseIdsToList(response);
+            List<Integer> IDS = utilsService.splitToListInt(response);
 
             int c = 0;
             for (int id : IDS) {

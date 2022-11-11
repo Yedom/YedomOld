@@ -42,7 +42,7 @@
 <div class="bg unselectable">
     <div class="main col-md-6 mx-auto text-center">
         <hr />
-        <input type="button" onclick="window.location='/lk/profile'+window.location.search;"
+        <input type="button" th:attr="onclick=|click('')|"
                id="profile" class="btn btn-primary" value="Профиль" th:value="#{profile.profile}" />
 
         <button id="friends" type="button"
@@ -53,23 +53,26 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="friends">
             <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/lk/profile/friends'+window.location.search;"
+                   onclick="click('friends')"
                    th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
             <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/lk/profile/followers'+window.location.search;"
+                   onclick="click('followers')"
                    th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
             <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/lk/profile/following'+window.location.search;"
+                   onclick="click('following')"
                    th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
         </ul>
 
-        <input type="button" onclick="window.location='/lk/profile/courses'+window.location.search;"
+        <input type="button"
+               onclick="click('courses')"
                id="courses" class="btn" value="Завершенные курсы"
                th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
-        <input type="button" onclick="window.location='/lk/profile/organizations'+window.location.search;"
+        <input type="button"
+               onclick="click('organizations')"
                id="organizations" class="btn" value="Организации"
                th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
-        <input type="button" onclick="window.location='/lk/profile/balance';"
+        <input type="button"
+               onclick="click('balance')"
                id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
         <hr />
         <br />
@@ -95,13 +98,13 @@
                             <!-- Last login -->
                             <div class="created-on">
                                 <h6 th:text="#{profile.last_login}">Last login</h6>
-                                <h6 th:text="${T(ru.mralexeimk.yedom.utils.CommonUtils).calculateTimeLoginAgo(user.lastLogin)}"></h6>
+                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}"></h6>
                             </div>
 
                             <!-- Created on -->
                             <div class="last-login">
                                 <h6 th:text="#{profile.created_on}">Created on</h6>
-                                <h6 th:text="${T(ru.mralexeimk.yedom.utils.CommonUtils).getCreatedOnDate(user.createdOn)}"></h6>
+                                <h6 th:text="${@utilsService.getCreatedOnDate(user.createdOn)}"></h6>
                             </div>
 
                             <!-- Add to friends -->
@@ -139,11 +142,9 @@
 </script>
 
 <script th:inline="javascript">
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlUsername = urlParams.get('username');
-
+    let username = /*[[${user.username}]]*/ '';
     // Another profile
-    if(urlUsername != null) {
+    if(username !== [[${user.username}]]) {
         $('#balance').hide();
         $('#avatar-upload').attr('disabled', 'disabled');
         $('.avatar-wrapper').css('cursor', 'default');
@@ -153,8 +154,13 @@
         $('#add_friend').hide();
     }
 
+    function click(value) {
+        if(username === '') window.location = '/profile/';
+        window.location = '/profile/' + username + '/' + value;
+    }
+
     function follow() {
-        fetch("/lk/profile/follow" + window.location.search, {
+        fetch("/profile/follow" + window.location.search, {
             method: 'POST'
         }).then(response => {
             if(response.ok) {
@@ -165,7 +171,7 @@
 
     function uploadAvatar(baseImg) {
         let data = {baseImg: baseImg};
-        fetch("/lk/profile/uploadAvatar", {
+        fetch("/profile/uploadAvatar", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

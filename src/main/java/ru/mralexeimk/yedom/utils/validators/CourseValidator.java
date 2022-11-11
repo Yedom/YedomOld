@@ -6,16 +6,18 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.models.Course;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 @Component
 public class CourseValidator implements Validator {
+    private final UtilsService utilsService;
     private final LanguageUtil languageUtil;
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CourseValidator(LanguageUtil languageUtil, CoursesConfig coursesConfig) {
+    public CourseValidator(UtilsService utilsService, LanguageUtil languageUtil, CoursesConfig coursesConfig) {
+        this.utilsService = utilsService;
         this.languageUtil = languageUtil;
         this.coursesConfig = coursesConfig;
     }
@@ -40,11 +42,11 @@ public class CourseValidator implements Validator {
             if(course.getDescription().length() > coursesConfig.getMaxDescriptionLength()) {
                 reject("description", "course.description.size", errors);
             }
-            if(!CommonUtils.regexMatch(coursesConfig.getRegexp(), course.getTags())
+            if(!utilsService.regexMatch(coursesConfig.getRegexp(), course.getTags())
                     || course.getTags().contains("@ ") || course.getTags().contains(" @")) {
                 reject("tags", "course.tags.pattern", errors);
             }
-            if(CommonUtils.containsSymbols(course.getTags(), coursesConfig.getTagsDisabledSymbols())) {
+            if(utilsService.containsSymbols(course.getTags(), coursesConfig.getTagsDisabledSymbols())) {
                 reject("tags", "course.tags.disabled_symbols", errors);
             }
             if(course.getTags().split("@").length < coursesConfig.getMinTagsCount()) {

@@ -8,18 +8,20 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.models.Code;
-import ru.mralexeimk.yedom.utils.CommonUtils;
 
 import java.util.HashMap;
 
 @Service
 public class EmailService {
-    private final HashMap<String, Code> codeByUsername = new HashMap<>();
+    private final UtilsService utilsService;
     private final JavaMailSender emailSender;
     private final EmailConfig emailConfig;
 
+    private final HashMap<String, Code> codeByUsername = new HashMap<>();
+
     @Autowired
-    public EmailService(JavaMailSender emailSender, EmailConfig emailConfig) {
+    public EmailService(UtilsService utilsService, JavaMailSender emailSender, EmailConfig emailConfig) {
+        this.utilsService = utilsService;
         this.emailSender = emailSender;
         this.emailConfig = emailConfig;
     }
@@ -45,7 +47,8 @@ public class EmailService {
                 } catch(Exception ignored) {}
                 for(String userName : codeByUsername.keySet()) {
                     long current_time = System.currentTimeMillis();
-                    if(current_time - codeByUsername.get(userName).getStartTime() >= 1000*60*5) {
+                    if(current_time - codeByUsername.get(userName).getStartTime() >=
+                            1000L*emailConfig.getConfirmCodeTimeout()) {
                         removeCode(userName);
                     }
                 }
@@ -66,7 +69,7 @@ public class EmailService {
     }
 
     public Code getRandomCode() {
-        return new Code(String.valueOf(CommonUtils.getRandomNumber(100000, 999999)));
+        return new Code(String.valueOf(utilsService.getRandomNumber(100000, 999999)));
     }
 
     public boolean isCorrectCode(String code) {

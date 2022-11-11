@@ -8,7 +8,6 @@ public class ClientSocket {
     private Socket socket;
     private DataOutputStream dout;
     private DataInputStream din;
-    private boolean isActive = false;
 
     public ClientSocket(String host, int port) {
         try {
@@ -47,18 +46,6 @@ public class ClientSocket {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void activate() {
-        isActive = true;
-    }
-
-    public void deactivate() {
-        isActive = false;
     }
 
     public Socket getSocket() {

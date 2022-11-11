@@ -9,25 +9,33 @@ import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/constructor")
 public class ConstructorController {
+    private final UtilsService utilsService;
     private final DraftCourseRepository draftCourseRepository;
     private final UserRepository userRepository;
     private final OrganizationsService organizationsService;
 
-    public ConstructorController(DraftCourseRepository draftCourseRepository, UserRepository userRepository, OrganizationsService organizationsService) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, UserRepository userRepository, OrganizationsService organizationsService) {
+        this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
         this.userRepository = userRepository;
         this.organizationsService = organizationsService;
     }
 
+    /**
+     * Check if UserEntity has access to DraftCourse
+     */
     private boolean checkAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
         if(!draftCourseEntity.isByOrganization()) {
             return userEntity.getId() == draftCourseEntity.getCreatorId();
@@ -36,14 +44,38 @@ public class ConstructorController {
         }
     }
 
+    /**
+     * Get user's draft courses
+     */
     @GetMapping()
-    public String index() {
-        return "lk/draftCourses";
+    public String index(Model model, HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        List<DraftCourse> draftCourses = new ArrayList<>();
+
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return "redirect:/errors/notfound";
+
+        for(Integer id : utilsService.splitToListInt(userEntity.getDraftCoursesIds())) {
+            DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);
+            if(draftCourseEntity == null) continue;
+            draftCourses.add(new DraftCourse(draftCourseEntity));
+        }
+
+        model.addAttribute("draft_courses", draftCourses);
+
+        return "constructor/index";
     }
 
+    /**
+     * Open draft course constructor page
+     */
     @GetMapping("/{hash}")
     public String draftCourse(Model model, @PathVariable String hash, HttpSession session) {
-        String check = CommonUtils.preventUnauthorizedAccess(session);
+        String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
@@ -51,11 +83,11 @@ public class ConstructorController {
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
-        if(userEntity == null || draftCourseEntity == null) return "redirect:/lk/draftCourses";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/lk/draftCourses";
+        if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
+        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         model.addAttribute("draftCourse", draftCourseEntity);
 
-        return "lk/constructor/draftCourse";
+        return "constructor/draftcourse";
     }
 }

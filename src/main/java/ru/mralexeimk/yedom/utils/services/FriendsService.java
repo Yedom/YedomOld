@@ -3,30 +3,33 @@ package ru.mralexeimk.yedom.utils.services;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.utils.CommonUtils;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FriendsService {
-    public final Pair<String, String> DEFAULT_FOLLOW_BTN;
-
+    private final UtilsService utilsService;
     private final LanguageUtil languageUtil;
     private final UserRepository userRepository;
 
-    public FriendsService(LanguageUtil languageUtil, UserRepository userRepository) {
+    public final Pair<String, String> DEFAULT_FOLLOW_BTN;
+
+    public FriendsService(UtilsService utilsService, LanguageUtil languageUtil, UserRepository userRepository) {
+        this.utilsService = utilsService;
         this.languageUtil = languageUtil;
         this.userRepository = userRepository;
         DEFAULT_FOLLOW_BTN = new Pair<>(
                 languageUtil.getLocalizedMessage("profile.follow"), "btn-green");
     }
 
-    public Pair<String, String> updateFollowBtn(UserEntity userEntity, UserEntity userEntity2) {
+    /**
+     * Get button action by user's relationships
+     */
+    public Pair<String, String> getFollowButtonAction(UserEntity userEntity, UserEntity userEntity2) {
         String id = String.valueOf(userEntity2.getId());
 
         String action = languageUtil.getLocalizedMessage("profile.follow");
@@ -46,35 +49,38 @@ public class FriendsService {
         return new Pair<>(action, color);
     }
 
-    public Pair<String, String> updateFollowBtn(User user, UserEntity userEntity2) {
+    public Pair<String, String> getFollowButtonAction(User user, UserEntity userEntity2) {
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
         if (userEntity == null) return new Pair<>("", "");
 
-        return updateFollowBtn(userEntity, userEntity2);
+        return getFollowButtonAction(userEntity, userEntity2);
     }
 
     public int getFriendsCount(UserEntity userEntity) {
-        return CommonUtils.splitToListString(userEntity.getFriendsIds()).size();
+        return utilsService.splitToListString(userEntity.getFriendsIds()).size();
     }
 
     public int getFollowersCount(UserEntity userEntity) {
-        return CommonUtils.splitToListString(userEntity.getFollowersIds()).size();
+        return utilsService.splitToListString(userEntity.getFollowersIds()).size();
     }
 
     public int getFollowingCount(UserEntity userEntity) {
-        return CommonUtils.splitToListString(userEntity.getFollowingIds()).size();
+        return utilsService.splitToListString(userEntity.getFollowingIds()).size();
     }
 
-    public void followPress(UserEntity userEntity, UserEntity userEntity2) {
+    /**
+     * Change user's relationships by 'userEntity' button press
+     */
+    public void followButtonPress(UserEntity userEntity, UserEntity userEntity2) {
         String id = String.valueOf(userEntity.getId()),
                 id2 = String.valueOf(userEntity2.getId());
 
-        List<String> friendsIds = CommonUtils.splitToListString(userEntity.getFriendsIds()),
-                followersIds = CommonUtils.splitToListString(userEntity.getFollowersIds()),
-                followingIds = CommonUtils.splitToListString(userEntity.getFollowingIds()),
-                friendsIds2 = CommonUtils.splitToListString(userEntity2.getFriendsIds()),
-                followersIds2 = CommonUtils.splitToListString(userEntity2.getFollowersIds()),
-                followingIds2 = CommonUtils.splitToListString(userEntity2.getFollowingIds());
+        List<String> friendsIds = utilsService.splitToListString(userEntity.getFriendsIds()),
+                followersIds = utilsService.splitToListString(userEntity.getFollowersIds()),
+                followingIds = utilsService.splitToListString(userEntity.getFollowingIds()),
+                friendsIds2 = utilsService.splitToListString(userEntity2.getFriendsIds()),
+                followersIds2 = utilsService.splitToListString(userEntity2.getFollowersIds()),
+                followingIds2 = utilsService.splitToListString(userEntity2.getFollowingIds());
 
         if(friendsIds.contains(id2)) {
             friendsIds.remove(id2);
@@ -113,10 +119,10 @@ public class FriendsService {
         userRepository.save(userEntity2);
     }
 
-    public void followPress(User user, UserEntity userEntity2) {
+    public void followButtonPress(User user, UserEntity userEntity2) {
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
         if (userEntity == null) return;
 
-        followPress(userEntity, userEntity2);
+        followButtonPress(userEntity, userEntity2);
     }
 }

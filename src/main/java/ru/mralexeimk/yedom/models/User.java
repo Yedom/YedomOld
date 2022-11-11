@@ -3,7 +3,7 @@ package ru.mralexeimk.yedom.models;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -20,8 +20,8 @@ public class User {
     private String email;
 
     private String role = "user";
-    private Timestamp createdOn = CommonUtils.getCurrentTimestamp();
-    private Timestamp lastLogin = CommonUtils.getCurrentTimestamp();
+    private Timestamp createdOn;
+    private Timestamp lastLogin;
     private int balance = 0;
 
     private String avatar = "";

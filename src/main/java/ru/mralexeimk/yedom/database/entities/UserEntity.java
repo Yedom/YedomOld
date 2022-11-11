@@ -3,7 +3,7 @@ package ru.mralexeimk.yedom.database.entities;
 import lombok.*;
 import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.CommonUtils;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,10 +32,10 @@ public class UserEntity {
     private String role = "user";
 
     @Column(name = "created_on")
-    private Timestamp createdOn = CommonUtils.getCurrentTimestamp();
+    private Timestamp createdOn;
 
     @Column(name = "last_login")
-    private Timestamp lastLogin = CommonUtils.getCurrentTimestamp();
+    private Timestamp lastLogin;
 
     @Column(name = "balance")
     private int balance = 0;

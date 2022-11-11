@@ -15,6 +15,9 @@ public class MainController {
         return "index";
     }
 
+    /**
+     * robots.txt to allow browser to crawl the site
+     */
     @RequestMapping(value = "/robots.txt")
     public void robots(HttpServletResponse response) {
         try {
@@ -22,6 +25,9 @@ public class MainController {
         } catch (IOException ignored) {}
     }
 
+    /**
+     * Favicon on browser tab
+     */
     @RequestMapping("favicon.ico")
     String favicon() {
         return "forward:/resources/favicon.ico";
