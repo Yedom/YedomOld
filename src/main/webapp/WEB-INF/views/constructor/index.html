@@ -29,10 +29,18 @@
 
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
 
+<div class="bg">
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+</div>
+
 <div class="bg section">
   <div class="row py-lg-5">
     <div class="col-lg-6 col-md-8 mx-auto over-particles">
-      <input type="submit" onclick="clickAdd()" style="width: 100%; height: 100%; font-size: 25px;" id="addBtn"
+      <input type="submit" onclick="clickAdd()" class="btn main-button main-button-big"
              value="Добавить курс" th:value="#{course.add}" />
       <br />
       <br />

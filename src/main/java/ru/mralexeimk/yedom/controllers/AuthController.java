@@ -253,10 +253,11 @@ public class AuthController {
                         emailService.getCodeByUser()
                                 .get(user.getUsername()).getCode().equals(code.getCode())) {
                     user.setEmailConfirmed(true);
+                    user.setCreatedOn(utilsService.getCurrentTimestamp());
+                    user.setLastLogin(utilsService.getCurrentTimestamp());
+                    user.setAvatar(profileConfig.getBaseAvatarDefault());
 
                     UserEntity userEntity = new UserEntity(user);
-                    userEntity.setAvatar(profileConfig.getBaseAvatarDefault());
-                    userEntity.setLastLogin(utilsService.getCurrentTimestamp());
 
                     userRepository.save(userEntity);
                     session.setAttribute("user", new User(userEntity));

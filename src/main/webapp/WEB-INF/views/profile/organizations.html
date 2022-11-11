@@ -43,10 +43,10 @@
 </div>
 
 <div class="bg unselectable">
-    <div class="main main-raised col-md-8 mx-auto text-center">
+    <div class="main main-raised col-md-6 mx-auto text-center">
         <hr />
 
-        <input type="button" onclick="window.location='/profile/' + [[${user.username}]]"
+        <input type="button" onclick="clickButton('')"
                id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
 
         <button id="friends" type="button"
@@ -56,47 +56,73 @@
             Друзья
         </button>
         <ul class="dropdown-menu" aria-labelledby="friends">
-            <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/profile/'+[[${user.username}]]+'/friends'"
+            <li><a class="dropdown-item"
+                   onclick="clickButton('friends')"
                    th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
-            <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/profile/'+[[${user.username}]]+'/followers'"
+            <li><a class="dropdown-item"
+                   onclick="clickButton('followers')"
                    th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
-            <li><a class="dropdown-item" href="#"
-                   onclick="window.location='/profile/'+[[${user.username}]]+'/following'"
+            <li><a class="dropdown-item"
+                   onclick="clickButton('following')"
                    th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
         </ul>
 
-        <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/courses'"
+        <input type="button"
+               onclick="clickButton('courses')"
                id="courses" class="btn" value="Завершенные курсы"
                th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
-        <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/organizations'"
+        <input type="button"
+               onclick="clickButton('organizations')"
                id="organizations" class="btn btn-primary" value="Организации"
                th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
-        <input type="button" onclick="window.location='/profile/'+[[${user.username}]]+'/balance';"
+        <input type="button"
+               onclick="clickButton('balance')"
                id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
 
         <hr />
-        <br />
-
-        <br />
-        <br />
-        <input type="submit" onclick="window.location='/organizations/create'"
-               id="createOrg" value="Создать организацию" th:value="#{organization.create}" />
-        <br />
-        <br />
+        <div id="orgCreate">
+            <br />
+            <input type="button" onclick="window.location='/organization/add'"
+                   class="btn main-button" value="Создать организацию" th:value="#{organization.create}" />
+            <br />
+            <br />
+        </div>
 
         <!-- Organizations in -->
-        <div class="row">
-            <div class="col col-3" th:each="organization : ${organizations}">
-                <div class="card-plain card-blog card">
-                    <div class="card-avatar">
-                        <a href="#" th:href="@{'/organizations/' + ${organization.name}}">
-                            <img class="img-raised rounded-circle img-fluid" src="../../resources/images/default.png"
-                                 th:src="${organization.avatar}"  alt="..."/>
-                        </a>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 th:text="#{profile.organizations}">Organizations</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th class="text-center" th:text="#{organization.icon}">Organization icon</th>
+                                        <th class="text-center" th:text="#{organization.name}">Organization name</th>
+                                        <th class="text-center" th:text="#{courses.count}">Courses count</th>
+                                        <th class="text-center" th:text="#{auth.lk.role}">Role</th>
+                                    </tr>
+                                    <tbody>
+
+                                    <tr class="clickable-tr" th:each="organization : ${organizations}"
+                                        th:attr="onclick=|clickOrg('${organization.name}')|">
+                                        <td class="text-center">
+                                            <img class="img-raised rounded-circle img-fluid" src="../../resources/images/default.png"
+                                                 style="width: 50px; height: 50px;"
+                                                 th:src="${organization.avatar}"  alt="..."/>
+                                        </td>
+                                        <td class="text-center" th:text="${organization.name}">Yedom</td>
+                                        <td class="text-center" th:text="${@organizationsService.getCoursesCount(organization.id)}">13</td>
+                                        <td class="text-center" th:text="${@organizationsService.getUserRoleInOrganization(organization.id, user)}">Admin</td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <h5 th:text="${organization.name}">Organization</h5>
+                    <br />
                 </div>
             </div>
         </div>
@@ -129,11 +155,22 @@
 </script>
 
 <script th:inline="javascript">
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+    let userEntityName = /*[[${user.username}]]*/ '';
+    let userName = /*[[${session_username}]]*/ '';
+
     // Another profile
-    if(urlUsername != null && urlUsername !== [[${user.username}]]) {
+    if(userName !== userEntityName) {
         $('#balance').hide();
+        $('#orgCreate').hide();
+    }
+
+    function clickOrg(name) {
+        window.location = '/organization/' + name;
+    }
+
+    function clickButton(value) {
+        if(userEntityName === '') window.location = '/profile/';
+        window.location = '/profile/' + userEntityName + '/' + value;
     }
 </script>
 </body>

@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 public class TagsService {
     private final SmartSearchServerConfig smartSearchServerConfig;
     private final Map<String, ClientSocket> clientSocketByEmail = new HashMap<>();
+    private final Map<String, ClientSocket> clientSocketByIp = new HashMap<>();
 
     @Autowired
     public TagsService(SmartSearchServerConfig smartSearchServerConfig) {
@@ -52,6 +53,36 @@ public class TagsService {
         return response;
     }
 
+    public String sendSocket(String ip, SocketType socketType) {
+        return sendSocket(ip, socketType, "", false);
+    }
+
+    public String sendSocket(String ip, SocketType socketType, String msg) {
+        return sendSocket(ip, socketType, msg, false);
+    }
+
+    /**
+     * Send socket to SmartSearchServer and get response
+     */
+    public String sendSocket(String ip, SocketType socketType, String msg, boolean resending) {
+        String response = "";
+        ClientSocket clientSocket = createConnection(ip);
+        try {
+            clientSocket.getSocket().setSoTimeout(smartSearchServerConfig.getTimeout());
+            clientSocket.sendMessage(socketType + ":" + msg);
+            response = clientSocket.receiveMessage();
+        } catch (Exception ex) {
+            if (clientSocket != null) {
+                clientSocket.close();
+                clientSocketByIp.remove(ip);
+                if(!resending)
+                    return sendSocket(ip, socketType, msg, true);
+            }
+            ex.printStackTrace();
+        }
+        return response;
+    }
+
     /**
      * Create connection between Java client and Python server with multithreading sockets
      */
@@ -65,6 +96,23 @@ public class TagsService {
                 clientSocket.getSocket().setSoTimeout(smartSearchServerConfig.getTimeout());
                 clientSocket.sendMessage(user.getEmail());
                 clientSocketByEmail.put(user.getEmail(), clientSocket);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return clientSocket;
+    }
+
+    public ClientSocket createConnection(String ip) {
+        ClientSocket clientSocket = null;
+        try {
+            if (clientSocketByIp.containsKey(ip)) {
+                clientSocket = clientSocketByIp.get(ip);
+            } else {
+                clientSocket = new ClientSocket(smartSearchServerConfig.getHost(), smartSearchServerConfig.getPort());
+                clientSocket.getSocket().setSoTimeout(smartSearchServerConfig.getTimeout());
+                clientSocket.sendMessage(ip);
+                clientSocketByIp.put(ip, clientSocket);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

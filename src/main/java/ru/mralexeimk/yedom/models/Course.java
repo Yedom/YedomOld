@@ -21,6 +21,7 @@ public class Course extends DraftCourse {
     // Model fields
     private String creatorName = "";
     private String creatorAvatar = "";
+    private String creatorType = "";
     private Timestamp completedOn = null;
 
     public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
@@ -54,5 +55,6 @@ public class Course extends DraftCourse {
         this.setCreatorName(course.getCreatorName());
         this.setCreatorAvatar(course.getCreatorAvatar());
         this.setCompletedOn(course.getCompletedOn());
+        this.setCreatorType(course.getCreatorType());
     }
 }

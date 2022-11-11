@@ -43,7 +43,7 @@
                    th:name="search" th:placeholder="#{courses.search}" />
             <br />
             <br />
-            <input type="submit" onclick="clickSearch()" id="searchBtn"
+            <input type="submit" onclick="clickSearch()" class="btn main-button"
                    value="Поиск" th:value="#{common.search}" />
             <br />
             <br />
@@ -61,11 +61,11 @@
         <div class="col" th:each="course : ${courses}">
             <div class="card-plain card-blog card">
                 <h4 class="card-title card-content unselectable">
-                    <a class="titles" href="#" th:href="@{'/courses/' + ${course.getHash()}}"
+                    <a class="titles"  th:href="@{'/courses/' + ${course.getHash()}}"
                        th:text="${course.title}">Course Title aw awf aw awf awaf 22r1 2r1 2r 12r 12r12r12r</a>
                 </h4>
                 <div class="unselectable perspective card-content card-header card-header-image">
-                    <a href="#" th:href="@{'/courses/' + ${course.hash}}">
+                    <a th:href="@{'/courses/' + ${course.hash}}">
                         <img class="courseImg" src="../../resources/images/screen.png"
                              th:src="@{/resources/images/screen.png}" alt="...">
                     </a>
@@ -78,7 +78,7 @@
                     </p>
                     <div class="card-footer unselectable">
                         <div class="author">
-                            <a href="#" th:href="@{'/profile/' + ${course.creatorName}}">
+                            <a th:href="@{'/'+${course.creatorType}+'/' + ${course.creatorName}}">
                                 <img src="../../resources/images/screen.png"
                                      th:src="${course.creatorAvatar}" alt="..." class="avatar img-raised">
                                 <span class="authorName" th:text="${course.creatorName}">Author</span>

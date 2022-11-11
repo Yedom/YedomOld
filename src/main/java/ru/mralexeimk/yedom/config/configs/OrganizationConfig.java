@@ -11,4 +11,5 @@ public class OrganizationConfig {
     private int minNameLength;
     private int maxNameLength;
     private String baseBannerDefault;
+    private int maxOrganizationsPerUser;
 }

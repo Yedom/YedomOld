@@ -3,6 +3,7 @@ package ru.mralexeimk.yedom.utils.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
@@ -88,6 +89,16 @@ public class UtilsService {
             case SHA256 -> hashSHA256(str);
             case MD5 -> hashMD5(str);
         };
+    }
+
+    /**
+     * models validator
+     */
+    public void reject(String field, String msg, Errors errors) {
+        if(!errors.hasFieldErrors(field)) {
+            errors.rejectValue(field, msg,
+                    languageUtil.getLocalizedMessage(msg));
+        }
     }
 
     /**

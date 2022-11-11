@@ -19,6 +19,7 @@ import ru.mralexeimk.yedom.models.Amounts;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.custom.Triple;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.services.FriendsService;
@@ -56,7 +57,7 @@ public class ProfileController {
      * Get UserEntity of visited profile
      * @return Pair of UserEntity and Boolean (my profile or not)
      */
-    private Pair<UserEntity, Boolean> getUserEntity(String username, HttpSession session) {
+    private Triple<UserEntity, User, Boolean> getUserEntity(String username, HttpSession session) {
         User user = null;
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check == null) user = (User) session.getAttribute("user");
@@ -73,7 +74,7 @@ public class ProfileController {
         else {
             userEntity = userRepository.findByUsername(username).orElse(null);
         }
-        return new Pair<>(userEntity, isSelf);
+        return new Triple<>(userEntity, user, isSelf);
     }
 
     /**
@@ -85,7 +86,7 @@ public class ProfileController {
         amounts.setFollowersCount(friendsService.getFollowersCount(userEntity));
         amounts.setFollowingCount(friendsService.getFollowingCount(userEntity));
         amounts.setCompletedCoursesCount(completedCoursesRepository.countAllByUserId(userEntity.getId()));
-        amounts.setOrganizationsCount(organizationsService.getOrganizationsCount(userEntity));
+        amounts.setOrganizationsCount(organizationsService.getOrganizationsInCount(userEntity));
 
         return amounts;
     }
@@ -112,18 +113,22 @@ public class ProfileController {
                              HttpSession session) {
         Pair<String, String> pair = friendsService.DEFAULT_FOLLOW_BTN;
 
-        Pair<UserEntity, Boolean> profile = getUserEntity(username, session);
+        var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
-        boolean isSelf = profile.getSecond();
+        User user = profile.getSecond();
 
-        if(userEntity == null) return "redirect:/errors/notfound";
+        if(userEntity == null) {
+            if(user != null) return "redirect:/auth/login";
+            return "redirect:/";
+        }
 
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
                 getAmounts(userEntity));
 
-        if(!isSelf) {
-            pair = friendsService.getFollowButtonAction((User)session.getAttribute("user"), userEntity);
+        if(user != null) {
+            model.addAttribute("session_username", user.getUsername());
+            pair = friendsService.getFollowButtonAction(user, userEntity);
         }
 
         model.addAttribute("btn_properties", pair);
@@ -139,11 +144,17 @@ public class ProfileController {
                                     @PathVariable(value = "username") String username,
                                     @PathVariable(value = "type") String type,
                                     HttpSession session) {
-        Pair<UserEntity, Boolean> profile = getUserEntity(username, session);
+        var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
+        User user = profile.getSecond();
 
-        if(userEntity == null) return "redirect:/errors/notfound";
+        if(userEntity == null) {
+            if(user != null) return "redirect:/auth/login";
+            return "redirect:/";
+        }
 
+        if(user != null) model.addAttribute("session_username", user.getUsername());
+        model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
                 getAmounts(userEntity));
 
@@ -166,10 +177,14 @@ public class ProfileController {
     public String profileCoursesGet(Model model,
                                     @PathVariable(value = "username") String username,
                                     HttpSession session) {
-        Pair<UserEntity, Boolean> profile = getUserEntity(username, session);
+        var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
+        User user = profile.getSecond();
 
-        if(userEntity == null) return "redirect:/errors/notfound";
+        if(userEntity == null) {
+            if(user != null) return "redirect:/auth/login";
+            return "redirect:/";
+        };
 
         List<CompletedCoursesEntity> completedCoursesEntities =
                 completedCoursesRepository.findAllByUserIdOrderByCompletedOnDesc(userEntity.getId());
@@ -193,6 +208,8 @@ public class ProfileController {
             completedCourses.add(course);
         }
 
+        if(user != null) model.addAttribute("session_username", user.getUsername());
+        model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
                 getAmounts(userEntity));
 
@@ -208,10 +225,14 @@ public class ProfileController {
     public String profileOrganizationsGet(Model model,
                                           @PathVariable(value = "username") String username,
                                           HttpSession session) {
-        Pair<UserEntity, Boolean> profile = getUserEntity(username, session);
+        var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
+        User user = profile.getSecond();
 
-        if(userEntity == null) return "redirect:/errors/notfound";
+        if(userEntity == null) {
+            if(user != null) return "redirect:/auth/login";
+            return "redirect:/";
+        }
 
         List<Organization> organizations = new ArrayList<>();
 
@@ -221,6 +242,8 @@ public class ProfileController {
             organizations.add(new Organization(organizationEntity));
         }
 
+        if(user != null) model.addAttribute("session_username", user.getUsername());
+        model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
                 getAmounts(userEntity));
         model.addAttribute("organizations", organizations);
@@ -236,16 +259,17 @@ public class ProfileController {
     public String profileBalanceGet(Model model,
                                     @PathVariable(value = "username") String username,
                                     HttpSession session) {
-        Pair<UserEntity, Boolean> profile = getUserEntity(username, session);
+        var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
-        boolean isSelf = profile.getSecond();
+        User user = profile.getSecond();
+        boolean isSelf = profile.getThird();
 
-        if(userEntity == null || !isSelf) return "redirect:/errors/notfound";
+        if(userEntity == null || !isSelf) return "redirect:/profile";
 
+        if(user != null) model.addAttribute("session_username", user.getUsername());
+        model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
                 getAmounts(userEntity));
-        model.addAttribute("user",
-                new User(userEntity));
 
         return "profile/balance";
     }
@@ -253,8 +277,8 @@ public class ProfileController {
     /**
      * User follow button press
      */
-    @PostMapping("/{username}/follow")
-    public @ResponseBody ResponseEntity<Object> followBtn(@PathVariable(value = "username") String username,
+    @PostMapping("/follow")
+    public @ResponseBody ResponseEntity<Object> followBtn(@RequestParam(name = "username") String username,
                                                           HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -273,8 +297,8 @@ public class ProfileController {
     /**
      * User upload avatar
      */
-    @PostMapping("/{username}/uploadAvatar")
-    public @ResponseBody ResponseEntity<Object> uploadAvatar(@PathVariable(value = "username") String username,
+    @PostMapping("/uploadAvatar")
+    public @ResponseBody ResponseEntity<Object> uploadAvatar(@RequestParam(name = "username") String username,
                                                              @RequestBody String data,
                                                              HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);

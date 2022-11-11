@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Pair<T, V> {
+public class Triple<T, V, K> {
     private T first;
     private V second;
+    private K third;
 }

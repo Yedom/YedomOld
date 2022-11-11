@@ -43,10 +43,14 @@ public class OrganizationEntity {
     @Column(name = "draft_courses_ids")
     private String draftCoursesIds = "";
 
+    @Column(name = "followers_ids")
+    private String followersIds = "";
+
     // Add to database constructor
     public OrganizationEntity(Organization organization) {
         this.name = organization.getName();
         this.adminId = organization.getAdminId();
+        this.avatar = organization.getAvatar();
     }
 
     @Override

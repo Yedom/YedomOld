@@ -32,6 +32,7 @@ public class User {
     private String followersIds = "";
     private String organizationsIds = "";
     private String inOrganizationsIds = "";
+    private String organizationsFollowingIds = "";
 
     // Model fields
     private boolean emailConfirmed = false;
@@ -55,7 +56,7 @@ public class User {
                 Timestamp createdOn, Timestamp lastLogin, int balance, String avatar,
                 String coursesIds, String draftCoursesIds, String friendsIds,
                 String followingIds, String followersIds, String organizationsIds,
-                String inOrganizationsIds) {
+                String inOrganizationsIds, String organizationsFollowingIds) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -72,6 +73,7 @@ public class User {
         this.followersIds = followersIds;
         this.organizationsIds = organizationsIds;
         this.inOrganizationsIds = inOrganizationsIds;
+        this.organizationsFollowingIds = organizationsFollowingIds;
     }
 
     // User by UserEntity constructor
@@ -81,7 +83,7 @@ public class User {
                 userEntity.getLastLogin(), userEntity.getBalance(), userEntity.getAvatar(),
                 userEntity.getCoursesIds(), userEntity.getDraftCoursesIds(), userEntity.getFriendsIds(),
                 userEntity.getFollowingIds(), userEntity.getFollowersIds(), userEntity.getOrganizationsIds(),
-                userEntity.getInOrganizationsIds());
+                userEntity.getInOrganizationsIds(), userEntity.getOrganizationsFollowingIds());
         emailConfirmed = true;
     }
 
@@ -90,7 +92,8 @@ public class User {
                 cp.getCreatedOn(), cp.getLastLogin(), cp.getBalance(), cp.getAvatar(),
                 cp.getCoursesIds(), cp.getDraftCoursesIds(), cp.getFriendsIds(),
                 cp.getFollowingIds(), cp.getFollowersIds(), cp.getOrganizationsIds(),
-                cp.getInOrganizationsIds(), cp.isEmailConfirmed(), cp.getNewPassword(),
+                cp.getInOrganizationsIds(), cp.getOrganizationsFollowingIds(),
+                cp.isEmailConfirmed(), cp.getNewPassword(),
                 cp.getNewPasswordRepeat(), cp.getArgs(), cp.getVals());
     }
 

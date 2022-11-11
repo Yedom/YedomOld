@@ -32,6 +32,23 @@ body {
     position: absolute;
     user-select: none;
 }
+.main-button {
+    width: 70%;
+    font-size: 25px !important;
+    background-color: #3a8d08 !important;;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif !important;
+    font-weight: bold !important;
+    border: 1px solid transparent !important;
+}
+.main-button-big {
+    width: 100%;
+    height: 100%;
+    font-size: 50px;
+}
+.main-button:hover {
+    background-color: #39843c !important;;
+    border: 1px solid gold !important;
+}
 .over-particles {
     z-index: 3;
 }
@@ -150,6 +167,10 @@ header {
 .nav-link {
     color: green;
     font-size: 30px;
+    cursor: pointer;
+}
+.dropdown-menu {
+    cursor: pointer;
 }
 input[type=text], textarea {
     padding:5px;
@@ -161,11 +182,6 @@ input[type=text], textarea {
     width: 100%;
     height: 50px;
     font-size: 20px;
-}
-#searchBtn {
-    width: 50%;
-    height: 30%;
-    font-size: 30px;
 }
 input[type=submit]{
     padding: 7px;
@@ -258,10 +274,11 @@ a:active, a:hover, a{
     font-size: 15px;
     font-weight: 400;
     padding: 10px 20px;
-    border-radius: 10px;
-    border: 2px solid black;
     cursor: pointer;
     transition: all 0.3s ease 0s;
+}
+.dropdown-item.active, .dropdown-item:active {
+    background-color: white;
 }
 .btn-primary {
     background-color: darkgray !important;

@@ -4,22 +4,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.models.Organization;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 @Component
 public class OrganizationValidator implements Validator {
-    private final LanguageUtil languageUtil;
+    private final UtilsService utilsService;
     private final OrganizationConfig organizationConfig;
+    private final OrganizationRepository organizationRepository;
 
-    public OrganizationValidator(LanguageUtil languageUtil, OrganizationConfig organizationConfig) {
-        this.languageUtil = languageUtil;
+    public OrganizationValidator(UtilsService utilsService, OrganizationConfig organizationConfig, OrganizationRepository organizationRepository) {
+        this.utilsService = utilsService;
         this.organizationConfig = organizationConfig;
-    }
-
-    public void reject(String field, String msg, Errors errors) {
-        errors.rejectValue(field, msg,
-                languageUtil.getLocalizedMessage(msg));
+        this.organizationRepository = organizationRepository;
     }
 
     @Override
@@ -27,15 +26,24 @@ public class OrganizationValidator implements Validator {
         return Organization.class.equals(aClass);
     }
 
+    public void addValidator(Organization org, Errors errors) {
+        if(org.getName() == null || org.getName().isEmpty()) {
+            utilsService.reject("name", "organization.name.not.empty", errors);
+        }
+        else if(org.getName().length() < organizationConfig.getMinNameLength() ||
+                org.getName().length() > organizationConfig.getMaxNameLength()) {
+            utilsService.reject("name", "organization.name.size", errors);
+        }
+        else if(organizationRepository.findByName(org.getName()).isPresent()) {
+            utilsService.reject("name", "organization.name.unique", errors);
+        }
+    }
+
     @Override
-    public void validate(Object o, org.springframework.validation.Errors errors) {
+    public void validate(Object o, Errors errors) {
         if(o instanceof Organization org) {
-            if(org.getName() == null || org.getName().isEmpty()) {
-                reject("name", "organization.name.not.empty", errors);
-            }
-            else if(org.getName().length() < organizationConfig.getMinNameLength() ||
-                    org.getName().length() > organizationConfig.getMaxNameLength()) {
-                reject("name", "organization.name.size", errors);
+            if(org.getArgs().contains("add")) {
+                addValidator(org, errors);
             }
         }
     }

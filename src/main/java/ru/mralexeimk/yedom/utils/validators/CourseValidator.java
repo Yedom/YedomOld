@@ -22,11 +22,6 @@ public class CourseValidator implements Validator {
         this.coursesConfig = coursesConfig;
     }
 
-    public void reject(String field, String msg, Errors errors) {
-        errors.rejectValue(field, msg,
-                languageUtil.getLocalizedMessage(msg));
-    }
-
     @Override
     public boolean supports(Class<?> aClass) {
         return Course.class.equals(aClass);
@@ -37,23 +32,23 @@ public class CourseValidator implements Validator {
         if(o instanceof Course course) {
             if(course.getTitle().length() < coursesConfig.getMinTitleLength() ||
                     course.getTitle().length() > coursesConfig.getMaxTitleLength()) {
-                reject("title", "course.title.size", errors);
+                utilsService.reject("title", "course.title.size", errors);
             }
             if(course.getDescription().length() > coursesConfig.getMaxDescriptionLength()) {
-                reject("description", "course.description.size", errors);
+                utilsService.reject("description", "course.description.size", errors);
             }
             if(!utilsService.regexMatch(coursesConfig.getRegexp(), course.getTags())
                     || course.getTags().contains("@ ") || course.getTags().contains(" @")) {
-                reject("tags", "course.tags.pattern", errors);
+                utilsService.reject("tags", "course.tags.pattern", errors);
             }
             if(utilsService.containsSymbols(course.getTags(), coursesConfig.getTagsDisabledSymbols())) {
-                reject("tags", "course.tags.disabled_symbols", errors);
+                utilsService.reject("tags", "course.tags.disabled_symbols", errors);
             }
             if(course.getTags().split("@").length < coursesConfig.getMinTagsCount()) {
-                reject("tags", "course.tags.count", errors);
+                utilsService.reject("tags", "course.tags.count", errors);
             }
             if(course.getTags().split("@").length > coursesConfig.getMaxTagsCount()) {
-                reject("tags", "course.tags.max_count", errors);
+                utilsService.reject("tags", "course.tags.max_count", errors);
             }
         }
     }

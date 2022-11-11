@@ -2,6 +2,7 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Value;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 
@@ -64,11 +65,17 @@ public class UserEntity {
     @Column(name = "in_organizations_ids")
     private String inOrganizationsIds = "";
 
+    @Column(name = "organizations_following_ids")
+    private String organizationsFollowingIds = "";
+
     // Add to database constructor
     public UserEntity(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();
+        this.createdOn = user.getCreatedOn();
+        this.lastLogin = user.getLastLogin();
+        this.avatar = user.getAvatar();
     }
 
     @Override
@@ -96,7 +103,6 @@ public class UserEntity {
                 ", createdOn=" + createdOn +
                 ", lastLogin=" + lastLogin +
                 ", balance=" + balance +
-                ", avatar='" + avatar + '\'' +
                 ", coursesIds='" + coursesIds + '\'' +
                 ", draftCoursesIds='" + draftCoursesIds + '\'' +
                 ", friendsIds='" + friendsIds + '\'' +
@@ -104,6 +110,7 @@ public class UserEntity {
                 ", followersIds='" + followersIds + '\'' +
                 ", organizationsIds='" + organizationsIds + '\'' +
                 ", inOrganizationsIds='" + inOrganizationsIds + '\'' +
+                ", organizationsFollowingIds='" + organizationsFollowingIds + '\'' +
                 '}';
     }
 }

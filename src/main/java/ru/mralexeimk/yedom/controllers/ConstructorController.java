@@ -57,7 +57,7 @@ public class ConstructorController {
 
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
-        if(userEntity == null) return "redirect:/errors/notfound";
+        if(userEntity == null) return "redirect:/";
 
         for(Integer id : utilsService.splitToListInt(userEntity.getDraftCoursesIds())) {
             DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);

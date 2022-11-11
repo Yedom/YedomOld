@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
     <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/bootstrap-select.min.css" th:href="@{/resources/css/bootstrap-select.min.css}">
 
     <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -19,6 +20,7 @@
     <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
     <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
 </head>
@@ -56,6 +58,12 @@
                 <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
                 <br/>
                 <textarea th:placeholder="#{course.add.tags}" class="textarea-add" rows="10" th:field="*{tags}" id="tags"></textarea>
+                <br />
+                <label th:for="section" th:text="#{course.add.by}">От имени</label>:
+                <br/>
+                <select name="section" id="section" class="selectpicker" data-style="select-with-transition">
+                    <option th:each="option : ${options}" th:value="${option.value}" th:text="${option.text}">Username</option>
+                </select>
                 <br />
                 <div id="tagsToAdd" class="unselectable">
                 </div>

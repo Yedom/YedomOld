@@ -9,21 +9,26 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
+import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.TagEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.models.CourseOption;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.RolesService;
 import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.validators.CourseValidator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -32,27 +37,68 @@ import java.util.*;
 public class CoursesController {
     private final UtilsService utilsService;
     private final CourseRepository courseRepository;
+    private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final CourseValidator courseValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
     private final RolesService rolesService;
+    private final OrganizationsService organizationsService;
     private final LanguageUtil languageUtil;
     private final SmartSearchConfig smartSearchConfig;
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
+    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, OrganizationsService organizationsService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
         this.courseRepository = courseRepository;
+        this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.courseValidator = courseValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
         this.rolesService = rolesService;
+        this.organizationsService = organizationsService;
         this.languageUtil = languageUtil;
         this.smartSearchConfig = smartSearchConfig;
         this.coursesConfig = coursesConfig;
+    }
+
+    /**
+     * Model's course set creatorName and avatar
+     */
+    private void courseProcess(Course course) {
+        if(!course.isByOrganization()) {
+            Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
+            userEntity.ifPresent(entity -> {
+                course.setCreatorName(userEntity.get().getUsername());
+                course.setCreatorAvatar(userEntity.get().getAvatar());
+                course.setCreatorType("profile");
+            });
+        }
+        else {
+            Optional<OrganizationEntity> organizationEntity = organizationRepository.findById(course.getCreatorId());
+            organizationEntity.ifPresent(entity -> {
+                course.setCreatorName(organizationEntity.get().getName());
+                course.setCreatorAvatar(organizationEntity.get().getAvatar());
+                course.setCreatorType("organization");
+            });
+        }
+    }
+
+    /**
+     * Add List of CourseOption to model
+     */
+    private void addOptions(Model model, UserEntity userEntity) {
+        List<CourseOption> options = new ArrayList<>();
+
+        options.add(new CourseOption("0", userEntity.getUsername()));
+        for(int id : utilsService.splitToListInt(userEntity.getInOrganizationsIds())) {
+            OrganizationEntity organizationEntity = organizationRepository.findById(id).orElse(null);
+            if(organizationEntity == null) continue;
+            options.add(new CourseOption(String.valueOf(id), organizationEntity.getName()));
+        }
+        model.addAttribute("options", options);
     }
 
     /**
@@ -61,29 +107,30 @@ public class CoursesController {
      */
     @GetMapping
     public String index(Model model, @RequestParam(required = false, name = "search") String search,
+                        HttpServletRequest request,
                         HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
-        User user = (User) session.getAttribute("user");
 
         List<Course> courses = new ArrayList<>();
         if(search == null) {
             courses = courseRepository.findByOrderByViewsDesc().stream()
                     .map(Course::new)
-                    .peek(course -> {
-                        if(!course.isByOrganization()) {
-                            Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
-                            userEntity.ifPresent(entity -> {
-                                course.setCreatorName(userEntity.get().getUsername());
-                                course.setCreatorAvatar(userEntity.get().getAvatar());
-                            });
-                        }
-                    })
+                    .peek(this::courseProcess)
                     .toList();
         }
         else {
-            String response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
+            String response;
+
+            // Authorized (save thread by email)
+            if(check == null) {
+                User user = (User) session.getAttribute("user");
+                response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
+            }
+            // Unauthorized (save thread by ip)
+            else {
+                response = tagsService.sendSocket(
+                        request.getRemoteAddr(), SocketType.SEARCH_COURSES, search);
+            }
             if(!response.equals("")) {
                 List<Integer> IDS = utilsService.splitToListInt(response);
 
@@ -91,13 +138,7 @@ public class CoursesController {
                     CourseEntity courseEntity = courseRepository.findById(id).orElse(null);
                     if(courseEntity != null) {
                         Course course = new Course(courseEntity);
-                        if(!course.isByOrganization()) {
-                            Optional<UserEntity> userEntity = userRepository.findById(course.getCreatorId());
-                            userEntity.ifPresent(entity -> {
-                                course.setCreatorName(userEntity.get().getUsername());
-                                course.setCreatorAvatar(userEntity.get().getAvatar());
-                            });
-                        }
+                        courseProcess(course);
                         courses.add(course);
                     }
                 }
@@ -113,10 +154,7 @@ public class CoursesController {
      * Get course page by hash
      */
     @GetMapping("/{hash}")
-    public String course(Model model, @PathVariable String hash, HttpSession session) {
-        String check = utilsService.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
+    public String course(Model model, @PathVariable String hash) {
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
         if(courseEntity == null) return "redirect:/courses";
 
@@ -129,9 +167,17 @@ public class CoursesController {
      * Open create course page
      */
     @GetMapping("/add")
-    public String add(@ModelAttribute("course") Course course, HttpSession session) {
+    public String add(Model model,
+                      @ModelAttribute("course") Course course,
+                      HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        if(userEntity == null) return "redirect:/courses";
+
+        addOptions(model, userEntity);
 
         return "courses/add";
     }
@@ -140,12 +186,19 @@ public class CoursesController {
      * Save course in user's draft courses
      */
     @PostMapping("/add")
-    public String addPost(@ModelAttribute("course") Course course,
+    public String addPost(Model model,
+                          @ModelAttribute("course") Course course,
+                          @RequestParam(value="section", defaultValue = "0") String sectionValue,
                           BindingResult bindingResult, HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return "redirect:/courses";
+
+        addOptions(model, userEntity);
 
         if(!rolesService.hasPermission(user, "courses.add")) {
             bindingResult.rejectValue("title",
@@ -165,13 +218,32 @@ public class CoursesController {
             return "courses/add";
         }
 
-        cloneCourse.setCreatorId(user.getId());
-        cloneCourse.setAvatar(coursesConfig.getBaseAvatarDefault());
-        cloneCourse.setHash(utilsService.hash(cloneCourse.getId(), HashAlg.SHA256));
+        try {
+            CourseEntity courseEntity = new CourseEntity(cloneCourse);
+            courseEntity.setAvatar(coursesConfig.getBaseAvatarDefault());
+            if(courseRepository.isNotEmpty())
+                courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1, HashAlg.SHA256));
+            else
+                courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
 
-        CourseEntity courseEntity = new CourseEntity(cloneCourse);
-
-        courseRepository.save(courseEntity);
+            if(sectionValue.equals("0")) {
+                courseEntity.setByOrganization(false);
+                courseEntity.setCreatorId(user.getId());
+            }
+            else {
+                int orgId = Integer.parseInt(sectionValue);
+                if(organizationsService.isMember(userEntity, orgId)) {
+                    courseEntity.setByOrganization(true);
+                    courseEntity.setCreatorId(orgId);
+                }
+                else throw new Exception();
+            }
+            courseRepository.save(courseEntity);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            utilsService.reject("title", "common.error", bindingResult);
+            return "courses/add";
+        }
 
         return "redirect:/constructor";
     }
