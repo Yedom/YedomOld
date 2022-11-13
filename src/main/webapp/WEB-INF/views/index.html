@@ -21,20 +21,20 @@
     <script src="../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script src="../resources/js/three.min.js" th:src="@{/resources/js/three.min.js}"></script>
+    <script type="module" src="../resources/js/OrbitControls.js" th:src="@{/resources/js/OrbitControls.js}"></script>
+    <script type="module" src="../resources/js/GLTFLoader.js" th:src="@{/resources/js/GLTFLoader.js}"></script>
 </head>
 <body class="index-page">
 
 <!-- Particles Container -->
 <div id="particles-container"></div>
 
+<!-- 3D Model Container -->
+<div id="model-container"></div>
+
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../resources/common/header.html"></div>
 
-<!-- Image on center -->
-<div class="bg page-header">
-    <div class="unselectable title-img сol-md-5 mx-auto text-center section">
-        <img class="banner" src="../resources/images/screen.png" alt="Yedom">
-    </div>
-</div>
 
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../resources/common/footer.html"></div>
 
@@ -44,6 +44,44 @@
     particlesJS.load('particles-container', '../resources/assets/particles.json', function () {
         console.log('particles-js loaded!');
     });
+</script>
+
+<!-- Add 3D Model -->
+<script type="module">
+    let container = document.getElementById('model-container');
+
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.5, 1000);
+
+    let renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor(0x404040);
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.domElement.setAttribute("id", "model-3d");
+    container.appendChild(renderer.domElement);
+
+    document.body.insertBefore(renderer.domElement, document.body.firstChild);
+
+    let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    camera.position.set(-16, 21.8, -13.8);
+    controls.target.set(40, 0, 5);
+    controls.update();
+
+    const aLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    aLight.position.setScalar(10);
+    scene.add(aLight, new THREE.AmbientLight(0xffffff, 0.5));
+
+    let loader = new THREE.GLTFLoader();
+    let obj = null;
+
+    loader.load('../resources/models/yedom.gltf', function(gltf) {
+        obj = gltf.scene;
+        scene.add(obj);
+    });
+
+    renderer.setAnimationLoop(_ => {
+        renderer.render(scene, camera);
+    })
 </script>
 </body>
 </html>

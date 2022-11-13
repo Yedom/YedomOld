@@ -264,7 +264,7 @@ input[type=submit]{
 .upload-button .fa-arrow-circle-up:hover {
     opacity: .9;
 }
-a:active, a:hover, a{
+a:active, a:hover, a {
     text-decoration: none;
     color: #1b1e21;
 }
@@ -288,6 +288,9 @@ a:active, a:hover, a{
 .btn-primary {
     background-color: darkgray !important;
     border: 4px solid black !important;
+}
+#model-3d {
+    position: absolute;
 }
 .pre-scrollable {
     max-height: 500px;
