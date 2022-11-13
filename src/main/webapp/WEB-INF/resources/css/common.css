@@ -23,6 +23,11 @@ body {
     width: 45px;
     height: 45px;
 }
+.profile-label {
+    font-weight: bold;
+    font-family: "Cascadia Mono", monospace;
+    color: #000000;
+}
 #particles-container {
     z-index: 2;
     top: 0;

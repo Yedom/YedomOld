@@ -107,10 +107,7 @@ public class CoursesController {
      */
     @GetMapping
     public String index(Model model, @RequestParam(required = false, name = "search") String search,
-                        HttpServletRequest request,
-                        HttpSession session) {
-        String check = utilsService.preventUnauthorizedAccess(session);
-
+                        HttpServletRequest request) {
         List<Course> courses = new ArrayList<>();
         if(search == null) {
             courses = courseRepository.findByOrderByViewsDesc().stream()
@@ -119,18 +116,9 @@ public class CoursesController {
                     .toList();
         }
         else {
-            String response;
+            String response = tagsService.sendSocket(
+                    request.getSession().getId(), SocketType.SEARCH_COURSES, search);
 
-            // Authorized (save thread by email)
-            if(check == null) {
-                User user = (User) session.getAttribute("user");
-                response = tagsService.sendSocket(user, SocketType.SEARCH_COURSES, search);
-            }
-            // Unauthorized (save thread by ip)
-            else {
-                response = tagsService.sendSocket(
-                        request.getRemoteAddr(), SocketType.SEARCH_COURSES, search);
-            }
             if(!response.equals("")) {
                 List<Integer> IDS = utilsService.splitToListInt(response);
 
@@ -254,7 +242,7 @@ public class CoursesController {
     @GetMapping(value = "/add/tagsUpdate", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public String tagsUpdate(@RequestParam(required = false, name = "tags") String tags,
-                             HttpSession session) {
+                                HttpServletRequest request, HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
@@ -269,7 +257,8 @@ public class CoursesController {
                 String search = utilsService.getLastN(
                         tags.split(" "),
                         smartSearchConfig.getMaxWordsInRequest());
-                String response = tagsService.sendSocket(user, SocketType.SEARCH_RELATED_TAGS, search.strip());
+                String response = tagsService.sendSocket(
+                        request.getSession().getId(), SocketType.SEARCH_RELATED_TAGS, search.strip());
 
                 if (!response.equals("")) {
                     List<Integer> IDS = utilsService.splitToListInt(response);
@@ -296,13 +285,10 @@ public class CoursesController {
      */
     @GetMapping(value = "/popularTags", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public String popularTags(HttpSession session) {
-        String check = utilsService.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
+    public String popularTags(HttpServletRequest request) {
         StringBuilder htmlResponse = new StringBuilder();
-        User user = (User) session.getAttribute("user");
-        String response = tagsService.sendSocket(user, SocketType.GET_POPULAR_TAGS);
+        String response = tagsService.sendSocket(
+                request.getSession().getId(), SocketType.GET_POPULAR_TAGS);
 
         if (!response.equals("")) {
             List<Integer> IDS = utilsService.splitToListInt(response);

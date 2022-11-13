@@ -42,16 +42,20 @@
 </div>
 
 <div class="bg unselectable">
-    <div class="main main-raised col-md-6 mx-auto text-center">
+    <div class="main main-raised col-md-7 mx-auto text-center">
+        <br />
         <hr />
-
+        <div class="name">
+            <h2 th:text="${user.username}">Username</h2>
+        </div>
+        <hr />
         <input type="button" onclick="clickButton('')"
                id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
 
         <button id="friends" type="button"
                 class="btn btn-primary dropdown-toggle"
                 data-toggle="dropdown" aria-expanded="false"
-                th:value="#{profile.friends}">
+                th:text="#{profile.friends}">
             Друзья
         </button>
         <ul class="dropdown-menu" aria-labelledby="friends">

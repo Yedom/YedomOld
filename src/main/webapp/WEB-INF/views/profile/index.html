@@ -40,7 +40,12 @@
 </div>
 
 <div class="bg unselectable">
-    <div class="main col-md-6 mx-auto text-center">
+    <div class="main col-md-7 mx-auto text-center">
+        <br />
+        <hr />
+        <div class="name">
+            <h2 th:text="${user.username}">Username</h2>
+        </div>
         <hr />
         <input type="button" onclick="clickButton('')"
                id="profile" class="btn btn-primary" value="Профиль" th:value="#{profile.profile}" />
@@ -48,7 +53,7 @@
         <button id="friends" type="button"
                 class="btn dropdown-toggle"
                 data-toggle="dropdown" aria-expanded="false"
-                th:value="#{profile.friends}">
+                th:text="#{profile.friends}">
             Друзья
         </button>
         <ul class="dropdown-menu" aria-labelledby="friends">
@@ -81,9 +86,6 @@
                 <div class="row">
                     <div class="col-md-6 ml-auto mr-auto">
                         <div class="profile">
-                            <div class="name">
-                                <h2 th:text="${user.username}">Username</h2>
-                            </div>
                             <div class="avatar avatar-wrapper">
                                 <img class="profile-pic" src="../../resources/images/default.png"
                                 th:src="${user.avatar}" alt=""/>
@@ -97,14 +99,14 @@
 
                             <!-- Last login -->
                             <div class="created-on">
-                                <h6 th:text="#{profile.last_login}">Last login</h6>
-                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}"></h6>
+                                <h4 class="profile-label" th:text="#{profile.last_login}">Last login</h4>
+                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
                             </div>
 
                             <!-- Created on -->
                             <div class="last-login">
-                                <h6 th:text="#{profile.created_on}">Created on</h6>
-                                <h6 th:text="${@utilsService.getCreatedOnDate(user.createdOn)}"></h6>
+                                <h4 class="profile-label" th:text="#{profile.created_on}">Created on</h4>
+                                <h6 th:text="${@utilsService.getCreatedOnDate(user.createdOn)}">2021.03.22</h6>
                             </div>
 
                             <!-- Add to friends -->
@@ -144,7 +146,12 @@
 <script th:inline="javascript">
     let userEntityName = /*[[${user.username}]]*/ '';
     let userName = /*[[${session_username}]]*/ '';
+    let btnClass = /*[[${btn_properties.second}]]*/ '';
     let anotherUser = false;
+
+    if(btnClass === 'btn-disabled') {
+        $('#add_friend').attr('hidden', 'hidden');
+    }
 
     // Another profile
     if(userName !== userEntityName) {

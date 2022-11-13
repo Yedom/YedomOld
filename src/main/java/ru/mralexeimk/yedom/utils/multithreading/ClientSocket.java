@@ -8,12 +8,14 @@ public class ClientSocket {
     private Socket socket;
     private DataOutputStream dout;
     private DataInputStream din;
+    private long lastActivityTime;
 
     public ClientSocket(String host, int port) {
         try {
             socket = new Socket(host, port);
             dout = new DataOutputStream(socket.getOutputStream());
             din = new DataInputStream(socket.getInputStream());
+            lastActivityTime = System.currentTimeMillis();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -23,6 +25,7 @@ public class ClientSocket {
         try {
             dout.writeUTF(msg);
             dout.flush();
+            lastActivityTime = System.currentTimeMillis();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -32,6 +35,7 @@ public class ClientSocket {
         String msg = "";
         try {
             msg = din.readUTF();
+            lastActivityTime = System.currentTimeMillis();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -40,6 +44,7 @@ public class ClientSocket {
 
     public void close() {
         try {
+            sendMessage("");
             dout.close();
             din.close();
             socket.close();
@@ -50,5 +55,9 @@ public class ClientSocket {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public long getLastActivityTime() {
+        return lastActivityTime;
     }
 }

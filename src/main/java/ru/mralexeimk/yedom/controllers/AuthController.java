@@ -22,6 +22,7 @@ import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -217,7 +218,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     public String loginUser(@ModelAttribute("user") User user,
-                            BindingResult bindingResult, HttpSession session) {
+                            BindingResult bindingResult, HttpSession session,
+                            HttpServletRequest request) {
         userValidator.validate(user.withArgs("onLogin"), bindingResult);
         UserEntity userEntity = userRepository.findByEmail(user.getUsername()).orElse(null);
 
@@ -235,7 +237,8 @@ public class AuthController {
 
         user = new User(userEntity);
         session.setAttribute("user", user);
-        tagsService.createConnection(user);
+
+        tagsService.createConnection(request.getSession().getId());
 
         return "redirect:/";
     }
@@ -245,7 +248,8 @@ public class AuthController {
      */
     @PostMapping("/confirm")
     public String confirmUser(@ModelAttribute("code") @Valid Code code,
-                              BindingResult bindingResult, HttpSession session) {
+                              BindingResult bindingResult, HttpSession session,
+                              HttpServletRequest request) {
         if(emailService.isCorrectCode(code.getCode())) {
             if (session.getAttribute("user") != null) {
                 User user = (User) session.getAttribute("user");
@@ -262,7 +266,8 @@ public class AuthController {
                     userRepository.save(userEntity);
                     session.setAttribute("user", new User(userEntity));
                     emailService.removeCode(user.getUsername());
-                    tagsService.createConnection(user);
+
+                    tagsService.createConnection(request.getSession().getId());
                 } else bindingResult.rejectValue("code", "",
                         languageUtil.getLocalizedMessage("auth.confirm.deny"));
             } else bindingResult.rejectValue("code", "",

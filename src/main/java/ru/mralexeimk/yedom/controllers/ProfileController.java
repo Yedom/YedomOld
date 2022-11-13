@@ -82,9 +82,18 @@ public class ProfileController {
      */
     private Amounts getAmounts(UserEntity userEntity) {
         Amounts amounts = new Amounts();
-        amounts.setFriendsCount(friendsService.getFriendsCount(userEntity));
-        amounts.setFollowersCount(friendsService.getFollowersCount(userEntity));
-        amounts.setFollowingCount(friendsService.getFollowingCount(userEntity));
+        try {
+            amounts.setFriendsCount(friendsService.getFriendsCount(userEntity.getId()));
+            amounts.setFollowersCount(friendsService.getFollowersCount(userEntity.getId()));
+            amounts.setFollowingCount(friendsService.getFollowingsCount(userEntity.getId()));
+        } catch (Exception e) {
+            amounts.setFriendsCount(
+                    utilsService.splitToListString(userEntity.getFriendsIds()).size());
+            amounts.setFollowersCount(
+                    utilsService.splitToListString(userEntity.getFollowersIds()).size());
+            amounts.setFollowingCount(
+                    utilsService.splitToListString(userEntity.getFollowingIds()).size());
+        }
         amounts.setCompletedCoursesCount(completedCoursesRepository.countAllByUserId(userEntity.getId()));
         amounts.setOrganizationsCount(organizationsService.getOrganizationsInCount(userEntity));
 
@@ -128,7 +137,9 @@ public class ProfileController {
 
         if(user != null) {
             model.addAttribute("session_username", user.getUsername());
-            pair = friendsService.getFollowButtonAction(user, userEntity);
+            if(user.getId() != userEntity.getId()) {
+                pair = friendsService.getFollowButtonType(user.getId(), userEntity.getId());
+            }
         }
 
         model.addAttribute("btn_properties", pair);
@@ -158,13 +169,24 @@ public class ProfileController {
         model.addAttribute("amounts",
                 getAmounts(userEntity));
 
-        switch (type) {
-            case "friends" -> model.addAttribute("users",
-                    userRepository.findAllById(utilsService.splitToListInt(userEntity.getFriendsIds())));
-            case "followers" -> model.addAttribute("users",
-                    userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowersIds())));
-            case "following" -> model.addAttribute("users",
-                    userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowingIds())));
+        try {
+            switch (type) {
+                case "friends" -> model.addAttribute("users",
+                        userRepository.findAllById(friendsService.getFriendsList(userEntity.getId())));
+                case "followers" -> model.addAttribute("users",
+                        userRepository.findAllById(friendsService.getFollowersList(userEntity.getId())));
+                case "following" -> model.addAttribute("users",
+                        userRepository.findAllById(friendsService.getFollowingsList(userEntity.getId())));
+            }
+        } catch (Exception e) {
+            switch (type) {
+                case "friends" -> model.addAttribute("users",
+                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFriendsIds())));
+                case "followers" -> model.addAttribute("users",
+                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowersIds())));
+                case "following" -> model.addAttribute("users",
+                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowingIds())));
+            }
         }
 
         return "profile/friends";
@@ -289,7 +311,7 @@ public class ProfileController {
         if(user.getUsername().equals(username) || userEntity == null)
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        friendsService.followButtonPress(user, userEntity);
+        friendsService.followPress(user.getId(), userEntity.getId());
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }

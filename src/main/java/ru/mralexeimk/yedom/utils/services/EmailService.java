@@ -10,6 +10,7 @@ import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.models.Code;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class EmailService {
@@ -17,7 +18,7 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final EmailConfig emailConfig;
 
-    private final HashMap<String, Code> codeByUsername = new HashMap<>();
+    private final ConcurrentHashMap<String, Code> codeByUsername = new ConcurrentHashMap<>();
 
     @Autowired
     public EmailService(UtilsService utilsService, JavaMailSender emailSender, EmailConfig emailConfig) {
@@ -37,6 +38,9 @@ public class EmailService {
         }).start();
     }
 
+    /**
+     * Remove not used codes
+     */
     @EventListener(ContextRefreshedEvent.class)
     public void start() {
         System.out.println("Email service started!");
@@ -64,7 +68,7 @@ public class EmailService {
         codeByUsername.put(userName, code);
     }
 
-    public HashMap<String, Code> getCodeByUser() {
+    public ConcurrentHashMap<String, Code> getCodeByUser() {
         return codeByUsername;
     }
 

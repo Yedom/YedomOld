@@ -5,6 +5,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "ss-server")
-public class SmartSearchServerConfig extends AbstractServerConfig {
+@ConfigurationProperties(prefix = "fs-server")
+public class FriendsServerConfig extends AbstractServerConfig {
 }
