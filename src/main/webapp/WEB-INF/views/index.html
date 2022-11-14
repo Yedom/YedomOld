@@ -90,19 +90,25 @@
         controls.target.set(40, 0, 5);
         controls.update();
 
-        const aLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        aLight.position.setScalar(1);
+        const aLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        aLight.position.set(-50, 10, 20);
         scene.add(aLight, new THREE.AmbientLight(0xffffff, 0.5));
 
         let loader = new THREE.GLTFLoader();
-        let obj = null;
 
-        loader.load('../resources/models/yedom.gltf', function (gltf) {
-            obj = gltf.scene;
-            scene.add(obj);
+        var mixer, clock;
+        clock = new THREE.Clock();
+        loader.load('../resources/models/yedom/yedom.gltf', function (gltf) {
+            scene.add(gltf.scene);
+
+            mixer = new THREE.AnimationMixer(gltf.scene);
+            gltf.animations.forEach((clip) => {
+                mixer.clipAction(clip).play();
+            } );
         });
 
         renderer.setAnimationLoop(_ => {
+            if (mixer) mixer.update(clock.getDelta());
             renderer.render(scene, camera);
         })
 
