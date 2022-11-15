@@ -20,6 +20,7 @@ import org.springframework.web.servlet.config.annotation.*;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.utils.language.AcceptHeaderResolver;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
@@ -99,7 +100,9 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Bean
     public LocaleResolver localeResolver() {
-        return new AcceptHeaderResolver(applicationContext.getBean(UtilsService.class));
+        return new AcceptHeaderResolver(
+                applicationContext.getBean(UtilsService.class),
+                applicationContext.getBean(LanguageConfig.class));
     }
 
     @Bean

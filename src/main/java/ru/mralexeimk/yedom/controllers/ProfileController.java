@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.config.configs.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.CompletedCoursesEntity;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
@@ -41,9 +42,9 @@ public class ProfileController {
     private final CompletedCoursesRepository completedCoursesRepository;
     private final CourseRepository courseRepository;
     private final ProfileConfig profileConfig;
-    private final LanguageUtil languageUtil;
+    private final LanguageConfig languageConfig;
 
-    public ProfileController(UtilsService utilsService, FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationsService organizationsService, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, ProfileConfig profileConfig, LanguageUtil languageUtil) {
+    public ProfileController(UtilsService utilsService, FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationsService organizationsService, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, ProfileConfig profileConfig, LanguageConfig languageConfig) {
         this.utilsService = utilsService;
         this.friendsService = friendsService;
         this.userRepository = userRepository;
@@ -52,7 +53,7 @@ public class ProfileController {
         this.completedCoursesRepository = completedCoursesRepository;
         this.courseRepository = courseRepository;
         this.profileConfig = profileConfig;
-        this.languageUtil = languageUtil;
+        this.languageConfig = languageConfig;
     }
 
     /**
@@ -102,15 +103,22 @@ public class ProfileController {
         return amounts;
     }
 
-    private Boolean[] modelAddSettings(Model model, UserEntity profileUser,
+    private Boolean[] modelGetSettings(Model model, UserEntity profileUser,
                                        User user, HttpServletRequest request) {
+        return modelGetSettings(model, profileUser, user, request, true);
+    }
+
+    private Boolean[] modelGetSettings(Model model, UserEntity profileUser,
+                                       User user, HttpServletRequest request, boolean add) {
         Boolean[] res = new Boolean[4];
         String relation = "strangers";
         if(user != null) {
             if(profileUser.getId() != user.getId()) {
-                if(friendsService.getFriendsList(request, user.getId()).contains(profileUser.getId())) {
-                    relation = "friends";
-                }
+                try {
+                    if (friendsService.getFriendsList(request, user.getId()).contains(profileUser.getId())) {
+                        relation = "friends";
+                    }
+                } catch (Exception ignored) {}
             }
             else relation = "self";
         }
@@ -129,12 +137,16 @@ public class ProfileController {
                 || (relation.equals("strangers") && settings.isStrangersShowCompletedCourses())
                 || (relation.equals("friends") && settings.isFriendsShowCompletedCourses());
 
+        if(add) modelAddSettings(model, res);
+
+        return res;
+    }
+
+    private void modelAddSettings(Model model, Boolean[] res) {
         model.addAttribute("show_email", res[0]);
         model.addAttribute("show_links", res[1]);
         model.addAttribute("show_organizations", res[2]);
         model.addAttribute("show_courses", res[3]);
-
-        return res;
     }
 
     /**
@@ -168,7 +180,7 @@ public class ProfileController {
             return "redirect:/";
         }
 
-        modelAddSettings(model, userEntity, user, request);
+        modelGetSettings(model, userEntity, user, request);
 
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
@@ -204,7 +216,7 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         }
-        modelAddSettings(model, userEntity, user, request);
+        modelGetSettings(model, userEntity, user, request);
 
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
@@ -255,10 +267,11 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         };
-        Boolean[] ch = modelAddSettings(model, userEntity, user, request);
+        Boolean[] ch = modelGetSettings(model, userEntity, user, request, false);
         if(!ch[3]) {
             return "redirect:/profile/" + userEntity.getUsername();
         }
+        modelAddSettings(model, ch);
 
         List<CompletedCoursesEntity> completedCoursesEntities =
                 completedCoursesRepository.findAllByUserIdOrderByCompletedOnDesc(userEntity.getId());
@@ -307,10 +320,11 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         }
-        Boolean[] ch = modelAddSettings(model, userEntity, user, request);
+        Boolean[] ch = modelGetSettings(model, userEntity, user, request, false);
         if(!ch[2]) {
             return "redirect:/profile/" + userEntity.getUsername();
         }
+        modelAddSettings(model, ch);
 
         List<Organization> organizations = new ArrayList<>();
 
@@ -342,7 +356,7 @@ public class ProfileController {
         boolean isSelf = profile.getThird();
 
         if(userEntity == null || !isSelf) return "redirect:/profile";
-        modelAddSettings(model, userEntity, user, request);
+        modelGetSettings(model, userEntity, user, request);
 
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
@@ -366,7 +380,7 @@ public class ProfileController {
         boolean isSelf = profile.getThird();
 
         if(userEntity == null || !isSelf) return "redirect:/profile";
-        modelAddSettings(model, userEntity, user, request);
+        modelGetSettings(model, userEntity, user, request);
 
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
@@ -443,8 +457,9 @@ public class ProfileController {
         if(userEntity == null) {
             return "redirect:/profile";
         }
-
-        userEntity.setSettings(user.getSettings().toString());
+        if(languageConfig.getLanguages().contains(user.getSettings().getLang())) {
+            userEntity.setSettings(user.getSettings().toString());
+        }
         userRepository.save(userEntity);
 
         User cloneUser = new User(userEntity);

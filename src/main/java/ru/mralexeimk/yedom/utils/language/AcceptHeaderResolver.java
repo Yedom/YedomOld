@@ -1,8 +1,10 @@
 package ru.mralexeimk.yedom.utils.language;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 
@@ -15,13 +17,11 @@ import java.util.Locale;
 @Component
 public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
     private final UtilsService utilsService;
-    private final List<Locale> LOCALES = Arrays.asList(
-            new Locale("ru"),
-            new Locale("en")
-    );
+    private final List<Locale> LOCALES;
 
-    public AcceptHeaderResolver(UtilsService utilsService) {
+    public AcceptHeaderResolver(UtilsService utilsService, LanguageConfig languageConfig) {
         this.utilsService = utilsService;
+        LOCALES = languageConfig.getLanguages().stream().map(Locale::new).toList();
     }
 
     @Override
