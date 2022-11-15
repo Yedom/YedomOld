@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title}">Yedom</title>
+
+    <!-- Info -->
+    <meta name="description" content="Yedom education platform">
+    <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/bootstrap-select.min.css" th:href="@{/resources/css/bootstrap-select.min.css}">
+
+    <!-- Scripts -->
+    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
+</head>
+<body class="index-page sidebar-collapse bg">
+
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
+<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
+
+<div class="bg">
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+</div>
+
+<div class="bg unselectable">
+    <div class="main col-md-6 mx-auto text-center">
+        <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
+
+        <h2 th:text="#{profile.settings}">Settings</h2>
+        <form th:method="POST" th:action="@{/profile/${user.username}/settings}" th:object="${user.settings}">
+            <label th:for="lang" style="font-weight: bold;" th:text="#{common.lang}">Language</label>:
+            <br />
+            <select name="lang" id="lang" th:field="*{lang}" class="selectpicker" data-style="select-with-transition">
+                <option th:value="auto" th:text="#{common.lang.auto}">Auto</option>
+                <option th:value="en" th:text="#{common.lang.en}">English</option>
+                <option th:value="ru" th:text="#{common.lang.ru}">Russian</option>
+            </select>
+            <br />
+            <br />
+            <label th:for="lang" style="font-weight: bold;"
+                   th:text="#{profile.settings.strangers}">Strangers access</label>:
+            <br />
+
+            <input type="checkbox" id="show-email-strangers" name="show-email-strangers" value="1"
+                th:field="*{strangersShowEmail}">
+            <label th:text="#{profile.settings.email}" th:for="show-email-strangers"> Show email</label><br>
+
+            <input checked type="checkbox" id="show-links-strangers" name="show-links-strangers" value="1"
+                   th:field="*{strangersShowLinks}">
+            <label th:text="#{profile.settings.links}" th:for="show-links-strangers"> Show links</label><br>
+
+            <input checked type="checkbox" id="show-courses-strangers" name="show-courses-strangers" value="1"
+                   th:field="*{strangersShowCompletedCourses}">
+            <label th:text="#{profile.settings.courses}" th:for="show-courses-strangers"> Show completed courses</label><br>
+
+            <input checked type="checkbox" id="show-organizations-strangers" name="show-organizations-strangers" value="1"
+                   th:field="*{strangersShowOrganizations}">
+            <label th:text="#{profile.settings.organizations}" th:for="show-organizations-strangers"> Show organizations</label><br>
+
+            <br />
+            <label th:for="lang" style="font-weight: bold;"
+                   th:text="#{profile.settings.friends}">Friends access</label>:
+            <br />
+
+            <input checked type="checkbox" id="show-email-friends" name="show-email-friends" value="1"
+                   th:field="*{friendsShowEmail}">
+            <label th:text="#{profile.settings.email}" th:for="show-email-friends"> Show email</label><br>
+
+            <input checked type="checkbox" id="show-links-friends" name="show-links-friends" value="1"
+                   th:field="*{friendsShowLinks}">
+            <label th:text="#{profile.settings.links}" th:for="show-links-friends"> Show links</label><br>
+
+            <input checked type="checkbox" id="show-courses-friends" name="show-courses-friends" value="1"
+                   th:field="*{friendsShowCompletedCourses}">
+            <label th:text="#{profile.settings.courses}" th:for="show-courses-friends"> Show completed courses</label><br>
+
+            <input checked type="checkbox" id="show-organizations-friends" name="show-organizations-friends" value="1"
+                   th:field="*{friendsShowOrganizations}">
+            <label th:text="#{profile.settings.organizations}" th:for="show-organizations-friends"> Show organizations</label><br>
+
+            <br/>
+            <input type="submit" value="Сохранить" th:value="#{profile.settings.save}"/>
+            <br />
+            <br />
+        </form>
+        <br />
+        <br />
+    </div>
+</div>
+
+<div class="bg">
+    <br />
+    <br />
+    <br />
+    <br />
+</div>
+
+<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+
+<script>
+    w3.includeHTML();
+
+    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+        console.log('particles-js loaded!');
+    });
+</script>
+
+<script th:inline="javascript">
+    let userEntityName = /*[[${user.username}]]*/ '';
+    let userName = /*[[${session_username}]]*/ '';
+
+    $('#settings').addClass('btn-primary');
+    // Another profile
+    if(userName !== userEntityName) {
+        $('#balance').hide();
+        $('#settings').hide();
+    }
+    function clickButton(value) {
+        if(userEntityName === '') window.location = '/profile/';
+        window.location = '/profile/' + userEntityName + '/' + value;
+    }
+</script>
+</body>
+</html>

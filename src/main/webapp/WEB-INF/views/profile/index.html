@@ -40,47 +40,9 @@
 </div>
 
 <div class="bg unselectable">
-    <div class="main col-md-7 mx-auto text-center">
-        <br />
-        <hr />
-        <div class="name">
-            <h2 th:text="${user.username}">Username</h2>
-        </div>
-        <hr />
-        <input type="button" onclick="clickButton('')"
-               id="profile" class="btn btn-primary" value="Профиль" th:value="#{profile.profile}" />
+    <div class="main col-md-6 mx-auto text-center">
+        <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
 
-        <button id="friends" type="button"
-                class="btn dropdown-toggle"
-                data-toggle="dropdown" aria-expanded="false"
-                th:text="#{profile.friends}">
-            Друзья
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="friends">
-            <li><a class="dropdown-item"
-                   onclick="clickButton('friends')"
-                   th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
-            <li><a class="dropdown-item"
-                   onclick="clickButton('followers')"
-                   th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
-            <li><a class="dropdown-item"
-                   onclick="clickButton('following')"
-                   th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
-        </ul>
-
-        <input type="button"
-               onclick="clickButton('courses')"
-               id="courses" class="btn" value="Завершенные курсы"
-               th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
-        <input type="button"
-               onclick="clickButton('organizations')"
-               id="organizations" class="btn" value="Организации"
-               th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
-        <input type="button"
-               onclick="clickButton('balance')"
-               id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
-        <hr />
-        <br />
         <div class="profile-content">
             <div class="container">
                 <div class="row">
@@ -96,6 +58,12 @@
                             </div>
                             <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
                             <br />
+
+                            <!-- Email -->
+                            <div class="email" th:if="${show_email}">
+                                <h4 class="profile-label" th:text="#{auth.email}">Email</h4>
+                                <h6 class="selectable" th:text="${user.email}">yedom@yedom.ru</h6>
+                            </div>
 
                             <!-- Last login -->
                             <div class="created-on">
@@ -149,14 +117,17 @@
     let btnClass = /*[[${btn_properties.second}]]*/ '';
     let anotherUser = false;
 
+    $('#profile').addClass('btn-primary');
+
     if(btnClass === 'btn-disabled') {
-        $('#add_friend').attr('hidden', 'hidden');
+        $('#add_friend').hide();
     }
 
     // Another profile
     if(userName !== userEntityName) {
         anotherUser = true;
         $('#balance').hide();
+        $('#settings').hide();
         $('#avatar-upload').attr('disabled', 'disabled');
         $('.avatar-wrapper').css('cursor', 'default');
     }

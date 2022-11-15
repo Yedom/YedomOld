@@ -15,19 +15,19 @@ import ru.mralexeimk.yedom.database.repositories.CompletedCoursesRepository;
 import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
-import ru.mralexeimk.yedom.models.Amounts;
-import ru.mralexeimk.yedom.models.Course;
-import ru.mralexeimk.yedom.models.Organization;
-import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.models.*;
 import ru.mralexeimk.yedom.utils.custom.Triple;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.services.FriendsService;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Controller
@@ -41,8 +41,9 @@ public class ProfileController {
     private final CompletedCoursesRepository completedCoursesRepository;
     private final CourseRepository courseRepository;
     private final ProfileConfig profileConfig;
+    private final LanguageUtil languageUtil;
 
-    public ProfileController(UtilsService utilsService, FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationsService organizationsService, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, ProfileConfig profileConfig) {
+    public ProfileController(UtilsService utilsService, FriendsService friendsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationsService organizationsService, CompletedCoursesRepository completedCoursesRepository, CourseRepository courseRepository, ProfileConfig profileConfig, LanguageUtil languageUtil) {
         this.utilsService = utilsService;
         this.friendsService = friendsService;
         this.userRepository = userRepository;
@@ -51,6 +52,7 @@ public class ProfileController {
         this.completedCoursesRepository = completedCoursesRepository;
         this.courseRepository = courseRepository;
         this.profileConfig = profileConfig;
+        this.languageUtil = languageUtil;
     }
 
     /**
@@ -80,12 +82,12 @@ public class ProfileController {
     /**
      * Get count of friends/followers/following/completed courses/organizations in Amounts class
      */
-    private Amounts getAmounts(UserEntity userEntity) {
+    private Amounts getAmounts(UserEntity userEntity, HttpServletRequest request) {
         Amounts amounts = new Amounts();
         try {
-            amounts.setFriendsCount(friendsService.getFriendsCount(userEntity.getId()));
-            amounts.setFollowersCount(friendsService.getFollowersCount(userEntity.getId()));
-            amounts.setFollowingCount(friendsService.getFollowingsCount(userEntity.getId()));
+            amounts.setFriendsCount(friendsService.getFriendsCount(request, userEntity.getId()));
+            amounts.setFollowersCount(friendsService.getFollowersCount(request, userEntity.getId()));
+            amounts.setFollowingCount(friendsService.getFollowingsCount(request, userEntity.getId()));
         } catch (Exception e) {
             amounts.setFriendsCount(
                     utilsService.splitToListString(userEntity.getFriendsIds()).size());
@@ -98,6 +100,41 @@ public class ProfileController {
         amounts.setOrganizationsCount(organizationsService.getOrganizationsInCount(userEntity));
 
         return amounts;
+    }
+
+    private Boolean[] modelAddSettings(Model model, UserEntity profileUser,
+                                       User user, HttpServletRequest request) {
+        Boolean[] res = new Boolean[4];
+        String relation = "strangers";
+        if(user != null) {
+            if(profileUser.getId() != user.getId()) {
+                if(friendsService.getFriendsList(request, user.getId()).contains(profileUser.getId())) {
+                    relation = "friends";
+                }
+            }
+            else relation = "self";
+        }
+
+        UserSettings settings = new UserSettings(profileUser.getSettings());
+        res[0] = relation.equals("self")
+                || (relation.equals("strangers") && settings.isStrangersShowEmail())
+                || (relation.equals("friends") && settings.isFriendsShowEmail());
+        res[1] = relation.equals("self")
+                || (relation.equals("strangers") && settings.isStrangersShowLinks())
+                || (relation.equals("friends") && settings.isFriendsShowLinks());
+        res[2] = relation.equals("self")
+                || (relation.equals("strangers") && settings.isStrangersShowOrganizations())
+                || (relation.equals("friends") && settings.isFriendsShowOrganizations());
+        res[3] = relation.equals("self")
+                || (relation.equals("strangers") && settings.isStrangersShowCompletedCourses())
+                || (relation.equals("friends") && settings.isFriendsShowCompletedCourses());
+
+        model.addAttribute("show_email", res[0]);
+        model.addAttribute("show_links", res[1]);
+        model.addAttribute("show_organizations", res[2]);
+        model.addAttribute("show_courses", res[3]);
+
+        return res;
     }
 
     /**
@@ -119,7 +156,7 @@ public class ProfileController {
     @GetMapping("/{username}")
     public String profileGet(Model model,
                              @PathVariable(value = "username") String username,
-                             HttpSession session) {
+                             HttpServletRequest request, HttpSession session) {
         Pair<String, String> pair = friendsService.DEFAULT_FOLLOW_BTN;
 
         var profile = getUserEntity(username, session);
@@ -131,14 +168,18 @@ public class ProfileController {
             return "redirect:/";
         }
 
+        modelAddSettings(model, userEntity, user, request);
+
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
-                getAmounts(userEntity));
+                getAmounts(userEntity, request));
 
+        // user is authorized
         if(user != null) {
             model.addAttribute("session_username", user.getUsername());
+            // not user's profile
             if(user.getId() != userEntity.getId()) {
-                pair = friendsService.getFollowButtonType(user.getId(), userEntity.getId());
+                pair = friendsService.getFollowButtonType(request, user.getId(), userEntity.getId());
             }
         }
 
@@ -154,7 +195,7 @@ public class ProfileController {
     public String profileFriendsGet(Model model,
                                     @PathVariable(value = "username") String username,
                                     @PathVariable(value = "type") String type,
-                                    HttpSession session) {
+                                    HttpSession session, HttpServletRequest request) {
         var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
         User user = profile.getSecond();
@@ -163,29 +204,36 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         }
+        modelAddSettings(model, userEntity, user, request);
 
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
-                getAmounts(userEntity));
+                getAmounts(userEntity, request));
 
         try {
             switch (type) {
                 case "friends" -> model.addAttribute("users",
-                        userRepository.findAllById(friendsService.getFriendsList(userEntity.getId())));
+                        userRepository.findAllById(
+                                friendsService.getFriendsList(request, userEntity.getId())));
                 case "followers" -> model.addAttribute("users",
-                        userRepository.findAllById(friendsService.getFollowersList(userEntity.getId())));
+                        userRepository.findAllById(
+                                friendsService.getFollowersList(request, userEntity.getId())));
                 case "following" -> model.addAttribute("users",
-                        userRepository.findAllById(friendsService.getFollowingsList(userEntity.getId())));
+                        userRepository.findAllById(
+                                friendsService.getFollowingsList(request, userEntity.getId())));
             }
         } catch (Exception e) {
             switch (type) {
                 case "friends" -> model.addAttribute("users",
-                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFriendsIds())));
+                        userRepository.findAllById(
+                                utilsService.splitToListInt(userEntity.getFriendsIds())));
                 case "followers" -> model.addAttribute("users",
-                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowersIds())));
+                        userRepository.findAllById(
+                                utilsService.splitToListInt(userEntity.getFollowersIds())));
                 case "following" -> model.addAttribute("users",
-                        userRepository.findAllById(utilsService.splitToListInt(userEntity.getFollowingIds())));
+                        userRepository.findAllById(
+                                utilsService.splitToListInt(userEntity.getFollowingIds())));
             }
         }
 
@@ -198,7 +246,7 @@ public class ProfileController {
     @GetMapping("/{username}/courses")
     public String profileCoursesGet(Model model,
                                     @PathVariable(value = "username") String username,
-                                    HttpSession session) {
+                                    HttpSession session, HttpServletRequest request) {
         var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
         User user = profile.getSecond();
@@ -207,6 +255,10 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         };
+        Boolean[] ch = modelAddSettings(model, userEntity, user, request);
+        if(!ch[3]) {
+            return "redirect:/profile/" + userEntity.getUsername();
+        }
 
         List<CompletedCoursesEntity> completedCoursesEntities =
                 completedCoursesRepository.findAllByUserIdOrderByCompletedOnDesc(userEntity.getId());
@@ -233,7 +285,7 @@ public class ProfileController {
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
-                getAmounts(userEntity));
+                getAmounts(userEntity, request));
 
         model.addAttribute("completed_courses", completedCourses);
 
@@ -246,7 +298,7 @@ public class ProfileController {
     @GetMapping("/{username}/organizations")
     public String profileOrganizationsGet(Model model,
                                           @PathVariable(value = "username") String username,
-                                          HttpSession session) {
+                                          HttpSession session, HttpServletRequest request) {
         var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
         User user = profile.getSecond();
@@ -254,6 +306,10 @@ public class ProfileController {
         if(userEntity == null) {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
+        }
+        Boolean[] ch = modelAddSettings(model, userEntity, user, request);
+        if(!ch[2]) {
+            return "redirect:/profile/" + userEntity.getUsername();
         }
 
         List<Organization> organizations = new ArrayList<>();
@@ -267,10 +323,33 @@ public class ProfileController {
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
-                getAmounts(userEntity));
+                getAmounts(userEntity, request));
         model.addAttribute("organizations", organizations);
 
         return "profile/organizations";
+    }
+
+    /**
+     * User settings page
+     */
+    @GetMapping("/{username}/settings")
+    public String profileSettingsGet(Model model,
+                                    @PathVariable(value = "username") String username,
+                                    HttpSession session, HttpServletRequest request) {
+        var profile = getUserEntity(username, session);
+        UserEntity userEntity = profile.getFirst();
+        User user = profile.getSecond();
+        boolean isSelf = profile.getThird();
+
+        if(userEntity == null || !isSelf) return "redirect:/profile";
+        modelAddSettings(model, userEntity, user, request);
+
+        if(user != null) model.addAttribute("session_username", user.getUsername());
+        model.addAttribute("user", new User(userEntity));
+        model.addAttribute("amounts",
+                getAmounts(userEntity, request));
+
+        return "profile/settings";
     }
 
     /**
@@ -280,18 +359,19 @@ public class ProfileController {
     @GetMapping("/{username}/balance")
     public String profileBalanceGet(Model model,
                                     @PathVariable(value = "username") String username,
-                                    HttpSession session) {
+                                    HttpSession session, HttpServletRequest request) {
         var profile = getUserEntity(username, session);
         UserEntity userEntity = profile.getFirst();
         User user = profile.getSecond();
         boolean isSelf = profile.getThird();
 
         if(userEntity == null || !isSelf) return "redirect:/profile";
+        modelAddSettings(model, userEntity, user, request);
 
         if(user != null) model.addAttribute("session_username", user.getUsername());
         model.addAttribute("user", new User(userEntity));
         model.addAttribute("amounts",
-                getAmounts(userEntity));
+                getAmounts(userEntity, request));
 
         return "profile/balance";
     }
@@ -301,7 +381,7 @@ public class ProfileController {
      */
     @PostMapping("/follow")
     public @ResponseBody ResponseEntity<Object> followBtn(@RequestParam(name = "username") String username,
-                                                          HttpSession session) {
+                                                          HttpSession session, HttpServletRequest request) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
@@ -311,7 +391,7 @@ public class ProfileController {
         if(user.getUsername().equals(username) || userEntity == null)
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        friendsService.followPress(user.getId(), userEntity.getId());
+        friendsService.followPress(request, user.getId(), userEntity.getId());
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
@@ -350,5 +430,26 @@ public class ProfileController {
         }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    @PostMapping("/{username}/settings")
+    public String saveSettings(@ModelAttribute User user,
+                               HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User sessionUser = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(sessionUser.getId()).orElse(null);
+
+        if(userEntity == null) {
+            return "redirect:/profile";
+        }
+
+        userEntity.setSettings(user.getSettings().toString());
+        userRepository.save(userEntity);
+
+        User cloneUser = new User(userEntity);
+        session.setAttribute("user", cloneUser);
+
+        return "redirect:/profile/" + userEntity.getUsername() + "/settings";
     }
 }

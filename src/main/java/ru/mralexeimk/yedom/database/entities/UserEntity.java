@@ -8,7 +8,7 @@ import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Comparator;
+import java.util.*;
 
 @Getter
 @Setter
@@ -68,6 +68,12 @@ public class UserEntity {
     @Column(name = "organizations_following_ids")
     private String organizationsFollowingIds = "";
 
+    @Column(name = "settings")
+    private String settings = "lang=auto&strangersShowEmail=false&strangersShowLinks=false&strangersShowCompletedCourses=false&strangersShowOrganizations=false&friendsShowEmail=false&friendsShowLinks=false&friendsShowCompletedCourses=false&friendsShowOrganizations=true";
+
+    @Column(name = "links")
+    private String links = "";
+
     // Add to database constructor
     public UserEntity(User user) {
         this.username = user.getUsername();
@@ -111,6 +117,8 @@ public class UserEntity {
                 ", organizationsIds='" + organizationsIds + '\'' +
                 ", inOrganizationsIds='" + inOrganizationsIds + '\'' +
                 ", organizationsFollowingIds='" + organizationsFollowingIds + '\'' +
+                ", settings='" + settings + '\'' +
+                ", links='" + links + '\'' +
                 '}';
     }
 }

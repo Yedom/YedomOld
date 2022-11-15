@@ -38,52 +38,12 @@
     <br />
     <br />
     <br />
-    <br />
-    <br />
 </div>
 
 <div class="bg unselectable">
-    <div class="main main-raised col-md-7 mx-auto text-center">
-        <br />
-        <hr />
-        <div class="name">
-            <h2 th:text="${user.username}">Username</h2>
-        </div>
-        <hr />
-        <input type="button" onclick="clickButton('')"
-               id="profile" class="btn" value="Профиль" th:value="#{profile.profile}" />
+    <div class="main col-md-6 mx-auto text-center">
+        <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
 
-        <button id="friends" type="button"
-                class="btn dropdown-toggle"
-                data-toggle="dropdown" aria-expanded="false"
-                th:text="#{profile.friends}">
-            Друзья
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="friends">
-            <li><a class="dropdown-item"
-                   onclick="clickButton('friends')"
-                   th:text="#{profile.friends} + ' (' + ${amounts.friendsCount} +')'">Друзья</a></li>
-            <li><a class="dropdown-item"
-                   onclick="clickButton('followers')"
-                   th:text="#{profile.followers} + ' (' + ${amounts.followersCount} +')'">Подписчики</a></li>
-            <li><a class="dropdown-item"
-                   onclick="clickButton('following')"
-                   th:text="#{profile.following} + ' (' + ${amounts.followingCount} +')'">Подписки</a></li>
-        </ul>
-
-        <input type="button"
-               onclick="clickButton('courses')"
-               id="courses" class="btn" value="Завершенные курсы"
-               th:value="#{profile.courses.completed} + ' (' + ${amounts.completedCoursesCount} +')'" />
-        <input type="button"
-               onclick="clickButton('organizations')"
-               id="organizations" class="btn btn-primary" value="Организации"
-               th:value="#{profile.organizations} + ' (' + ${amounts.organizationsCount} +')'" />
-        <input type="button"
-               onclick="clickButton('balance')"
-               id="balance" class="btn" value="Баланс" th:value="#{profile.balance}" />
-
-        <hr />
         <div id="orgCreate">
             <br />
             <input type="button" onclick="window.location='/organization/add'"
@@ -162,9 +122,11 @@
     let userEntityName = /*[[${user.username}]]*/ '';
     let userName = /*[[${session_username}]]*/ '';
 
+    $('#organizations').addClass('btn-primary');
     // Another profile
     if(userName !== userEntityName) {
         $('#balance').hide();
+        $('#settings').hide();
         $('#orgCreate').hide();
     }
 

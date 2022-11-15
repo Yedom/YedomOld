@@ -3,22 +3,26 @@ package ru.mralexeimk.yedom.utils.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.configs.FriendsServerConfig;
+import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class FriendsService extends AbstractService {
+    private final UtilsService utilsService;
     private final LanguageUtil languageUtil;
     public final Pair<String, String> DEFAULT_FOLLOW_BTN;
     public final Pair<String, String> DISABLED_FOLLOW_BTN;
 
     @Autowired
-    public FriendsService(FriendsServerConfig friendsServerConfig, LanguageUtil languageUtil) {
+    public FriendsService(FriendsServerConfig friendsServerConfig, UtilsService utilsService, LanguageUtil languageUtil) {
         super(friendsServerConfig);
+        this.utilsService = utilsService;
         this.languageUtil = languageUtil;
         DEFAULT_FOLLOW_BTN = new Pair<>(
                 languageUtil.getLocalizedMessage("profile.follow"),
@@ -28,32 +32,38 @@ public class FriendsService extends AbstractService {
                 "btn-disabled");
     }
 
-    public int getFriendsCount(int id) {
-        return Integer.parseInt(sendSocket("0", SocketType.FRIENDS_COUNT, String.valueOf(id)));
+    public int getFriendsCount(HttpServletRequest request, int id) {
+        return Integer.parseInt(sendSocket(request.getSession().getId(),
+                SocketType.FRIENDS_COUNT, String.valueOf(id)));
     }
 
-    public int getFollowingsCount(int id) {
-        return Integer.parseInt(sendSocket("0", SocketType.FOLLOWINGS_COUNT, String.valueOf(id)));
+    public int getFollowingsCount(HttpServletRequest request, int id) {
+        return Integer.parseInt(sendSocket(request.getSession().getId(),
+                SocketType.FOLLOWINGS_COUNT, String.valueOf(id)));
     }
 
-    public int getFollowersCount(int id) {
-        return Integer.parseInt(sendSocket("0", SocketType.FOLLOWERS_COUNT, String.valueOf(id)));
+    public int getFollowersCount(HttpServletRequest request, int id) {
+        return Integer.parseInt(sendSocket(request.getSession().getId(),
+                SocketType.FOLLOWERS_COUNT, String.valueOf(id)));
     }
 
-    public List<Integer> getFriendsList(int id) {
-        return Arrays.stream(sendSocket("0", SocketType.FRIENDS_LIST, String.valueOf(id)).split(","))
+    public List<Integer> getFriendsList(HttpServletRequest request, int id) {
+        return Arrays.stream(sendSocket(request.getSession().getId(),
+                        SocketType.FRIENDS_LIST, String.valueOf(id)).split(","))
                 .map(Integer::parseInt)
                 .toList();
     }
 
-    public List<Integer> getFollowingsList(int id) {
-        return Arrays.stream(sendSocket("0", SocketType.FOLLOWINGS_LIST, String.valueOf(id)).split(","))
+    public List<Integer> getFollowingsList(HttpServletRequest request, int id) {
+        return Arrays.stream(sendSocket(request.getSession().getId(),
+                        SocketType.FOLLOWINGS_LIST, String.valueOf(id)).split(","))
                 .map(Integer::parseInt)
                 .toList();
     }
 
-    public List<Integer> getFollowersList(int id) {
-        return Arrays.stream(sendSocket("0", SocketType.FOLLOWERS_LIST, String.valueOf(id)).split(","))
+    public List<Integer> getFollowersList(HttpServletRequest request, int id) {
+        return Arrays.stream(sendSocket(request.getSession().getId(),
+                        SocketType.FOLLOWERS_LIST, String.valueOf(id)).split(","))
                 .map(Integer::parseInt)
                 .toList();
     }
@@ -76,22 +86,22 @@ public class FriendsService extends AbstractService {
         };
     }
 
-    public Pair<String, String> getFollowButtonType(int id1, int id2) {
+    public Pair<String, String> getFollowButtonType(HttpServletRequest request, int id1, int id2) {
         try {
             return connectionToButton(
-                    sendSocket(String.valueOf(id1),
+                    sendSocket(request.getSession().getId(),
                             SocketType.CONNECTION_TYPE,
-                            String.valueOf(id2)));
+                            id1 + "," + id2));
         } catch (Exception e) {
             return DISABLED_FOLLOW_BTN;
         }
     }
 
-    public void followPress(int id1, int id2) {
+    public void followPress(HttpServletRequest request, int id1, int id2) {
         try {
-            sendSocket(String.valueOf(id1),
+            sendSocket(request.getSession().getId(),
                     SocketType.FOLLOW_PRESS,
-                    String.valueOf(id2));
+                    id1 + "," + id2);
         } catch (Exception ignored) {}
     }
 }

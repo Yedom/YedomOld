@@ -40,7 +40,6 @@ public class GlobalController {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check == null) {
             User user = (User) session.getAttribute("user");
-            friendsService.createConnection(String.valueOf(user.getId()));
 
             Timestamp now = new Timestamp(System.currentTimeMillis());
             Timestamp lastLogin = user.getLastLogin();
@@ -55,5 +54,6 @@ public class GlobalController {
             }
         }
         tagsService.createConnection(request.getSession().getId());
+        friendsService.createConnection(request.getSession().getId());
     }
 }

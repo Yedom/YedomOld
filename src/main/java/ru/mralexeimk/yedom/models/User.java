@@ -3,7 +3,6 @@ package ru.mralexeimk.yedom.models;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -33,6 +32,8 @@ public class User {
     private String organizationsIds = "";
     private String inOrganizationsIds = "";
     private String organizationsFollowingIds = "";
+    private UserSettings settings = new UserSettings();
+    private String links = "";
 
     // Model fields
     private boolean emailConfirmed = false;
@@ -56,7 +57,8 @@ public class User {
                 Timestamp createdOn, Timestamp lastLogin, int balance, String avatar,
                 String coursesIds, String draftCoursesIds, String friendsIds,
                 String followingIds, String followersIds, String organizationsIds,
-                String inOrganizationsIds, String organizationsFollowingIds) {
+                String inOrganizationsIds, String organizationsFollowingIds,
+                UserSettings settings, String links) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -74,6 +76,8 @@ public class User {
         this.organizationsIds = organizationsIds;
         this.inOrganizationsIds = inOrganizationsIds;
         this.organizationsFollowingIds = organizationsFollowingIds;
+        this.settings = settings;
+        this.links = links;
     }
 
     // User by UserEntity constructor
@@ -83,7 +87,8 @@ public class User {
                 userEntity.getLastLogin(), userEntity.getBalance(), userEntity.getAvatar(),
                 userEntity.getCoursesIds(), userEntity.getDraftCoursesIds(), userEntity.getFriendsIds(),
                 userEntity.getFollowingIds(), userEntity.getFollowersIds(), userEntity.getOrganizationsIds(),
-                userEntity.getInOrganizationsIds(), userEntity.getOrganizationsFollowingIds());
+                userEntity.getInOrganizationsIds(), userEntity.getOrganizationsFollowingIds(),
+                new UserSettings(userEntity.getSettings()), userEntity.getLinks());
         emailConfirmed = true;
     }
 
@@ -93,6 +98,7 @@ public class User {
                 cp.getCoursesIds(), cp.getDraftCoursesIds(), cp.getFriendsIds(),
                 cp.getFollowingIds(), cp.getFollowersIds(), cp.getOrganizationsIds(),
                 cp.getInOrganizationsIds(), cp.getOrganizationsFollowingIds(),
+                cp.getSettings(), cp.getLinks(),
                 cp.isEmailConfirmed(), cp.getNewPassword(),
                 cp.getNewPasswordRepeat(), cp.getArgs(), cp.getVals());
     }

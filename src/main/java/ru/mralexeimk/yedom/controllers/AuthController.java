@@ -25,6 +25,7 @@ import ru.mralexeimk.yedom.utils.validators.UserValidator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/auth")
@@ -235,8 +236,8 @@ public class AuthController {
         userEntity.setLastLogin(utilsService.getCurrentTimestamp());
         userRepository.save(userEntity);
 
-        user = new User(userEntity);
-        session.setAttribute("user", user);
+        User cloneUser = new User(userEntity);
+        session.setAttribute("user", cloneUser);
 
         tagsService.createConnection(request.getSession().getId());
 
@@ -264,7 +265,8 @@ public class AuthController {
                     UserEntity userEntity = new UserEntity(user);
 
                     userRepository.save(userEntity);
-                    session.setAttribute("user", new User(userEntity));
+                    user = new User(userEntity);
+                    session.setAttribute("user", user);
                     emailService.removeCode(user.getUsername());
 
                     tagsService.createConnection(request.getSession().getId());
