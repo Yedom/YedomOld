@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
     <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/bootstrap-select.min.css" th:href="@{/resources/css/bootstrap-select.min.css}">
 
     <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -21,7 +22,19 @@
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
     <script src="../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
+
+    <style>
+        .add-name {
+            height: 25px;
+            width: 20%;
+        }
+        .add-href {
+            height: 25px;
+            width: 45%;
+        }
+    </style>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -66,15 +79,28 @@
                             </div>
 
                             <!-- Last login -->
-                            <div class="created-on">
+                            <div class="created-on" th:if="${show_online}">
                                 <h4 class="profile-label" th:text="#{profile.last_login}">Last login</h4>
                                 <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
                             </div>
 
-                            <!-- Created on -->
-                            <div class="last-login">
-                                <h4 class="profile-label" th:text="#{profile.created_on}">Created on</h4>
-                                <h6 th:text="${@utilsService.getCreatedOnDate(user.createdOn)}">2021.03.22</h6>
+                            <!-- Links -->
+                            <div class="links-container" th:if="${show_links && user.links.length() > 0}">
+                                <h4 class="profile-label" th:text="#{profile.links}">Links</h4>
+                                <div class="links">
+                                    <div class="link" th:each="link : ${@utilsService.parseLinks(user.links)}" th:id="${link.first}">
+                                        <a target="_blank" rel="noopener noreferrer" class="link-href"
+                                           href="#" th:text="${link.first}" th:href="${link.second}">GitHub profile</a>
+                                        <i th:attr="onclick=|deleteLink('${link.first}')|" class="material-icons centered-icon">delete</i>
+                                    </div>
+                                </div>
+                                <i onclick="addLink()" id="add" class="material-icons centered-icon">add</i>
+                            </div>
+
+                            <!-- About -->
+                            <div class="about" th:if="${relation == 'self' || user.about.length() > 0}">
+                                <h4 class="profile-label" th:text="#{profile.about}">About me</h4>
+                                <textarea maxlength="400" th:text="${user.about}" rows="7" id="textarea-about"></textarea>
                             </div>
 
                             <!-- Add to friends -->
@@ -83,6 +109,7 @@
                                        class="btn" th:classappend="${btn_properties.second}" value="Подписаться"
                                        th:value="${btn_properties.first}" />
                             </div>
+
                             <br />
                         </div>
                     </div>
@@ -116,6 +143,7 @@
     let userName = /*[[${session_username}]]*/ '';
     let btnClass = /*[[${btn_properties.second}]]*/ '';
     let anotherUser = false;
+    let links = $('.links');
 
     $('#profile').addClass('btn-primary');
 
@@ -123,17 +151,119 @@
         $('#add_friend').hide();
     }
 
+    $('#add').hide();
+    showAdd();
+
     // Another profile
     if(userName !== userEntityName) {
         anotherUser = true;
-        $('#balance').hide();
-        $('#settings').hide();
+        $('#balance').remove();
+        $('#settings').remove();
+        $('.delete-icon').remove();
         $('#avatar-upload').attr('disabled', 'disabled');
         $('.avatar-wrapper').css('cursor', 'default');
+        $('#textarea-about').attr('disabled', 'disabled');
+        $('.centered-icon').remove();
     }
     // Our profile
     else {
-        $('#add_friend').hide();
+        $('#add_friend').remove();
+    }
+
+    function showAdd() {
+        let count = $('.link').length;
+        if(!anotherUser && count < 10) {
+            $('#add').show();
+        }
+    }
+
+    let pred = $('#textarea-about').val();
+
+    function saveAbout() {
+        let cur = $('#textarea-about').val();
+        if(pred !== cur) {
+            let data = {about: cur};
+            fetch("/profile/aboutUpdate", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    window.location.reload();
+                }
+            });
+            pred = cur;
+        }
+    }
+
+    $(window).bind('beforeunload', function(){
+        saveAbout();
+    });
+
+    $(window).click(function() {
+        saveAbout();
+    });
+
+    jQuery.fn.exists = function(){ return this.length > 0; }
+
+    function saveLink() {
+        let name = $('#last-name').val();
+        let href = $('#last-href').val();
+        name = name.replaceAll('$', '');
+        name = name.replaceAll('|', '');
+        href = href.replaceAll('$', '');
+        href = href.replaceAll('|', '');
+        if(name !== '' && href !== '' && !$('#'+name).exists()) {
+            $('#last').remove();
+            links.html(links.html() + '<div class="link" id="'+name+'">' +
+                '<a target="_blank" href="'+href+'" th:href="'+href+'" th:text="'+name+'" rel="noopener noreferrer" class="link-href" href="#">'+name+'</a>' +
+                '<i onclick="deleteLink(\''+name+'\')" class="material-icons centered-icon">delete</i>' +
+                '</div>');
+
+            showAdd();
+            linksUpdate();
+        }
+    }
+
+    function addLink() {
+        if(!$('#last').exists()) {
+            links.html(links.html() + "<div class='link' id='last'>" +
+                "<input type='text' id='last-name' maxlength='10' placeholder='GitHub' class='add-name'/>" +
+                "<input type='text' id='last-href' maxlength='300' placeholder='https://github.com' class='add-href'/>" +
+                "<i onclick='saveLink(\"last\")' class='material-icons centered-icon'>save</i>" +
+                "<i onclick='deleteLink(\"last\")' class='material-icons centered-icon'>delete</i>" +
+                "</div>")
+            $('#add').hide();
+        }
+    }
+
+    function deleteLink(linkId) {
+        $('#'+linkId).remove();
+        if(linkId === 'last') {
+            showAdd();
+        }
+        else {
+            linksUpdate();
+        }
+    }
+
+    function linksUpdate() {
+        var res = '';
+        $('.link').each(function (index, el) {
+            let aTag = $(el).find('a');
+            if(index > 0) res += '|';
+            res += aTag.text() + '$' + aTag.attr('href');
+        });
+        let data = {links: res};
+        fetch("/profile/linksUpdate", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        }).then(response => {
+            if(!response.ok) {
+                window.location.reload();
+            }
+        });
     }
 
     function clickButton(value) {

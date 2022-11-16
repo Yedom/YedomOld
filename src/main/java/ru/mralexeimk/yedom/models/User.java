@@ -3,6 +3,7 @@ package ru.mralexeimk.yedom.models;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.utils.custom.Pair;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -34,6 +35,7 @@ public class User {
     private String organizationsFollowingIds = "";
     private UserSettings settings = new UserSettings();
     private String links = "";
+    private String about = "";
 
     // Model fields
     private boolean emailConfirmed = false;
@@ -58,7 +60,7 @@ public class User {
                 String coursesIds, String draftCoursesIds, String friendsIds,
                 String followingIds, String followersIds, String organizationsIds,
                 String inOrganizationsIds, String organizationsFollowingIds,
-                UserSettings settings, String links) {
+                UserSettings settings, String links, String about) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -78,6 +80,7 @@ public class User {
         this.organizationsFollowingIds = organizationsFollowingIds;
         this.settings = settings;
         this.links = links;
+        this.about = about;
     }
 
     // User by UserEntity constructor
@@ -88,7 +91,7 @@ public class User {
                 userEntity.getCoursesIds(), userEntity.getDraftCoursesIds(), userEntity.getFriendsIds(),
                 userEntity.getFollowingIds(), userEntity.getFollowersIds(), userEntity.getOrganizationsIds(),
                 userEntity.getInOrganizationsIds(), userEntity.getOrganizationsFollowingIds(),
-                new UserSettings(userEntity.getSettings()), userEntity.getLinks());
+                new UserSettings(userEntity.getSettings()), userEntity.getLinks(), userEntity.getAbout());
         emailConfirmed = true;
     }
 
@@ -98,7 +101,7 @@ public class User {
                 cp.getCoursesIds(), cp.getDraftCoursesIds(), cp.getFriendsIds(),
                 cp.getFollowingIds(), cp.getFollowersIds(), cp.getOrganizationsIds(),
                 cp.getInOrganizationsIds(), cp.getOrganizationsFollowingIds(),
-                cp.getSettings(), cp.getLinks(),
+                cp.getSettings(), cp.getLinks(), cp.getAbout(),
                 cp.isEmailConfirmed(), cp.getNewPassword(),
                 cp.getNewPasswordRepeat(), cp.getArgs(), cp.getVals());
     }

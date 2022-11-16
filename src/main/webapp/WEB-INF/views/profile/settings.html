@@ -76,6 +76,10 @@
                    th:field="*{strangersShowOrganizations}">
             <label th:text="#{profile.settings.organizations}" th:for="show-organizations-strangers"> Show organizations</label><br>
 
+            <input checked type="checkbox" id="show-online-strangers" name="show-online-strangers" value="1"
+                   th:field="*{strangersShowOnline}">
+            <label th:text="#{profile.settings.online}" th:for="show-online-strangers"> Show online status</label><br>
+
             <br />
             <label th:for="lang" style="font-weight: bold;"
                    th:text="#{profile.settings.friends}">Friends access</label>:
@@ -96,6 +100,10 @@
             <input checked type="checkbox" id="show-organizations-friends" name="show-organizations-friends" value="1"
                    th:field="*{friendsShowOrganizations}">
             <label th:text="#{profile.settings.organizations}" th:for="show-organizations-friends"> Show organizations</label><br>
+
+            <input checked type="checkbox" id="show-online-friends" name="show-online-friends" value="1"
+                   th:field="*{friendsShowOnline}">
+            <label th:text="#{profile.settings.online}" th:for="show-online-friends"> Show online status</label><br>
 
             <br/>
             <input type="submit" value="Сохранить" th:value="#{profile.settings.save}"/>
@@ -131,8 +139,8 @@
     $('#settings').addClass('btn-primary');
     // Another profile
     if(userName !== userEntityName) {
-        $('#balance').hide();
-        $('#settings').hide();
+        $('#balance').remove();
+        $('#settings').remove();
     }
     function clickButton(value) {
         if(userEntityName === '') window.location = '/profile/';

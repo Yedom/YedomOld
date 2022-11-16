@@ -78,7 +78,6 @@ public abstract class AbstractService {
                 if(!resending)
                     return sendSocket(key, socketType, msg, true);
             }
-            ex.printStackTrace();
         }
         return response;
     }
@@ -94,9 +93,7 @@ public abstract class AbstractService {
                 clientSocket.sendMessage(key);
                 clientSocketByKey.put(key, clientSocket);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ignored) {}
         return clientSocket;
     }
 }

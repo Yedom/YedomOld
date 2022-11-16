@@ -17,6 +17,8 @@ public class UserSettings {
     @NotNull
     private boolean strangersShowOrganizations;
     @NotNull
+    private boolean strangersShowOnline;
+    @NotNull
     private boolean friendsShowEmail;
     @NotNull
     private boolean friendsShowLinks;
@@ -24,6 +26,8 @@ public class UserSettings {
     private boolean friendsShowCompletedCourses;
     @NotNull
     private boolean friendsShowOrganizations;
+    @NotNull
+    private boolean friendsShowOnline;
 
     public UserSettings() {
         this.lang = "auto";
@@ -31,10 +35,12 @@ public class UserSettings {
         this.strangersShowLinks = true;
         this.strangersShowCompletedCourses = true;
         this.strangersShowOrganizations = true;
+        this.strangersShowOnline = true;
         this.friendsShowEmail = true;
         this.friendsShowLinks = true;
         this.friendsShowCompletedCourses = true;
         this.friendsShowOrganizations = true;
+        this.friendsShowOnline = true;
     }
 
 
@@ -48,10 +54,12 @@ public class UserSettings {
                 case "strangersShowLinks" -> this.strangersShowLinks = Boolean.parseBoolean(keyValue[1]);
                 case "strangersShowCompletedCourses" -> this.strangersShowCompletedCourses = Boolean.parseBoolean(keyValue[1]);
                 case "strangersShowOrganizations" -> this.strangersShowOrganizations = Boolean.parseBoolean(keyValue[1]);
+                case "strangersShowOnline" -> this.strangersShowOnline = Boolean.parseBoolean(keyValue[1]);
                 case "friendsShowEmail" -> this.friendsShowEmail = Boolean.parseBoolean(keyValue[1]);
                 case "friendsShowLinks" -> this.friendsShowLinks = Boolean.parseBoolean(keyValue[1]);
                 case "friendsShowCompletedCourses" -> this.friendsShowCompletedCourses = Boolean.parseBoolean(keyValue[1]);
                 case "friendsShowOrganizations" -> this.friendsShowOrganizations = Boolean.parseBoolean(keyValue[1]);
+                case "friendsShowOnline" -> this.friendsShowOnline = Boolean.parseBoolean(keyValue[1]);
             }
         }
     }
@@ -62,9 +70,11 @@ public class UserSettings {
                 "&strangersShowLinks=" + strangersShowLinks +
                 "&strangersShowCompletedCourses=" + strangersShowCompletedCourses +
                 "&strangersShowOrganizations=" + strangersShowOrganizations +
+                "&strangersShowOnline=" + strangersShowOnline +
                 "&friendsShowEmail=" + friendsShowEmail +
                 "&friendsShowLinks=" + friendsShowLinks +
                 "&friendsShowCompletedCourses=" + friendsShowCompletedCourses +
-                "&friendsShowOrganizations=" + friendsShowOrganizations;
+                "&friendsShowOrganizations=" + friendsShowOrganizations +
+                "&friendsShowOnline=" + friendsShowOnline;
     }
 }

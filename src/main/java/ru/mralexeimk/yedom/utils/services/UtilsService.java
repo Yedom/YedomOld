@@ -5,17 +5,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -79,6 +80,49 @@ public class UtilsService {
             return hash;
         } catch (Exception ignored) {};
         return null;
+    }
+
+    public boolean isCorrectLinks(String links) {
+        try {
+            var pairs = parseLinks(links);
+            Set<String> uniques = new HashSet<>();
+            if(pairs.size() > 10) return false;
+            for(var pair : pairs) {
+                String name = pair.getFirst();
+                String link = pair.getSecond();
+                if(uniques.contains(name)) return false;
+                uniques.add(name);
+                if(name.length() == 0 || name.length() > 10) return false;
+                if(link.length() > 300) return false;
+                if(!isValidURL(link)) return false;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isValidURL(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            url.toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public List<Pair<String, String>> parseLinks(String links) {
+        List<Pair<String, String>> res = new ArrayList<>();
+        if (links != null && !links.isEmpty()) {
+            String[] linksArray = links.split("\\|");
+            for (String link : linksArray) {
+                String[] linkArray = link.split("\\$");
+                res.add(new Pair<>(linkArray[0], linkArray[1]));
+            }
+        }
+        return res;
     }
 
     /**

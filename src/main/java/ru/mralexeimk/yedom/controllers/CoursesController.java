@@ -8,17 +8,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
-import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
-import ru.mralexeimk.yedom.database.entities.TagEntity;
-import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.entities.*;
+import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.CourseOption;
+import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
-import ru.mralexeimk.yedom.database.repositories.CourseRepository;
-import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
@@ -37,6 +32,7 @@ import java.util.*;
 public class CoursesController {
     private final UtilsService utilsService;
     private final CourseRepository courseRepository;
+    private final DraftCourseRepository draftCourseRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final CourseValidator courseValidator;
@@ -49,9 +45,10 @@ public class CoursesController {
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, OrganizationsService organizationsService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
+    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, OrganizationsService organizationsService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
         this.courseRepository = courseRepository;
+        this.draftCourseRepository = draftCourseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.courseValidator = courseValidator;
@@ -175,7 +172,7 @@ public class CoursesController {
      */
     @PostMapping("/add")
     public String addPost(Model model,
-                          @ModelAttribute("course") Course course,
+                          @ModelAttribute("course") DraftCourse draftCourse,
                           @RequestParam(value="section", defaultValue = "0") String sectionValue,
                           BindingResult bindingResult, HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
@@ -188,14 +185,7 @@ public class CoursesController {
 
         addOptions(model, userEntity);
 
-        if(!rolesService.hasPermission(user, "courses.add")) {
-            bindingResult.rejectValue("title",
-                    "common.permission",
-                    languageUtil.getLocalizedMessage("common.permission"));
-            return "courses/add";
-        }
-
-        Course cloneCourse = new Course(course);
+        DraftCourse cloneCourse = new DraftCourse(draftCourse);
         cloneCourse.setTags(
                 utilsService.clearSpacesAroundSymbol(
                                 cloneCourse.getTags().replaceAll(", ", "@"), "@")
@@ -207,7 +197,7 @@ public class CoursesController {
         }
 
         try {
-            CourseEntity courseEntity = new CourseEntity(cloneCourse);
+            DraftCourseEntity courseEntity = new DraftCourseEntity(cloneCourse);
             courseEntity.setAvatar(coursesConfig.getBaseAvatarDefault());
             if(courseRepository.isNotEmpty())
                 courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1, HashAlg.SHA256));
@@ -226,7 +216,7 @@ public class CoursesController {
                 }
                 else throw new Exception();
             }
-            courseRepository.save(courseEntity);
+            draftCourseRepository.save(courseEntity);
         } catch (Exception ex) {
             ex.printStackTrace();
             utilsService.reject("title", "common.error", bindingResult);

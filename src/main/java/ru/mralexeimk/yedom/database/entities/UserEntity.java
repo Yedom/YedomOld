@@ -74,6 +74,9 @@ public class UserEntity {
     @Column(name = "links")
     private String links = "";
 
+    @Column(name = "about")
+    private String about = "";
+
     // Add to database constructor
     public UserEntity(User user) {
         this.username = user.getUsername();
@@ -82,6 +85,8 @@ public class UserEntity {
         this.createdOn = user.getCreatedOn();
         this.lastLogin = user.getLastLogin();
         this.avatar = user.getAvatar();
+        this.links = user.getLinks();
+        this.about = user.getAbout();
     }
 
     @Override

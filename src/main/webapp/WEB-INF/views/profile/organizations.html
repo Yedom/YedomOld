@@ -125,9 +125,9 @@
     $('#organizations').addClass('btn-primary');
     // Another profile
     if(userName !== userEntityName) {
-        $('#balance').hide();
-        $('#settings').hide();
-        $('#orgCreate').hide();
+        $('#balance').remove();
+        $('#settings').remove();
+        $('#orgCreate').remove();
     }
 
     function clickOrg(name) {

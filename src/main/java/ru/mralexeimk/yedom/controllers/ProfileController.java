@@ -103,14 +103,14 @@ public class ProfileController {
         return amounts;
     }
 
-    private Boolean[] modelGetSettings(Model model, UserEntity profileUser,
+    private Pair<Boolean[], String> modelGetSettings(Model model, UserEntity profileUser,
                                        User user, HttpServletRequest request) {
         return modelGetSettings(model, profileUser, user, request, true);
     }
 
-    private Boolean[] modelGetSettings(Model model, UserEntity profileUser,
+    private Pair<Boolean[], String> modelGetSettings(Model model, UserEntity profileUser,
                                        User user, HttpServletRequest request, boolean add) {
-        Boolean[] res = new Boolean[4];
+        Boolean[] res = new Boolean[5];
         String relation = "strangers";
         if(user != null) {
             if(profileUser.getId() != user.getId()) {
@@ -136,17 +136,23 @@ public class ProfileController {
         res[3] = relation.equals("self")
                 || (relation.equals("strangers") && settings.isStrangersShowCompletedCourses())
                 || (relation.equals("friends") && settings.isFriendsShowCompletedCourses());
+        res[4] = relation.equals("self")
+                || (relation.equals("strangers") && settings.isStrangersShowOnline())
+                || (relation.equals("friends") && settings.isFriendsShowOnline());
 
-        if(add) modelAddSettings(model, res);
+        var set = new Pair<>(res, relation);
+        if(add) modelAddSettings(model, set);
 
-        return res;
+        return set;
     }
 
-    private void modelAddSettings(Model model, Boolean[] res) {
-        model.addAttribute("show_email", res[0]);
-        model.addAttribute("show_links", res[1]);
-        model.addAttribute("show_organizations", res[2]);
-        model.addAttribute("show_courses", res[3]);
+    private void modelAddSettings(Model model, Pair<Boolean[], String> settings) {
+        model.addAttribute("show_email", settings.getFirst()[0]);
+        model.addAttribute("show_links", settings.getFirst()[1]);
+        model.addAttribute("show_organizations", settings.getFirst()[2]);
+        model.addAttribute("show_courses", settings.getFirst()[3]);
+        model.addAttribute("show_online", settings.getFirst()[4]);
+        model.addAttribute("relation", settings.getSecond());
     }
 
     /**
@@ -267,8 +273,8 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         };
-        Boolean[] ch = modelGetSettings(model, userEntity, user, request, false);
-        if(!ch[3]) {
+        var ch = modelGetSettings(model, userEntity, user, request, false);
+        if(!ch.getFirst()[3]) {
             return "redirect:/profile/" + userEntity.getUsername();
         }
         modelAddSettings(model, ch);
@@ -320,8 +326,8 @@ public class ProfileController {
             if(user != null) return "redirect:/auth/login";
             return "redirect:/";
         }
-        Boolean[] ch = modelGetSettings(model, userEntity, user, request, false);
-        if(!ch[2]) {
+        var ch = modelGetSettings(model, userEntity, user, request, false);
+        if(!ch.getFirst()[2]) {
             return "redirect:/profile/" + userEntity.getUsername();
         }
         modelAddSettings(model, ch);
@@ -410,12 +416,63 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    @PostMapping("/linksUpdate")
+    public @ResponseBody ResponseEntity<Object> linksUpdate(@RequestBody String data,
+                                                            HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        try {
+            JSONObject json = new JSONObject(data);
+            String links = json.getString("links");
+
+            if (!utilsService.isCorrectLinks(links)) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+            userEntity.setLinks(links);
+            userRepository.save(userEntity);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    @PostMapping("/aboutUpdate")
+    public @ResponseBody ResponseEntity<Object> aboutUpdate(@RequestBody String data,
+                                                            HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        try {
+            JSONObject json = new JSONObject(data);
+            String about = json.getString("about");
+
+            if (about.length() > 400) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+            userEntity.setAbout(about);
+            userRepository.save(userEntity);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
     /**
      * User upload avatar
      */
     @PostMapping("/uploadAvatar")
-    public @ResponseBody ResponseEntity<Object> uploadAvatar(@RequestParam(name = "username") String username,
-                                                             @RequestBody String data,
+    public @ResponseBody ResponseEntity<Object> uploadAvatar(@RequestBody String data,
                                                              HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -423,7 +480,7 @@ public class ProfileController {
         User user = (User) session.getAttribute("user");
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
-        if(!user.getUsername().equals(username) || userEntity == null)
+        if(userEntity == null)
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         try {

@@ -52,7 +52,7 @@
             <div style="color:red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name Error</div>
             <br/>
             <label th:for="password" th:text="#{auth.password}">Пароль</label>: <br/>
-            <input type="text" th:field="*{password}" id="password"/>
+            <input type="password" th:field="*{password}" id="password"/>
             <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
             <br/>
             <label th:for="email" th:text="#{auth.email}">Email</label>: <br/>
