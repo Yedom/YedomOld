@@ -50,31 +50,16 @@
             height: 100% !important;
         }
         .particles-js-canvas-el {
-            height: 375% !important;
+            height: 0 !important;
         }
         .btn-primary {
             background: transparent;
             margin-top: 40px;
             border-style: none !important;
         }
-        @media only screen and (max-width: 1200px) {
-            .particles-js-canvas-el {
-                height: 315% !important;
-            }
-        }
-        @media only screen and (max-width: 992px) {
-            .particles-js-canvas-el {
-                height: 330% !important;
-            }
-        }
-        @media only screen and (max-width: 767px) {
-            .particles-js-canvas-el {
-                height: 780% !important;
-            }
-        }
         @media only screen and (max-width: 600px) {
-            .particles-js-canvas-el {
-                height: 635% !important;
+            h1 {
+                font-size: 2.0rem !important;
             }
         }
     </style>
@@ -236,6 +221,7 @@
         let controls = new THREE.OrbitControls(camera, renderer.domElement);
         camera.position.set(-16, 22.8, -13.8);
         controls.target.set(40, 0, 5);
+        controls.enabled = false;
         controls.update();
 
         const aLight = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -258,7 +244,11 @@
         renderer.setAnimationLoop(_ => {
             if (mixer) mixer.update(clock.getDelta());
             renderer.render(scene, camera);
-        })
+        });
+
+        container.addEventListener('mousedown', function (event) {
+            event.preventDefault();
+        }, false);
 
         let oldX = 0;
         let oldY = 0;
@@ -288,5 +278,17 @@
         console.log('particles-js loaded!');
     });
 </script>
+
+<script>
+    window.onload = function () {
+        let particles = $('.particles-js-canvas-el');
+        let top = $('footer').offset().top - 50;
+        particles.attr('style', 'height: ' + top + 'px !important');
+        particles.attr('height', top);
+
+        pJSDom[0].pJS.fn.particlesRefresh();
+    }
+</script>
+
 </body>
 </html>
