@@ -167,6 +167,51 @@ public class ProfileController {
         return "redirect:/profile/" + user.getUsername();
     }
 
+    @GetMapping("/friends")
+    public String indexFriends(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User user = (User) session.getAttribute("user");
+
+        return "redirect:/profile/" + user.getUsername() + "/friends";
+    }
+
+    @GetMapping("/courses")
+    public String indexCourses(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User user = (User) session.getAttribute("user");
+
+        return "redirect:/profile/" + user.getUsername() + "/courses";
+    }
+
+    @GetMapping("/organizations")
+    public String indexOrganizations(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User user = (User) session.getAttribute("user");
+
+        return "redirect:/profile/" + user.getUsername() + "/organizations";
+    }
+
+    @GetMapping("/balance")
+    public String indexBalance(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User user = (User) session.getAttribute("user");
+
+        return "redirect:/profile/" + user.getUsername() + "/balance";
+    }
+
+    @GetMapping("/settings")
+    public String indexSettings(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+        User user = (User) session.getAttribute("user");
+
+        return "redirect:/profile/" + user.getUsername() + "/settings";
+    }
+
     /**
      * Get profile page of user
      * (Authorize is not required)

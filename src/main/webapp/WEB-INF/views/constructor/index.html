@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
   <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
   <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/bootstrap-select.min.css" th:href="@{/resources/css/bootstrap-select.min.css}">
 
   <!-- Scripts -->
   <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -20,6 +21,7 @@
   <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
   <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
   <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
   <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
 </head>
 <body class="index-page sidebar-collapse">
@@ -28,12 +30,6 @@
 <div id="particles-container"></div>
 
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
-
-<div class="bg">
-  <br />
-  <br />
-  <br />
-</div>
 
 <div class="bg section">
   <div class="row py-lg-5">
@@ -54,6 +50,13 @@
 
           <!-- My Courses -->
           <h2 th:text="#{common.my_courses}">Courses Constructor</h2>
+          <br />
+          <label th:for="section" th:text="#{course.add.by}">От имени</label>:
+          <br/>
+          <select name="section" id="section" class="selectpicker" data-style="select-with-transition">
+            <option th:each="option : ${options}" th:attrappend="selected=${section_value == option.value}?selected" th:value="${option.value}" th:text="${option.text}">Username</option>
+          </select>
+          <br />
           <div class="card">
             <div class="card-body">
               <div class="table-responsive">
@@ -107,11 +110,20 @@
 </script>
 
 <script th:inline="javascript">
+  $('select').on('change', function() {
+    optionSelect(this.value);
+  });
+
   function clickAdd() {
     window.location.href = '/courses/add';
   }
+
   function clickCourse(hash) {
     window.location.href = '/constructor/' + hash;
+  }
+
+  function optionSelect(value) {
+    window.location.href = '/constructor?section=' + value;
   }
 </script>
 </body>

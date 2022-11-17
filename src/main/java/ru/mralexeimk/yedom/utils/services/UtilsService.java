@@ -1,20 +1,22 @@
 package ru.mralexeimk.yedom.utils.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
+import ru.mralexeimk.yedom.models.CourseOption;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -25,10 +27,12 @@ import java.util.stream.Stream;
 @Service
 public class UtilsService {
     private final LanguageUtil languageUtil;
+    private final OrganizationRepository organizationRepository;
 
     @Autowired
-    public UtilsService(LanguageUtil tmpLanguageUtil) {
+    public UtilsService(LanguageUtil tmpLanguageUtil, OrganizationRepository organizationRepository) {
         this.languageUtil = tmpLanguageUtil;
+        this.organizationRepository = organizationRepository;
     }
 
     /**
@@ -225,6 +229,35 @@ public class UtilsService {
     }
 
     /**
+     * Add is 'auth' attribute to model
+     */
+    public void addAuth(Model model, HttpSession session) {
+        boolean auth = false;
+        if(session.getAttribute("user") != null) {
+            User user = (User) session.getAttribute("user");
+            if(user.isEmailConfirmed()) {
+                auth = true;
+            }
+        }
+        model.addAttribute("auth", auth);
+    }
+
+    /**
+     * Add List of CourseOption to model
+     */
+    public void addOptions(Model model, UserEntity userEntity) {
+        List<CourseOption> options = new ArrayList<>();
+
+        options.add(new CourseOption("0", userEntity.getUsername()));
+        for(int id : splitToListInt(userEntity.getInOrganizationsIds())) {
+            OrganizationEntity organizationEntity = organizationRepository.findById(id).orElse(null);
+            if(organizationEntity == null) continue;
+            options.add(new CourseOption(String.valueOf(id), organizationEntity.getName()));
+        }
+        model.addAttribute("options", options);
+    }
+
+    /**
      * Timestamp to date
      */
     public String getCreatedOnDate(Timestamp createdOn) {
@@ -249,5 +282,9 @@ public class UtilsService {
                 .filter(i -> !i.isEmpty())
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
+    }
+
+    public String listToString(List<String> list) {
+        return String.join(",", list);
     }
 }

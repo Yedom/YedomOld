@@ -122,6 +122,8 @@ div.editable {
 }
 .hot-bar {
     font-size: 17px;
+    color: rgb(10,88,202);
+    font-weight: bold;
 }
 * {
     margin: 0;
@@ -338,8 +340,35 @@ a:active, a:hover, a {
 .nav {
     color: #3a8d08;
 }
+#player {
+    width: 100%;
+    height: 640px;
+}
+#logo {
+    position: absolute;
+    margin-top: 8%;
+    margin-left: 15%;
+    z-index: 3;
+}
 @media only screen and (max-width: 600px) {
     .title-img {
         width: 100%;
+    }
+    header {
+        position: relative !important;
+    }
+    #player {
+        height: 320px;
+    }
+    #logo {
+        width: 100%;
+        margin-top: 0;
+        margin-left: 0;
+    }
+}
+@media only screen and (max-width: 370px) {
+    .copyright {
+        width: 100%;
+        float: unset !important;
     }
 }

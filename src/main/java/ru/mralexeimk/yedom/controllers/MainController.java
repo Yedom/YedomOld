@@ -1,17 +1,20 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.mralexeimk.yedom.models.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Controller
 @RequestMapping("/")
 public class MainController {
     @GetMapping()
-    public String index() {
+    public String index(Model model, HttpSession session) {
         return "index";
     }
 

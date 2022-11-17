@@ -84,21 +84,6 @@ public class CoursesController {
     }
 
     /**
-     * Add List of CourseOption to model
-     */
-    private void addOptions(Model model, UserEntity userEntity) {
-        List<CourseOption> options = new ArrayList<>();
-
-        options.add(new CourseOption("0", userEntity.getUsername()));
-        for(int id : utilsService.splitToListInt(userEntity.getInOrganizationsIds())) {
-            OrganizationEntity organizationEntity = organizationRepository.findById(id).orElse(null);
-            if(organizationEntity == null) continue;
-            options.add(new CourseOption(String.valueOf(id), organizationEntity.getName()));
-        }
-        model.addAttribute("options", options);
-    }
-
-    /**
      * Open courses list page
      * @param search user search query
      */
@@ -162,7 +147,7 @@ public class CoursesController {
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
         if(userEntity == null) return "redirect:/courses";
 
-        addOptions(model, userEntity);
+        utilsService.addOptions(model, userEntity);
 
         return "courses/add";
     }
@@ -183,7 +168,7 @@ public class CoursesController {
 
         if(userEntity == null) return "redirect:/courses";
 
-        addOptions(model, userEntity);
+        utilsService.addOptions(model, userEntity);
 
         DraftCourse cloneCourse = new DraftCourse(draftCourse);
         cloneCourse.setTags(
@@ -199,24 +184,35 @@ public class CoursesController {
         try {
             DraftCourseEntity courseEntity = new DraftCourseEntity(cloneCourse);
             courseEntity.setAvatar(coursesConfig.getBaseAvatarDefault());
-            if(courseRepository.isNotEmpty())
-                courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1, HashAlg.SHA256));
+            if(draftCourseRepository.isNotEmpty())
+                courseEntity.setHash(utilsService.hash(draftCourseRepository.getLastId() + 1,
+                        HashAlg.SHA256));
             else
                 courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
 
             if(sectionValue.equals("0")) {
                 courseEntity.setByOrganization(false);
-                courseEntity.setCreatorId(user.getId());
+                courseEntity.setCreatorId(userEntity.getId());
+                draftCourseRepository.save(courseEntity);
+                List<String> draftCoursesIds = utilsService.splitToListString(userEntity.getDraftCoursesIds());
+                draftCoursesIds.add(String.valueOf(courseEntity.getId()));
+                userEntity.setDraftCoursesIds(utilsService.listToString(draftCoursesIds));
+                userRepository.save(userEntity);
             }
             else {
                 int orgId = Integer.parseInt(sectionValue);
-                if(organizationsService.isMember(userEntity, orgId)) {
+                OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
+                if(organizationEntity != null && organizationsService.isMember(userEntity, orgId)) {
                     courseEntity.setByOrganization(true);
                     courseEntity.setCreatorId(orgId);
+                    draftCourseRepository.save(courseEntity);
+                    List<String> draftCoursesIds = utilsService.splitToListString(organizationEntity.getDraftCoursesIds());
+                    draftCoursesIds.add(String.valueOf(courseEntity.getId()));
+                    organizationEntity.setDraftCoursesIds(utilsService.listToString(draftCoursesIds));
+                    organizationRepository.save(organizationEntity);
                 }
                 else throw new Exception();
             }
-            draftCourseRepository.save(courseEntity);
         } catch (Exception ex) {
             ex.printStackTrace();
             utilsService.reject("title", "common.error", bindingResult);

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../resources/css/common.css" th:href="@{/resources/css/common.css}">
     <link rel="stylesheet" href="../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../resources/css/interactive-cards.css" th:href="@{../resources/css/interactive-cards.css}">
 
     <!-- Scripts -->
     <script src="../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -29,6 +30,12 @@
         html, body {
             height: 100%;
         }
+        body {
+            text-align: left;
+        }
+        header {
+            position: relative !important;
+        }
         #model-container {
             width: 100%;
             height: 92%;
@@ -36,18 +43,53 @@
         }
         .particles-js-canvas-el, #model-3d {
             width: 100% !important;
-            height: 100% !important;
             position: absolute !important;
             display: block !important;
         }
+        #model-3d {
+            height: 100% !important;
+        }
+        .particles-js-canvas-el {
+            height: 375% !important;
+        }
+        .btn-primary {
+            background: transparent;
+            margin-top: 40px;
+            border-style: none !important;
+        }
+        @media only screen and (max-width: 1200px) {
+            .particles-js-canvas-el {
+                height: 315% !important;
+            }
+        }
+        @media only screen and (max-width: 992px) {
+            .particles-js-canvas-el {
+                height: 330% !important;
+            }
+        }
+        @media only screen and (max-width: 767px) {
+            .particles-js-canvas-el {
+                height: 780% !important;
+            }
+        }
         @media only screen and (max-width: 600px) {
-
+            .particles-js-canvas-el {
+                height: 635% !important;
+            }
         }
     </style>
 </head>
-<body class="bg index-page">
+<body class="bg">
 
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../resources/common/header.html"></div>
+
+<!-- Yedom introduction/description and logo -->
+<div id="logo" class="row unselectable">
+    <div class="ml-auto mr-auto text-center">
+        <h2 class="title" th:text="#{title}">Yedom</h2>
+        <h5 class="description" th:text="#{index.description}">Yedom is a platform for online education</h5>
+    </div>
+</div>
 
 <!-- 3D Model Container -->
 <div id="model-container">
@@ -58,6 +100,112 @@
         </div>
     </div>
 </div>
+
+<div class="container unselectable">
+    <!-- Demonstration -->
+    <div class="row">
+        <div class="ml-auto mr-auto text-center">
+            <h1 class="title" th:text="#{index.demo}">Demonstration</h1>
+        </div>
+        <div class="col-md-12 ml-auto mr-auto text-center">
+            <iframe id="player" type="text/html"
+                    src="https://www.youtube.com/embed/VbPC3DxAA50?enablejsapi=1&origin=http://yedom.ru">
+            </iframe>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <!-- Feature description -->
+    <div class="features">
+        <h1 style="text-align: center;" th:text="#{index.features}">Features</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-1.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_1.title}">Course Constructor</h4>
+                            <p th:text="#{index.f_1.desc}">Create your own course!</p>
+                            <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_2.title}">Smart Search System</h4>
+                            <p th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
+                            <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_3.title}">Profile/Friends System</h4>
+                            <p th:text="#{index.f_3.desc}">Follow me!</p>
+                            <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-3.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_4.title}">AR</h4>
+                            <p th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
+                            <button th:text="#{index.go}" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_5.title}">Organizations</h4>
+                            <p th:text="#{index.f_5.desc}">Create your organization!</p>
+                            <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
+                        <div class="card-img-overlay">
+                            <h4 th:text="#{index.f_6.title}">Profile Settings</h4>
+                            <p th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
+                            <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                                <i class="fas fa-long-arrow-alt-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
 
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../resources/common/footer.html"></div>
 
@@ -86,7 +234,7 @@
         container.appendChild(renderer.domElement);
 
         let controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(-16, 21.8, -13.8);
+        camera.position.set(-16, 22.8, -13.8);
         controls.target.set(40, 0, 5);
         controls.update();
 
@@ -114,7 +262,7 @@
 
         let oldX = 0;
         let oldY = 0;
-        container.onmousemove = function (e) {
+        window.onmousemove = function (e) {
             let changeX = e.x - oldX;
             let changeY = e.y - oldY;
 

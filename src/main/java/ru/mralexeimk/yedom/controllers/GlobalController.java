@@ -1,6 +1,7 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
@@ -32,12 +33,14 @@ public class GlobalController {
     /**
      * Global controller for all pages
      * Functions:
-     * 1. Update user last activity time with 1 minute interval
-     * 2. Attempt to create socket connection between user and server if it is not exist
+     * 1. Add auth attribute to model
+     * 2. Update user last activity time with 1 minute interval
+     * 3. Attempt to create socket connection between user and server if it is not exist
      */
     @ModelAttribute
-    public void global(HttpSession session, HttpServletRequest request) {
+    public void global(Model model, HttpSession session, HttpServletRequest request) {
         String check = utilsService.preventUnauthorizedAccess(session);
+        utilsService.addAuth(model, session);
         if(check == null) {
             User user = (User) session.getAttribute("user");
 

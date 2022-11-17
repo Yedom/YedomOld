@@ -1,7 +1,8 @@
 <!-- Header -->
-<header th:fragment="header-fragment" class="navbar fixed-top navbar-transparent">
+<header th:fragment="header-fragment" class="navbar fixed-top navbar-transparent"
+  style="position: absolute;margin-bottom: unset;padding: unset;">
   <div class="container-fluid unselectable header-container over-particles p-0">
-    <ul class="navbar-nav ml-4">
+    <ul class="nav ml-5">
       <li class="nav-item">
         <a class="nav-link" href="/">
           <img class="banner1" th:src="@{/resources/images/home.png}" alt="">
@@ -15,16 +16,34 @@
           <span th:text="#{common.courses}" class="hot-bar">Курсы</span>
         </a>
       </li>
-      <li class="dropdown-menu-show nav-item">
-        <a class="dropdown-toggle nav-link"  data-toggle="dropdown">
-          <i class="material-icons">apps</i> <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span></a>
+      <li class="nav-item" th:if="${auth}">
+        <a class="nav-link" href="/constructor">
+          <i class="material-icons">edit</i>
+          <span th:text="#{common.my_courses}" class="hot-bar">Конструктор курсов</span>
+        </a>
+      </li>
+      <li class="nav-item" th:if="${!auth}">
+        <a class="nav-link" href="/auth/reg">
+          <i class="material-icons">app_registration</i>
+          <span th:text="#{auth.sign_up}" class="hot-bar">Зарегистрироваться</span>
+        </a>
+      </li>
+      <li class="nav-item" th:if="${!auth}">
+        <a class="nav-link" href="/auth/login">
+          <i class="material-icons">login</i>
+          <span th:text="#{auth.log_in}" class="hot-bar">Войти</span>
+        </a>
+      </li>
+      <li class="dropdown-menu-show nav-item" th:if="${auth}">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown">
+          <i class="material-icons">apps</i>
+          <span class="hot-bar" th:text="#{common.lk}">Личный кабинет</span>
+        </a>
         <div class="dropdown-menu dropdown-with-icons">
-          <a href="/profile" class="dropdown-item"><i class="material-icons">login</i>
+          <a href="/profile" class="dropdown-item"><i class="material-icons">account_box</i>
             <span class="hot-bar" th:text="#{common.profile}">Мой профиль</span></a>
-          <a href="/account" class="dropdown-item"><i class="material-icons">account_box</i>
+          <a href="/account" class="dropdown-item"><i class="material-icons">lock</i>
             <span class="hot-bar" th:text="#{common.account}">Аккаунт</span></a>
-          <a href="/constructor" class="dropdown-item"><i class="material-icons">edit</i>
-            <span class="hot-bar" th:text="#{common.my_courses}">Конструктор курсов</span></a>
         </div>
       </li>
     </ul>

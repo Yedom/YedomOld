@@ -49,7 +49,6 @@
     <br />
     <br />
     <br />
-    <br />
 </div>
 
 <div class="bg unselectable">
@@ -85,7 +84,7 @@
                             </div>
 
                             <!-- Links -->
-                            <div class="links-container" th:if="${show_links && user.links.length() > 0}">
+                            <div class="links-container" th:if="${relation == 'self' || (show_links && user.links.length() > 0)}">
                                 <h4 class="profile-label" th:text="#{profile.links}">Links</h4>
                                 <div class="links">
                                     <div class="link" th:each="link : ${@utilsService.parseLinks(user.links)}" th:id="${link.first}">
