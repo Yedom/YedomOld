@@ -191,6 +191,7 @@ public class CoursesController {
         try {
             DraftCourseEntity courseEntity = new DraftCourseEntity(cloneCourse);
             courseEntity.setAvatar(coursesConfig.getBaseAvatarDefault());
+            courseEntity.setAddedOn(utilsService.getCurrentTimestamp());
             if(draftCourseRepository.isNotEmpty())
                 courseEntity.setHash(utilsService.hash(draftCourseRepository.getLastId() + 1,
                         HashAlg.SHA256));

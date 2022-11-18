@@ -2,13 +2,17 @@
   <br />
   <hr />
   <div class="name">
-    <h4 style="font-weight: bold;" th:text="${draftCourse.title}">Python OpenCV tutorial for beginners</h4>
+    <h4 style="font-weight: bold;" th:text="${course.title}">Python OpenCV tutorial for beginners</h4>
   </div>
   <hr />
   <input type="button"
          onclick="clickButton('')"
          id="main" class="btn" value="Главная страница"
          th:value="#{draft_courses.home}" />
+  <input type="button"
+         onclick="clickButton('edit')"
+         id="edit" class="btn" value="Редактировать"
+         th:value="#{draft_courses.edit}" />
   <input type="button"
          onclick="clickButton('settings')"
          id="settings" class="btn" value="Настройки"

@@ -21,6 +21,18 @@
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+
+    <style>
+        @media only screen and (max-width: 500px) {
+            .avatar-course {
+                width: 95%;
+                height: 120px;
+            }
+            .btn {
+                font-size: 10px !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -39,46 +51,57 @@
     <br />
 </div>
 
-<div class="bg unselectable">
-    <div class="main col-md-6 mx-auto text-center">
-        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
-        <div class="container">
-            <div class="avatar avatar-course">
-                <img class="profile-pic" src="../../resources/images/screen.png"
-                     th:src="${draftCourse.avatar}" alt=""/>
-                <div class="upload-button">
-                    <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+<div class="container">
+    <div class="row">
+        <div class="col-5 col-sm-3">
+            <div class="col-md-12 bg unselectable">
+                <div class="main mx-auto text-center">
+                    <h2>Модули</h2>
                 </div>
-                <input id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
             </div>
-            <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
-            <br />
-
-            <!-- Added on -->
-            <div class="added-on">
-                <h4 class="profile-label" th:text="#{draft_courses.added_on}">Added on</h4>
-                <h6 th:text="${@utilsService.getCreatedOnDate(draftCourse.addedOn)}">18.11.2022</h6>
-            </div>
-
-            <!-- Description -->
-            <div class="description">
-                <h4 class="profile-label" th:text="#{course.description}">Description</h4>
-                <h6 th:text="${draftCourse.description}">description</h6>
-            </div>
-
-            <!-- Tags -->
-            <div class="tags">
-                <h4 class="profile-label" th:text="#{course.tags.title}">Tags</h4>
-                <span class="tag" th:each="tag,index : ${draftCourse.tags.split('@')}">
-                    <a target="_blank" rel="noopener noreferrer" class="link-href" href="#"
-                       th:href="@{'/courses?search='+${tag}+'&tag=true'}"
-                       th:text="${tag}">programming</a>
-                    <span th:text="'(' + ${tagsCountCourses[index.index]} + ')'">(0)</span><span th:if="${!index.last}">, </span>
-                </span>
-            </div>
-            <br />
         </div>
-        <br />
+        <div class="col-7 col-sm-9 bg unselectable">
+            <div class="main mx-auto text-center">
+                <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+                <div class="container">
+                    <div class="avatar avatar-course">
+                        <img class="profile-pic" src="../../resources/images/screen.png"
+                             th:src="${course.avatar}" alt=""/>
+                        <div class="upload-button">
+                            <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+                        </div>
+                        <input id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
+                    </div>
+                    <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
+                    <br />
+
+                    <!-- Added on -->
+                    <div class="added-on">
+                        <h4 class="profile-label" th:text="#{draft_courses.added_on}">Added on</h4>
+                        <h6 th:text="${@utilsService.getCreatedOnDate(course.addedOn)}">18.11.2022</h6>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="description">
+                        <h4 class="profile-label" th:text="#{course.description}">Description</h4>
+                        <h6 th:text="${course.description}">description</h6>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="tags">
+                        <h4 class="profile-label" th:text="#{course.tags.title}">Tags</h4>
+                        <span class="tag" th:each="tag,index : ${course.tags.split('@')}">
+                            <a target="_blank" rel="noopener noreferrer" class="link-href" href="#"
+                               th:href="@{'/courses?search='+${tag}+'&tag=true'}"
+                               th:text="${tag}">programming</a>
+                            <span th:text="'(' + ${tagsCountCourses[index.index]} + ')'">(0)</span><span th:if="${!index.last}">, </span>
+                        </span>
+                    </div>
+                    <br />
+                </div>
+                <br />
+            </div>
+        </div>
     </div>
 </div>
 
@@ -101,7 +124,7 @@
     });
 </script>
 <script th:inline="javascript">
-    let hash = /*[[${draftCourse.hash}]]*/ '';
+    let hash = /*[[${course.hash}]]*/ '';
 
     $('#main').addClass('btn-primary');
 

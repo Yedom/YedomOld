@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
@@ -17,13 +18,11 @@ import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.utils.services.DraftCoursesService;
-import ru.mralexeimk.yedom.utils.services.TagsService;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
+import ru.mralexeimk.yedom.utils.validators.DraftCourseValidator;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +38,10 @@ public class ConstructorController {
     private final CoursesConfig coursesConfig;
     private final OrganizationsService organizationsService;
     private final DraftCoursesService draftCoursesService;
+    private final DraftCourseValidator draftCourseValidator;
     private final TagRepository tagRepository;
 
-    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, DraftCoursesService draftCoursesService, TagRepository tagRepository) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, DraftCoursesService draftCoursesService, DraftCourseValidator draftCourseValidator, TagRepository tagRepository) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
         this.organizationRepository = organizationRepository;
@@ -49,6 +49,7 @@ public class ConstructorController {
         this.coursesConfig = coursesConfig;
         this.organizationsService = organizationsService;
         this.draftCoursesService = draftCoursesService;
+        this.draftCourseValidator = draftCourseValidator;
         this.tagRepository = tagRepository;
     }
 
@@ -124,7 +125,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        model.addAttribute("draftCourse", draftCourseEntity);
+        model.addAttribute("course", draftCourseEntity);
 
         String[] tags = draftCourseEntity.getTags().split("@");
         Integer[] tagsCountCourses = new Integer[tags.length];
@@ -145,6 +146,28 @@ public class ConstructorController {
     }
 
     /**
+     * Open draft courses edit page
+     */
+    @GetMapping("/{hash}/edit")
+    public String draftCourseEdit(Model model, @PathVariable String hash,
+                                      HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
+        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        model.addAttribute("course", draftCourseEntity);
+
+        return "constructor/edit";
+    }
+
+    /**
      * Open draft courses settings page
      */
     @GetMapping("/{hash}/settings")
@@ -161,7 +184,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        model.addAttribute("draftCourse", draftCourseEntity);
+        model.addAttribute("course", draftCourseEntity);
 
         return "constructor/settings";
     }
@@ -183,9 +206,67 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        model.addAttribute("draftCourse", draftCourseEntity);
+        model.addAttribute("course", draftCourseEntity);
 
         return "constructor/public";
+    }
+
+    /**
+     * Post request to get recommended tags
+     */
+    @PostMapping("/{hash}/edit")
+    public String saveSettings(@ModelAttribute("course") DraftCourseEntity draftCourseEntityChanges,
+                               @PathVariable(value = "hash") String hash, BindingResult bindingResult,
+                               HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
+        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        draftCourseEntityChanges.setTags(utilsService.clearSpacesAroundSymbol(
+                        draftCourseEntityChanges.getTags().replaceAll(", ", "@"), "@")
+                .trim());
+
+        draftCourseValidator.validate(new DraftCourse(draftCourseEntityChanges), bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            return "constructor/edit";
+        }
+
+        draftCourseEntity.setTitle(draftCourseEntityChanges.getTitle());
+        draftCourseEntity.setDescription(draftCourseEntityChanges.getDescription());
+        draftCourseEntity.setTags(draftCourseEntityChanges.getTags());
+
+        draftCourseRepository.save(draftCourseEntity);
+
+        return "redirect:/constructor/" + hash + "/edit";
+    }
+
+    /**
+     * Post request to delete draft course
+     */
+    @PostMapping("/{hash}/delete")
+    public String courseDelete(@ModelAttribute("course") DraftCourseEntity draftCourseEntityChanges,
+                               @PathVariable(value = "hash") String hash,
+                               HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
+        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        draftCourseRepository.delete(draftCourseEntity);
+
+        return "redirect:/constructor/";
     }
 
     /**

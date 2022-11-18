@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title th:text="#{title}">Yedom</title>
+    <meta charset="UTF-8">
+    <title th:text="#{title}">Yedom</title>
 
-  <!-- Info -->
-  <meta name="description" content="Yedom education platform">
-  <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Info -->
+    <meta name="description" content="Yedom education platform">
+    <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
 
-  <!-- Scripts -->
-  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <!-- Scripts -->
+    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -30,50 +30,63 @@
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
 
 <div class="bg">
-  <br />
-  <br />
-  <br />
-  <br />
-  <br />
-  <br />
-  <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
 </div>
 
 <div class="bg unselectable">
-  <div class="main col-md-6 mx-auto text-center">
-    <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+    <div class="main col-md-6 mx-auto text-center">
+        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <input type="button" onclick="deleteCourse()" class="btn btn-red"
+               value="Удалить курс" th:value="#{draft_courses.delete}" />
 
-    <br />
-  </div>
+        <br />
+        <br />
+    </div>
 </div>
 
 <div class="bg">
-  <br />
-  <br />
-  <br />
-  <br />
-  <br />
-  <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
 </div>
 
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script>
-  w3.includeHTML();
+    w3.includeHTML();
 
-  particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
-    console.log('particles-js loaded!');
-  });
+    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+        console.log('particles-js loaded!');
+    });
 </script>
 <script th:inline="javascript">
-  let hash = /*[[${draftCourse.hash}]]*/ '';
+    let hash = /*[[${course.hash}]]*/ '';
 
-  $('#settings').addClass('btn-primary');
+    $('#settings').addClass('btn-primary');
 
-  function clickButton(value) {
-    if(hash === '') window.location = '/constructor/';
-    window.location = '/constructor/' + hash + '/' + value;
-  }
+    function clickButton(value) {
+        if(hash === '') window.location = '/constructor/';
+        window.location = '/constructor/' + hash + '/' + value;
+    }
+
+    function deleteCourse() {
+        fetch("/constructor/"+hash+"/delete", {
+            method: "POST"
+        }).then(response => {
+            if (response.ok) {
+                window.location = '/constructor/';
+            }
+        });
+    }
 </script>
 </body>
 </html>

@@ -45,7 +45,7 @@
         <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
 
         <h2 th:text="#{profile.settings}">Settings</h2>
-        <form th:method="POST" th:action="@{/profile/${user.username}/settings}" th:object="${user.settings}">
+        <form th:method="POST" th:action="@{/profile/{path}/settings(path=${user.username})}" th:object="${user.settings}">
             <label th:for="lang" style="font-weight: bold;" th:text="#{common.lang}">Language</label>:
             <br />
             <select name="lang" id="lang" th:field="*{lang}" class="selectpicker" data-style="select-with-transition">
