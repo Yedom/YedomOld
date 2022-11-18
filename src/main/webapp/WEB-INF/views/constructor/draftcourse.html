@@ -1,10 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title th:text="#{title}">Yedom</title>
 
+    <!-- Info -->
+    <meta name="description" content="Yedom education platform">
+    <meta name="keywords" content="yedom, education, platform, education platform, smart search, graphs, AR, AR technologies, online courses, courses, образовательная платформа, курсы, онлайн курсы">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+
+    <!-- Scripts -->
+    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+</head>
+<body class="bg index-page sidebar-collapse">
+
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
+<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
+
+<div class="bg">
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+</div>
+
+<div class="bg unselectable">
+    <div class="main col-md-6 mx-auto text-center">
+        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <div class="container">
+            <div class="avatar avatar-course">
+                <img class="profile-pic" src="../../resources/images/screen.png"
+                     th:src="${draftCourse.avatar}" alt=""/>
+                <div class="upload-button">
+                    <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+                </div>
+                <input id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
+            </div>
+            <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
+            <br />
+
+            <!-- Added on -->
+            <div class="added-on">
+                <h4 class="profile-label" th:text="#{draft_courses.added_on}">Added on</h4>
+                <h6 th:text="${@utilsService.getCreatedOnDate(draftCourse.addedOn)}">18.11.2022</h6>
+            </div>
+
+            <!-- Description -->
+            <div class="description">
+                <h4 class="profile-label" th:text="#{course.description}">Description</h4>
+                <h6 th:text="${draftCourse.description}">description</h6>
+            </div>
+
+            <!-- Tags -->
+            <div class="tags">
+                <h4 class="profile-label" th:text="#{course.tags.title}">Tags</h4>
+                <span class="tag" th:each="tag,index : ${draftCourse.tags.split('@')}">
+                    <a target="_blank" rel="noopener noreferrer" class="link-href" href="#"
+                       th:href="@{'/courses?search='+${tag}+'&tag=true'}"
+                       th:text="${tag}">programming</a>
+                    <span th:text="'(' + ${tagsCountCourses[index.index]} + ')'">(0)</span><span th:if="${!index.last}">, </span>
+                </span>
+            </div>
+            <br />
+        </div>
+        <br />
+    </div>
+</div>
+
+<div class="bg">
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+</div>
+
+<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+
+<script>
+    w3.includeHTML();
+
+    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
+        console.log('particles-js loaded!');
+    });
+</script>
+<script th:inline="javascript">
+    let hash = /*[[${draftCourse.hash}]]*/ '';
+
+    $('#main').addClass('btn-primary');
+
+    function clickButton(value) {
+        if(hash === '') window.location = '/constructor/';
+        window.location = '/constructor/' + hash + '/' + value;
+    }
+
+    function uploadAvatar(baseImg) {
+        let data = {baseImg: baseImg};
+        fetch("/constructor/"+hash+"/uploadAvatar", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        }).then(response => {
+            if(response.ok) {
+                window.location.reload();
+                $('#error').attr('hidden', 'hidden');
+            }
+            else {
+                $('#error').removeAttr('hidden');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        let readURL = function(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+
+                reader.onload = function () {
+                    uploadAvatar(reader.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(".file-upload").on('change', function(){
+            readURL(this);
+        });
+
+        $(".upload-button").on('click', function() {
+            $(".file-upload").click();
+        });
+    });
+</script>
 </body>
 </html>

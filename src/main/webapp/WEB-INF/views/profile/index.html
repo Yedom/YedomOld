@@ -101,6 +101,7 @@
                                 <h4 class="profile-label" th:text="#{profile.about}">About me</h4>
                                 <textarea maxlength="400" th:text="${user.about}" rows="7" id="textarea-about"></textarea>
                             </div>
+                            <br />
 
                             <!-- Add to friends -->
                             <div class="add-to-friends" id="add_friend">
@@ -108,7 +109,6 @@
                                        class="btn" th:classappend="${btn_properties.second}" value="Подписаться"
                                        th:value="${btn_properties.first}" />
                             </div>
-
                             <br />
                         </div>
                     </div>
@@ -287,7 +287,7 @@
     function uploadAvatar(baseImg) {
         if(anotherUser) return;
         let data = {baseImg: baseImg};
-        fetch("/profile/uploadAvatar?username="+userEntityName, {
+        fetch("/profile/uploadAvatar", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

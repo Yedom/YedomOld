@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,17 +19,18 @@ public class DraftCourse {
     protected String description;
     protected String tags;
     protected String avatar;
+    protected Timestamp addedOn;
 
     // DraftCourse by DraftCourseEntity
     public DraftCourse(DraftCourseEntity courseEntity) {
         this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
                 courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(),
-                courseEntity.getAvatar());
+                courseEntity.getAvatar(), courseEntity.getAddedOn());
     }
 
     public DraftCourse(DraftCourse a) {
         this(a.getId(), a.getHash(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
-                a.getDescription(), a.getTags(), a.getAvatar());
+                a.getDescription(), a.getTags(), a.getAvatar(), a.getAddedOn());
     }
 }

@@ -6,17 +6,18 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.models.Course;
+import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 @Component
-public class CourseValidator implements Validator {
+public class DraftCourseValidator implements Validator {
     private final UtilsService utilsService;
     private final LanguageUtil languageUtil;
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public CourseValidator(UtilsService utilsService, LanguageUtil languageUtil, CoursesConfig coursesConfig) {
+    public DraftCourseValidator(UtilsService utilsService, LanguageUtil languageUtil, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
         this.languageUtil = languageUtil;
         this.coursesConfig = coursesConfig;
@@ -29,25 +30,25 @@ public class CourseValidator implements Validator {
 
     @Override
     public void validate(Object o, Errors errors) {
-        if(o instanceof Course course) {
-            if(course.getTitle().length() < coursesConfig.getMinTitleLength() ||
-                    course.getTitle().length() > coursesConfig.getMaxTitleLength()) {
+        if(o instanceof DraftCourse draftCourse) {
+            if(draftCourse.getTitle().length() < coursesConfig.getMinTitleLength() ||
+                    draftCourse.getTitle().length() > coursesConfig.getMaxTitleLength()) {
                 utilsService.reject("title", "course.title.size", errors);
             }
-            if(course.getDescription().length() > coursesConfig.getMaxDescriptionLength()) {
+            if(draftCourse.getDescription().length() > coursesConfig.getMaxDescriptionLength()) {
                 utilsService.reject("description", "course.description.size", errors);
             }
-            if(!utilsService.regexMatch(coursesConfig.getRegexp(), course.getTags())
-                    || course.getTags().contains("@ ") || course.getTags().contains(" @")) {
+            if(!utilsService.regexMatch(coursesConfig.getRegexp(), draftCourse.getTags())
+                    || draftCourse.getTags().contains("@ ") || draftCourse.getTags().contains(" @")) {
                 utilsService.reject("tags", "course.tags.pattern", errors);
             }
-            if(utilsService.containsSymbols(course.getTags(), coursesConfig.getTagsDisabledSymbols())) {
+            if(utilsService.containsSymbols(draftCourse.getTags(), coursesConfig.getTagsDisabledSymbols())) {
                 utilsService.reject("tags", "course.tags.disabled_symbols", errors);
             }
-            if(course.getTags().split("@").length < coursesConfig.getMinTagsCount()) {
+            if(draftCourse.getTags().split("@").length < coursesConfig.getMinTagsCount()) {
                 utilsService.reject("tags", "course.tags.count", errors);
             }
-            if(course.getTags().split("@").length > coursesConfig.getMaxTagsCount()) {
+            if(draftCourse.getTags().split("@").length > coursesConfig.getMaxTagsCount()) {
                 utilsService.reject("tags", "course.tags.max_count", errors);
             }
         }

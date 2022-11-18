@@ -1,0 +1,22 @@
+<div th:fragment="draftcourse-fragment">
+  <br />
+  <hr />
+  <div class="name">
+    <h4 style="font-weight: bold;" th:text="${draftCourse.title}">Python OpenCV tutorial for beginners</h4>
+  </div>
+  <hr />
+  <input type="button"
+         onclick="clickButton('')"
+         id="main" class="btn" value="Главная страница"
+         th:value="#{draft_courses.home}" />
+  <input type="button"
+         onclick="clickButton('settings')"
+         id="settings" class="btn" value="Настройки"
+         th:value="#{draft_courses.settings}" />
+  <input type="button"
+         onclick="clickButton('public')"
+         id="public" class="btn" value="Публикация"
+         th:value="#{draft_courses.public}" />
+  <hr />
+  <br />
+</div>

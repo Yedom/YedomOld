@@ -7,10 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.config.configs.DraftCoursesConfig;
 import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
-import ru.mralexeimk.yedom.models.CourseOption;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
@@ -21,7 +21,7 @@ import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.RolesService;
 import ru.mralexeimk.yedom.utils.services.TagsService;
-import ru.mralexeimk.yedom.utils.validators.CourseValidator;
+import ru.mralexeimk.yedom.utils.validators.DraftCourseValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -35,28 +35,26 @@ public class CoursesController {
     private final DraftCourseRepository draftCourseRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
-    private final CourseValidator courseValidator;
+    private final DraftCourseValidator draftCourseValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
-    private final RolesService rolesService;
     private final OrganizationsService organizationsService;
-    private final LanguageUtil languageUtil;
     private final SmartSearchConfig smartSearchConfig;
     private final CoursesConfig coursesConfig;
+    private final DraftCoursesConfig draftCoursesConfig;
 
     @Autowired
-    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CourseValidator courseValidator, TagRepository tagRepository, TagsService tagsService, RolesService rolesService, OrganizationsService organizationsService, LanguageUtil languageUtil, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig) {
+    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, DraftCourseValidator draftCourseValidator, TagRepository tagRepository, TagsService tagsService, OrganizationsService organizationsService, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig, DraftCoursesConfig draftCoursesConfig) {
         this.utilsService = utilsService;
         this.courseRepository = courseRepository;
         this.draftCourseRepository = draftCourseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
-        this.courseValidator = courseValidator;
+        this.draftCourseValidator = draftCourseValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
-        this.rolesService = rolesService;
+        this.draftCoursesConfig = draftCoursesConfig;
         this.organizationsService = organizationsService;
-        this.languageUtil = languageUtil;
         this.smartSearchConfig = smartSearchConfig;
         this.coursesConfig = coursesConfig;
     }
@@ -88,7 +86,9 @@ public class CoursesController {
      * @param search user search query
      */
     @GetMapping
-    public String index(Model model, @RequestParam(required = false, name = "search") String search,
+    public String index(Model model,
+                        @RequestParam(required = false, name = "search") String search,
+                        @RequestParam(required = false, name = "tag") String tag,
                         HttpServletRequest request) {
         List<Course> courses = new ArrayList<>();
         if(search == null) {
@@ -98,8 +98,15 @@ public class CoursesController {
                     .toList();
         }
         else {
-            String response = tagsService.sendSocket(
-                    request.getSession().getId(), SocketType.SEARCH_COURSES, search);
+            String response;
+            if(tag == null) {
+                response = tagsService.sendSocket(
+                        request.getSession().getId(), SocketType.SEARCH_COURSES, search);
+            }
+            else {
+                response = tagsService.sendSocket(
+                        request.getSession().getId(), SocketType.SEARCH_COURSES_TAG, search);
+            }
 
             if(!response.equals("")) {
                 List<Integer> IDS = utilsService.splitToListInt(response);
@@ -175,7 +182,7 @@ public class CoursesController {
                 utilsService.clearSpacesAroundSymbol(
                                 cloneCourse.getTags().replaceAll(", ", "@"), "@")
                         .trim());
-        courseValidator.validate(cloneCourse, bindingResult);
+        draftCourseValidator.validate(cloneCourse, bindingResult);
 
         if(bindingResult.hasErrors()) {
             return "courses/add";
@@ -191,6 +198,11 @@ public class CoursesController {
                 courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
 
             if(sectionValue.equals("0")) {
+                if(draftCourseRepository.countByCreatorId(userEntity.getId()) >=
+                        draftCoursesConfig.getMaxPerUser()) {
+                    utilsService.reject("name", "courses.limit", bindingResult);
+                    return "courses/add";
+                }
                 courseEntity.setByOrganization(false);
                 courseEntity.setCreatorId(userEntity.getId());
                 draftCourseRepository.save(courseEntity);
@@ -203,6 +215,11 @@ public class CoursesController {
                 int orgId = Integer.parseInt(sectionValue);
                 OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
                 if(organizationEntity != null && organizationsService.isMember(userEntity, orgId)) {
+                    if(draftCourseRepository.countByCreatorId(orgId) >=
+                            draftCoursesConfig.getMaxPerOrganization()) {
+                        utilsService.reject("name", "courses.limit", bindingResult);
+                        return "courses/add";
+                    }
                     courseEntity.setByOrganization(true);
                     courseEntity.setCreatorId(orgId);
                     draftCourseRepository.save(courseEntity);

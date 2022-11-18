@@ -73,7 +73,7 @@
                       th:attr="onclick=|clickCourse('${course.hash}')|">
                     <td class="text-center" th:text="${course.title}">Основы программирования на Python</td>
                     <td class="text-center" th:text="${course.description}">описание</td>
-                    <td class="text-center" th:text="${course.tags}">программирование, python, для новичков</td>
+                    <td class="text-center" th:text="${course.tags.replaceAll('@', ', ')}">программирование, python, для новичков</td>
                   </tr>
 
                   </tbody>

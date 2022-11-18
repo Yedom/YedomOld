@@ -12,6 +12,7 @@ public class CoursesConfig {
     private int maxTitleLength;
     private int maxDescriptionLength;
     private String baseAvatarDefault;
+    private int baseAvatarMaxSize;
     private int minTagsCount;
     private int maxTagsCount;
     private String tagsDisabledSymbols;
