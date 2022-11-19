@@ -46,40 +46,43 @@
   <br />
 </div>
 
-<div class="bg unselectable">
-  <div class="main col-md-6 mx-auto text-center">
-    <div class="container expanded-form">
-      <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
-      <form th:method="POST" th:action="@{/constructor/{path}/edit(path=${course.hash})}" th:object="${course}">
-        <label th:for="title" th:text="#{course.title}">Название курса</label>:
-        <br/>
-        <textarea class="textarea-add" th:field="*{title}" id="title"></textarea>
-        <br />
-        <label th:for="description" th:text="#{course.description}">Описание курса</label>:
-        <br/>
-        <textarea class="textarea-add" rows="5" th:field="*{description}" id="description"></textarea>
-        <br />
-        <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
-        <br/>
-        <textarea th:inline="text" class="textarea-add" rows="5" name="tags" id="tags">[[${course.tags.replaceAll('@', ', ')}]]</textarea>
-        <br />
-        <div id="tagsToAdd" class="unselectable">
+<div class="container">
+  <div class="row">
+    <div th:replace="../resources/common/modules.html :: modules-fragment" w3-include-html="../../resources/common/modules.html"></div>
+    <div class="col-7 col-sm-9 bg unselectable">
+      <div class="main mx-auto text-center">
+        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <form th:method="POST" th:action="@{/constructor/{path}/edit(path=${course.hash})}" th:object="${course}">
+          <label th:for="title" th:text="#{course.title}">Название курса</label>:
+          <br/>
+          <textarea class="textarea-add" th:field="*{title}" id="title"></textarea>
+          <br />
+          <label th:for="description" th:text="#{course.description}">Описание курса</label>:
+          <br/>
+          <textarea class="textarea-add" rows="5" th:field="*{description}" id="description"></textarea>
+          <br />
+          <label th:for="tags" th:text="#{course.tags.title}">Тэги</label>:
+          <br/>
+          <textarea th:inline="text" class="textarea-add" rows="5" name="tags" id="tags">[[${course.tags.replaceAll('@', ', ')}]]</textarea>
+          <br />
+          <div id="tagsToAdd" class="unselectable">
+          </div>
+          <br />
+          <br />
+          <input type="submit" value="Сохранить курс" th:value="#{course.save}"/>
+          <br />
+        </form>
+
+        <!-- Errors -->
+        <div class="errors container" th:if="${#fields.hasErrors('course.*')}">
+          <h4 th:text="#{common.errors}">Errors:</h4>
+          <ul>
+            <li style="color: red;" th:each="err : ${#fields.errors('course.*')}" th:text="${err}" />
+          </ul>
         </div>
         <br />
-        <br />
-        <input type="submit" value="Сохранить курс" th:value="#{course.save}"/>
-        <br />
-      </form>
-
-      <!-- Errors -->
-      <div class="errors container" th:if="${#fields.hasErrors('course.*')}">
-        <h4 th:text="#{common.errors}">Errors:</h4>
-        <ul>
-          <li style="color: red;" th:each="err : ${#fields.errors('course.*')}" th:text="${err}" />
-        </ul>
       </div>
     </div>
-    <br />
   </div>
 </div>
 

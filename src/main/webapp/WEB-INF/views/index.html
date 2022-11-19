@@ -46,6 +46,9 @@
             position: absolute !important;
             display: block !important;
         }
+        .bg {
+            background-color: #eeeeee;
+        }
         #model-3d {
             height: 100% !important;
         }
@@ -213,7 +216,7 @@
 
         let renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setClearColor(0x1b1e21);
+        renderer.setClearColor(0xeeeeee);
         renderer.setSize(innerWidth, innerHeight);
         renderer.domElement.setAttribute("id", "model-3d");
         container.appendChild(renderer.domElement);
@@ -274,7 +277,7 @@
 
     w3.includeHTML();
 
-    particlesJS.load('model-container', '../resources/assets/particles.json', function () {
+    particlesJS.load('model-container', '../resources/assets/particles_home.json', function () {
         console.log('particles-js loaded!');
     });
 </script>

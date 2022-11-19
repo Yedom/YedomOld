@@ -39,14 +39,19 @@
     <br />
 </div>
 
-<div class="bg unselectable">
-    <div class="main col-md-6 mx-auto text-center">
-        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
-        <input type="button" onclick="deleteCourse()" class="btn btn-red"
-               value="Удалить курс" th:value="#{draft_courses.delete}" />
+<div class="container">
+    <div class="row">
+        <div th:replace="../resources/common/modules.html :: modules-fragment" w3-include-html="../../resources/common/modules.html"></div>
+        <div class="col-7 col-sm-9 bg unselectable">
+            <div class="main mx-auto text-center">
+                <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+                <input type="button" onclick="deleteCourse()" class="btn btn-red"
+                       value="Удалить курс" th:value="#{draft_courses.delete}" />
 
-        <br />
-        <br />
+                <br />
+                <br />
+            </div>
+        </div>
     </div>
 </div>
 

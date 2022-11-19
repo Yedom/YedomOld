@@ -39,11 +39,15 @@
   <br />
 </div>
 
-<div class="bg unselectable">
-  <div class="main col-md-6 mx-auto text-center">
-    <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
-
-    <br />
+<div class="container">
+  <div class="row">
+    <div th:replace="../resources/common/modules.html :: modules-fragment" w3-include-html="../../resources/common/modules.html"></div>
+    <div class="col-7 col-sm-9 bg unselectable">
+      <div class="main mx-auto text-center">
+        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <br />
+      </div>
+    </div>
   </div>
 </div>
 
