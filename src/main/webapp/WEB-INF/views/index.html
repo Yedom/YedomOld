@@ -56,6 +56,9 @@
         #model-3d {
             height: 100% !important;
         }
+        .video {
+            border: 0;
+        }
         .descriptions {
             font-family: 'Source Code Pro', monospace;
         }
@@ -66,6 +69,24 @@
             background: transparent;
             margin-top: 40px;
             border-style: none !important;
+        }
+        .card-1 {
+            filter: drop-shadow(0 0 0.75rem #3a8d08);
+        }
+        .card-2 {
+            filter: drop-shadow(0 0 0.75rem #345da8);
+        }
+        .card-3 {
+            filter: drop-shadow(0 0 0.75rem #2fac66);
+        }
+        .card-4 {
+            filter: drop-shadow(0 0 0.75rem #000000);
+        }
+        .card-5 {
+            filter: drop-shadow(0 0 0.75rem #861f80);
+        }
+        .card-6 {
+            filter: drop-shadow(0 0 0.75rem #36a9e1);
         }
         @media only screen and (max-width: 600px) {
             h1 {
@@ -101,16 +122,13 @@
     <div class="ml-auto mr-auto text-center">
         <h1 class="text" th:text="#{index.demo}">Demonstration</h1>
     </div>
-    <div class="row">
-        <br />
-        <div class="col-md-10 ml-auto mr-auto text-center">
-            <iframe id="player" type="text/html"
-                    src="https://www.youtube.com/embed/VbPC3DxAA50?enablejsapi=1&origin=http://yedom.ru">
-            </iframe>
+    <div class="row" style="height: 401px;">
+        <div class="col-md-6" style="width: 673px;">
+            <iframe class="video" allowfullscreen="" src="https://www.youtube.com/embed/VbPC3DxAA50?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=VbPC3DxAA50&amp;controls=0" width="660" height="371"></iframe>
         </div>
-        <div class="col-md-2 text-center">
-            <h2>Strain your brain</h2>
-            <p>awfawfawfawfwq 123 r23f 242 32 2f2 3323f2 3f2 32 3 23 23r</p>
+        <div class="col-md-6 col-lg-4" style="width: 287px;margin-left: auto;">
+            <h2 class="text">Напряги извилины</h2>
+            <h5 class ="text">Ваше понимание - наша работа</h5>
         </div>
     </div>
     <br />
@@ -124,7 +142,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card text-white">
+                    <div class="card card-1 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-1.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_1.title}">Course Constructor</h4>
@@ -136,8 +154,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white">
-                        <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
+                    <div class="card card-2 text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-2_2.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_2.title}">Smart Search System</h4>
                             <p class="descriptions" th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
@@ -148,8 +166,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white">
-                        <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
+                    <div class="card card-3 text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-4_2.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_3.title}">Profile/Friends System</h4>
                             <p class="descriptions" th:text="#{index.f_3.desc}">Follow me!</p>
@@ -165,8 +183,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card text-white">
-                        <img class="card-img w-100 d-block card" src="../resources/images/card-3.png" alt="">
+                    <div class="card card-4 text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-3_2.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_4.title}">AR</h4>
                             <p class="descriptions" th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
@@ -177,8 +195,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white">
-                        <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
+                    <div class="card card-5 text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-5.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_5.title}">Organizations</h4>
                             <p class="descriptions" th:text="#{index.f_5.desc}">Create your organization!</p>
@@ -189,8 +207,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white">
-                        <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
+                    <div class="card card-6 text-white">
+                        <img class="card-img w-100 d-block card" src="../resources/images/card-6.png" alt="">
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_6.title}">Profile Settings</h4>
                             <p class="descriptions" th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
