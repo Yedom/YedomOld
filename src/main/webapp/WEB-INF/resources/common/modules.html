@@ -1,7 +1,29 @@
 <div th:fragment="modules-fragment" class="col-5 col-sm-3">
     <div class="col-md-12 bg unselectable">
         <div class="main mx-auto text-center">
-            <h2>Модули</h2>
+            <h2>Modules</h2>
+            <button type="button" class="collapsible">
+                <i onclick="addModule()" id="addModule" class="material-icons centered-icon">add</i>
+            </button>
+            <div class="content-collapse">
+                <i onclick="addModule()" id="addLesson" class="material-icons centered-icon">add</i>
+            </div>
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    var coll = $('.collapsible');
+
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].click(function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        });
+    }
+</script>
