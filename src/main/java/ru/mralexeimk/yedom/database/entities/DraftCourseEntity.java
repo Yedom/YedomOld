@@ -45,6 +45,9 @@ public class DraftCourseEntity {
     @Column(name = "added_on")
     private Timestamp addedOn;
 
+    @Column(name = "modules")
+    private String modules;
+
     // Add to database constructor
     public DraftCourseEntity(DraftCourse draftCourse) {
         this.title = draftCourse.getTitle();
@@ -55,6 +58,7 @@ public class DraftCourseEntity {
         this.avatar = draftCourse.getAvatar();
         this.hash = draftCourse.getHash();
         this.addedOn = draftCourse.getAddedOn();
+        this.modules = draftCourse.getModules();
     }
 
     @Override

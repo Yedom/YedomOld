@@ -27,9 +27,10 @@ public class Course extends DraftCourse {
     private Timestamp completedOn = null;
 
     public Course(int id, String hash, String title, boolean byOrganization, int creatorId,
-                  String description, String tags, String avatar, Timestamp addedOn, int views, int likes,
+                  String description, String tags, String avatar, Timestamp addedOn,
+                  String modules, int views, int likes,
                   int investments, boolean acceptTasks, String completeRequestsUsersIds) {
-        super(id, hash, title, byOrganization, creatorId, description, tags, avatar, addedOn);
+        super(id, hash, title, byOrganization, creatorId, description, tags, avatar, addedOn, modules);
         this.views = views;
         this.likes = likes;
         this.investments = investments;
@@ -42,7 +43,8 @@ public class Course extends DraftCourse {
         this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
                 courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(),
-                courseEntity.getAvatar(), courseEntity.getAddedOn(), courseEntity.getViews(),
+                courseEntity.getAvatar(), courseEntity.getAddedOn(),
+                courseEntity.getModules(), courseEntity.getViews(),
                 courseEntity.getLikes(), courseEntity.getInvestments(), courseEntity.isAcceptTasks(),
                 courseEntity.getCompleteRequestsUsersIds());
     }
@@ -51,12 +53,14 @@ public class Course extends DraftCourse {
         this(course.getId(), course.getHash(), course.getTitle(),
                 course.isByOrganization(), course.getCreatorId(),
                 course.getDescription(), course.getTags(),
-                course.getAvatar(), course.getAddedOn(), course.getViews(),
+                course.getAvatar(), course.getAddedOn(),
+                course.getModules(), course.getViews(),
                 course.getLikes(), course.getInvestments(), course.isAcceptTasks(),
                 course.getCompleteRequestsUsersIds());
         this.setCreatorName(course.getCreatorName());
         this.setCreatorAvatar(course.getCreatorAvatar());
         this.setCompletedOn(course.getCompletedOn());
+        this.setModules(course.getModules());
         this.setCreatorType(course.getCreatorType());
     }
 }

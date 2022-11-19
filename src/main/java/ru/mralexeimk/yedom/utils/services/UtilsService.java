@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.services;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -286,5 +287,9 @@ public class UtilsService {
 
     public String listToString(List<String> list) {
         return String.join(",", list);
+    }
+
+    public String jsonToString(StringBuilder str, String key) {
+        return new JSONObject(Map.of(key, str.toString())).toString();
     }
 }

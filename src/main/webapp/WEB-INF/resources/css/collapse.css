@@ -25,9 +25,17 @@ h1, h2, h3, h4, h5 {
     display: inline-block;
     width: 100%;
     text-align: center;
+    transition: all .2s ease-in-out;
+}
+.add-icon {
+    font-size: 30px;
+    vertical-align: middle;
 }
 #last-module > #addModule, #last-module > #addLesson {
     text-align: center;
+}
+.centered-icon {
+    padding-top: 10px;
 }
 .add-module {
     width: 90%;
@@ -37,15 +45,6 @@ h1, h2, h3, h4, h5 {
     padding-bottom: 5px;
     padding-top: 5px;
 }
-.save-icon:hover {
-    color: green;
-}
-.delete-icon:hover {
-    color: red;
-}
-.centered-icon {
-    padding-top: 10px;
-}
 #addModule:hover {
-    color: red;
+    color: green;
 }

@@ -281,7 +281,7 @@ public class CoursesController {
                 }
             } catch (Exception ignored) {}
         }
-        return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
+        return utilsService.jsonToString(htmlResponse, "tags");
     }
 
     /**
@@ -309,6 +309,6 @@ public class CoursesController {
                 ++c;
             }
         }
-        return new JSONObject(Map.of("tags", htmlResponse.toString())).toString();
+        return utilsService.jsonToString(htmlResponse, "tags");
     }
 }

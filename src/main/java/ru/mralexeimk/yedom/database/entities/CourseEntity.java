@@ -44,6 +44,9 @@ public class CourseEntity {
     @Column(name = "added_on")
     private Timestamp addedOn;
 
+    @Column(name = "modules")
+    private String modules;
+
     @Column(name = "views")
     private int views = 0;
 
@@ -69,6 +72,7 @@ public class CourseEntity {
         this.avatar = course.getAvatar();
         this.hash = course.getHash();
         this.addedOn = course.getAddedOn();
+        this.modules = course.getModules();
     }
 
     @Override

@@ -18,15 +18,18 @@ import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.utils.services.DraftCoursesService;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 import ru.mralexeimk.yedom.utils.validators.DraftCourseValidator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/constructor")
@@ -306,5 +309,32 @@ public class ConstructorController {
         }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    /**
+     * Get draft course modules
+     */
+    @GetMapping(value = "/{hash}/modules", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public String getCourseModules(@PathVariable(value = "hash") String hash,
+                                   HttpSession session, HttpServletRequest request) {
+        StringBuilder htmlResponse = new StringBuilder();
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return utilsService.jsonToString(htmlResponse, "modules");
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(draftCourseEntity == null || !draftCoursesService.checkAccess(userEntity, draftCourseEntity))
+            return utilsService.jsonToString(htmlResponse, "modules");
+
+        JSONObject json = new JSONObject(draftCourseEntity.getModules());
+
+
+        return utilsService.jsonToString(htmlResponse, "modules");
     }
 }
