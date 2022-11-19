@@ -49,8 +49,15 @@
         .bg {
             background-color: #eeeeee;
         }
+        .text {
+             font-family: 'Source Code Pro', monospace;
+             color: #000000;
+         }
         #model-3d {
             height: 100% !important;
+        }
+        .descriptions {
+            font-family: 'Source Code Pro', monospace;
         }
         .particles-js-canvas-el {
             height: 0 !important;
@@ -74,8 +81,8 @@
 <!-- Yedom introduction/description and logo -->
 <div id="logo" class="row unselectable">
     <div class="ml-auto mr-auto text-center">
-        <h2 class="title" th:text="#{title}">Yedom</h2>
-        <h5 class="description" th:text="#{index.description}">Yedom is a platform for online education</h5>
+        <h2 class="text" th:text="#{title}">Yedom</h2>
+        <h5 class="text" th:text="#{index.description}">Yedom is a platform for online education</h5>
     </div>
 </div>
 
@@ -92,7 +99,7 @@
 <div class="container unselectable">
     <!-- Demonstration -->
     <div class="ml-auto mr-auto text-center">
-        <h1 class="title" th:text="#{index.demo}">Demonstration</h1>
+        <h1 class="text" th:text="#{index.demo}">Demonstration</h1>
     </div>
     <div class="row">
         <br />
@@ -102,6 +109,7 @@
             </iframe>
         </div>
         <div class="col-md-2 text-center">
+            <h2>Strain your brain</h2>
             <p>awfawfawfawfwq 123 r23f 242 32 2f2 3323f2 3f2 32 3 23 23r</p>
         </div>
     </div>
@@ -112,15 +120,15 @@
 
     <!-- Feature description -->
     <div class="features">
-        <h1 style="text-align: center;" th:text="#{index.features}">Features</h1>
+        <h1 class="text" style="text-align: center;" th:text="#{index.features}">Features</h1>
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-1.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_1.title}">Course Constructor</h4>
-                            <p th:text="#{index.f_1.desc}">Create your own course!</p>
+                            <h4 class="descriptions" th:text="#{index.f_1.title}">Course Constructor</h4>
+                            <p class="descriptions" th:text="#{index.f_1.desc}">Create your own course!</p>
                             <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
@@ -131,8 +139,8 @@
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_2.title}">Smart Search System</h4>
-                            <p th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
+                            <h4 class="descriptions" th:text="#{index.f_2.title}">Smart Search System</h4>
+                            <p class="descriptions" th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
                             <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
@@ -143,8 +151,8 @@
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-2.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_3.title}">Profile/Friends System</h4>
-                            <p th:text="#{index.f_3.desc}">Follow me!</p>
+                            <h4 class="descriptions" th:text="#{index.f_3.title}">Profile/Friends System</h4>
+                            <p class="descriptions" th:text="#{index.f_3.desc}">Follow me!</p>
                             <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
@@ -160,8 +168,8 @@
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-3.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_4.title}">AR</h4>
-                            <p th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
+                            <h4 class="descriptions" th:text="#{index.f_4.title}">AR</h4>
+                            <p class="descriptions" th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
                             <button th:text="#{index.go}" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
@@ -172,8 +180,8 @@
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_5.title}">Organizations</h4>
-                            <p th:text="#{index.f_5.desc}">Create your organization!</p>
+                            <h4 class="descriptions" th:text="#{index.f_5.title}">Organizations</h4>
+                            <p class="descriptions" th:text="#{index.f_5.desc}">Create your organization!</p>
                             <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
@@ -184,8 +192,8 @@
                     <div class="card text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-4.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 th:text="#{index.f_6.title}">Profile Settings</h4>
-                            <p th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
+                            <h4 class="descriptions" th:text="#{index.f_6.title}">Profile Settings</h4>
+                            <p class="descriptions" th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
                             <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>

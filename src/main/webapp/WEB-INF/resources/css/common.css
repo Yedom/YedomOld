@@ -25,7 +25,7 @@ body {
 }
 .profile-label {
     font-weight: bold;
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Source Code Pro', monospace;
     color: #000000;
 }
 #particles-container {
@@ -41,7 +41,7 @@ body {
     width: 70%;
     font-size: 25px !important;
     background-color: #3a8d08 !important;;
-    font-family: Roboto, Helvetica, Arial, sans-serif !important;
+    font-family: 'Source Code Pro', monospace !important;
     font-weight: bold !important;
     border: 1px solid transparent !important;
 }
@@ -58,7 +58,7 @@ body {
     z-index: 3;
 }
 .copyright {
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Source Code Pro', monospace;
     font-size: 20px;
 }
 .navbar-scroll {
@@ -245,7 +245,7 @@ input[type=submit]{
     transition: all .3s ease;
 }
 .profile-pic:after {
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Source Code Pro', monospace;
     content: "\f007";
     top: 0; left: 0;
     width: 100%;
