@@ -66,9 +66,5 @@
 
 .card .card-img {
   transition: all ease .3s;
-  margin: 0px;
+  margin: 0;
 }
-
-.row {
-}
-

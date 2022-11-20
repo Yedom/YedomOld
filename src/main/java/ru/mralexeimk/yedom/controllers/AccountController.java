@@ -14,6 +14,9 @@ import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * Controller for account page (where user can change username and password)
+ */
 @Controller
 @RequestMapping("/account")
 public class AccountController {
@@ -39,14 +42,14 @@ public class AccountController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        user.setPassword("");
+        user.setPassword(""); // to prevent password from showing in form
         model.addAttribute("user", user);
 
         return "auth/account";
     }
 
     /**
-     * User "save changes"/"logout" buttons handler
+     * User 'save changes'/'logout' buttons handler
      */
     @PostMapping
     public String accountPost(@ModelAttribute("user") User userModel,

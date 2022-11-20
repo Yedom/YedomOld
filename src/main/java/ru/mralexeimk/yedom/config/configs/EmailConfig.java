@@ -4,6 +4,10 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Email Service Configuration
+ * @author mralexeimk
+ */
 @Configuration
 @ConfigurationProperties(prefix = "email")
 @Data

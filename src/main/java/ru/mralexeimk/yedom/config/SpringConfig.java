@@ -7,9 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,6 +27,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Spring configuration
+ */
 @Configuration
 @ComponentScan("ru.mralexeimk.yedom")
 @EnableWebMvc
@@ -74,6 +74,9 @@ public class SpringConfig implements WebMvcConfigurer {
         registry.viewResolver(resolver);
     }
 
+    /**
+     * Set resource handlers
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
@@ -82,6 +85,9 @@ public class SpringConfig implements WebMvcConfigurer {
                 .addResourceLocations("/WEB-INF/resources/");
     }
 
+    /**
+     * Database connection by properties ('spring.datasource.*')
+     */
     @Bean
     @Primary
     @ConfigurationProperties("spring.datasource")
@@ -89,6 +95,9 @@ public class SpringConfig implements WebMvcConfigurer {
         return new DataSourceProperties();
     }
 
+    /**
+     * Email sender settings
+     */
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -108,6 +117,9 @@ public class SpringConfig implements WebMvcConfigurer {
         return mailSender;
     }
 
+    /**
+     * Resolve locale by 'Accept-Language' header or by user's settings
+     */
     @Bean
     public LocaleResolver localeResolver() {
         return new AcceptHeaderResolver(
@@ -115,11 +127,17 @@ public class SpringConfig implements WebMvcConfigurer {
                 applicationContext.getBean(LanguageConfig.class));
     }
 
+    /**
+     * LanguageUtil for getting translated messages from code
+     */
     @Bean
     public LanguageUtil languageUtil() {
         return new LanguageUtil();
     }
 
+    /**
+     * Message source for configuring localed messages in files
+     */
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource
@@ -137,6 +155,9 @@ public class SpringConfig implements WebMvcConfigurer {
         return bean;
     }
 
+    /**
+     * Password encoder for user's passwords
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

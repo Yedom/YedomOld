@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * Internationalization configuration
+ * @author mralexeimk
+ */
 @Configuration
 @ConfigurationProperties(prefix = "language")
 @Data
