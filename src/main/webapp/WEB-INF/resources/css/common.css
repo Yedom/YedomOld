@@ -347,7 +347,6 @@ a:active, a:hover, a {
 }
 #player {
     width: 100%;
-    height: 640px;
 }
 #logo {
     position: absolute;
