@@ -45,7 +45,7 @@
         <div class="col-7 col-sm-9 bg unselectable">
             <div class="main mx-auto text-center">
                 <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
-                <input type="button" onclick="deleteCourse()" class="btn btn-red"
+                <input type="button" id="delBtn" onclick="deleteCourse()" class="btn btn-red"
                        value="Удалить курс" th:value="#{draft_courses.delete}" />
 
                 <br />
@@ -75,6 +75,7 @@
 </script>
 <script th:inline="javascript">
     let hash = /*[[${course.hash}]]*/ '';
+    let deleting = /*[[#{draft_courses.deleting}]]*/ 'Удаление...';
 
     $('#settings').addClass('btn-primary');
 
@@ -84,6 +85,7 @@
     }
 
     function deleteCourse() {
+        $('#delBtn').val(deleting);
         fetch("/constructor/"+hash+"/delete", {
             method: "POST"
         }).then(response => {

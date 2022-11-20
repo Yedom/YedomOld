@@ -7,6 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,8 +25,9 @@ import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.utils.language.AcceptHeaderResolver;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Properties;
 
 @Configuration

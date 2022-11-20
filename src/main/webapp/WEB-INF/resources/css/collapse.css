@@ -1,7 +1,7 @@
 h1, h2, h3, h4, h5 {
     display: inline !important;
 }
-.collapsible {
+.collapsible, .collapsible-dis {
     background-color: #eee;
     color: #444;
     cursor: pointer;
@@ -34,11 +34,11 @@ h1, h2, h3, h4, h5 {
 #last-module > #addModule, #last-module > #addLesson {
     text-align: center;
 }
-.centered-icon {
+.add-icon, .save-icon, .delete-icon {
     padding-top: 10px;
 }
 .add-module {
-    width: 90%;
+    width: 95%;
     align-content: center;
 }
 #last {
@@ -46,5 +46,8 @@ h1, h2, h3, h4, h5 {
     padding-top: 5px;
 }
 #addModule:hover {
+    color: green;
+}
+#addLesson:hover {
     color: green;
 }

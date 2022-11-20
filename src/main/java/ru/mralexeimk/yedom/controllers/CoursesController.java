@@ -253,7 +253,6 @@ public class CoursesController {
         StringBuilder htmlResponse = new StringBuilder();
         if(tags != null && !tags.equals("")) {
             try {
-                User user = (User) session.getAttribute("user");
                 Set<String> tagsSet = new HashSet<>(Arrays.asList(tags.split("@")[0].split(", ")));
                 tags = tags
                         .replaceAll(",", "")

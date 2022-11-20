@@ -11,4 +11,8 @@ public class DraftCoursesConfig {
     private int maxPerUser;
     private int maxPerOrganization;
     private int daysAlive;
+    private int maxModuleAndLessonNameLength;
+    private int maxModules;
+    private int maxLessons;
+    private String modulesDisabledSymbols;
 }

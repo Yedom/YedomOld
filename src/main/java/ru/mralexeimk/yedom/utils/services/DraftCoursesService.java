@@ -7,21 +7,17 @@ import ru.mralexeimk.yedom.config.configs.DraftCoursesConfig;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
 
 import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class DraftCoursesService {
-    private final UtilsService utilsService;
-    private final UserRepository userRepository;
     private final DraftCourseRepository draftCourseRepository;
     private final OrganizationsService organizationsService;
     private final DraftCoursesConfig draftCoursesConfig;
 
-    public DraftCoursesService(UtilsService utilsService, UserRepository userRepository, DraftCourseRepository draftCourseRepository, OrganizationsService organizationsService, DraftCoursesConfig draftCoursesConfig) {
-        this.utilsService = utilsService;
-        this.userRepository = userRepository;
+    public DraftCoursesService(DraftCourseRepository draftCourseRepository, OrganizationsService organizationsService, DraftCoursesConfig draftCoursesConfig) {
         this.draftCourseRepository = draftCourseRepository;
         this.organizationsService = organizationsService;
         this.draftCoursesConfig = draftCoursesConfig;
@@ -46,11 +42,51 @@ public class DraftCoursesService {
     /**
      * Check if user has access to draft course
      */
-    public boolean checkAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
+    public boolean HasNoAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
         if(!draftCourseEntity.isByOrganization()) {
-            return userEntity.getId() == draftCourseEntity.getCreatorId();
+            return userEntity.getId() != draftCourseEntity.getCreatorId();
         } else {
-            return organizationsService.isMember(userEntity, draftCourseEntity.getCreatorId());
+            return !organizationsService.isMember(userEntity, draftCourseEntity.getCreatorId());
         }
+    }
+
+    /**
+     * Parse draft course modules from db string
+     */
+    public Map<String, List<String>> getModulesFromString(String modules) {
+        Map<String, List<String>> res = new HashMap<>();
+        try {
+            for (String row : modules.split("\\|")) {
+                String[] spl = row.split(":");
+                try {
+                    if(!spl[0].equals("")) {
+                        res.put(spl[0], Arrays.asList(spl[1].split(",")));
+                    }
+                } catch(Exception ex) {
+                    res.put(spl[0], new ArrayList<>());
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return res;
+    }
+
+    public String getModulesFromMap(Map<String, List<String>> modules) {
+        StringBuilder res = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : modules.entrySet()) {
+            res.append(entry.getKey()).append(":");
+            for (String s : entry.getValue()) {
+                res.append(s).append(",");
+            }
+            if(res.length() > 0 && res.charAt(res.length() - 1) == ',') {
+                res.deleteCharAt(res.length() - 1);
+            }
+            res.append("|");
+        }
+        if(res.length() > 0 && res.charAt(res.length() - 1) == '|') {
+            res.deleteCharAt(res.length() - 1);
+        }
+        return res.toString();
     }
 }
