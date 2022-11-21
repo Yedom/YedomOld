@@ -12,17 +12,18 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Service for working with friends system server
+ */
 @Service
 public class FriendsService extends AbstractService {
-    private final UtilsService utilsService;
     private final LanguageUtil languageUtil;
     public final Pair<String, String> DEFAULT_FOLLOW_BTN;
     public final Pair<String, String> DISABLED_FOLLOW_BTN;
 
     @Autowired
-    public FriendsService(FriendsServerConfig friendsServerConfig, UtilsService utilsService, LanguageUtil languageUtil) {
+    public FriendsService(FriendsServerConfig friendsServerConfig, LanguageUtil languageUtil) {
         super(friendsServerConfig);
-        this.utilsService = utilsService;
         this.languageUtil = languageUtil;
         DEFAULT_FOLLOW_BTN = new Pair<>(
                 languageUtil.getLocalizedMessage("profile.follow"),

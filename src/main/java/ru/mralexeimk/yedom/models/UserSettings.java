@@ -4,6 +4,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Model of user's settings
+ */
 @Data
 public class UserSettings {
     @NotNull

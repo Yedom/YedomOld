@@ -11,6 +11,9 @@ import ru.mralexeimk.yedom.models.User;
 
 import java.util.*;
 
+/**
+ * Service for roles (user, moderator, admin)
+ */
 @Service
 public class RolesService {
     private final RoleRepository roleRepository;

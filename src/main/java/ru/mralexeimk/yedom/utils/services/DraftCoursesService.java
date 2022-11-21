@@ -42,7 +42,7 @@ public class DraftCoursesService {
     /**
      * Check if user has access to draft course
      */
-    public boolean HasNoAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
+    public boolean hasNoAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
         if(!draftCourseEntity.isByOrganization()) {
             return userEntity.getId() != draftCourseEntity.getCreatorId();
         } else {

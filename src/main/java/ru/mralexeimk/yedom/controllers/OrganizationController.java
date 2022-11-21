@@ -20,6 +20,9 @@ import ru.mralexeimk.yedom.utils.validators.OrganizationValidator;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * Constructor for organization add/edit
+ */
 @Controller
 @RequestMapping("/organization")
 public class OrganizationController {

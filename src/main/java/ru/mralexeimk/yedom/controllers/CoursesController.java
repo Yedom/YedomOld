@@ -27,6 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
+/**
+ * Controller for courses list/search/add
+ */
 @Controller
 @RequestMapping("/courses")
 public class CoursesController {

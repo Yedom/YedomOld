@@ -27,6 +27,9 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Locale;
 
+/**
+ * Controller for authentication process pages
+ */
 @Controller
 @RequestMapping("/auth")
 public class AuthController {

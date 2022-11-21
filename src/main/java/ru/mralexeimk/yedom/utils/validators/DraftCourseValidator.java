@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.validators;
 
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -10,26 +11,27 @@ import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
+/**
+ * Draft course model validator
+ */
 @Component
 public class DraftCourseValidator implements Validator {
     private final UtilsService utilsService;
-    private final LanguageUtil languageUtil;
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public DraftCourseValidator(UtilsService utilsService, LanguageUtil languageUtil, CoursesConfig coursesConfig) {
+    public DraftCourseValidator(UtilsService utilsService, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
-        this.languageUtil = languageUtil;
         this.coursesConfig = coursesConfig;
     }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(@NonNull Class<?> aClass) {
         return Course.class.equals(aClass);
     }
 
     @Override
-    public void validate(Object o, Errors errors) {
+    public void validate(@NonNull Object o, @NonNull Errors errors) {
         if(o instanceof DraftCourse draftCourse) {
             if(draftCourse.getTitle().length() < coursesConfig.getMinTitleLength() ||
                     draftCourse.getTitle().length() > coursesConfig.getMaxTitleLength()) {

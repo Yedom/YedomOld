@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+/**
+ * Service for working with smart search server
+ */
 @Service
 public class TagsService extends AbstractService {
     @Autowired
