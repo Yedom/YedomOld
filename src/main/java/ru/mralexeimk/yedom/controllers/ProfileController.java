@@ -18,7 +18,6 @@ import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.*;
 import ru.mralexeimk.yedom.utils.custom.Triple;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.services.FriendsService;
@@ -26,12 +25,13 @@ import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Controller for user's profiles
+ */
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
@@ -104,9 +104,9 @@ public class ProfileController {
         return amounts;
     }
 
-    private Pair<Boolean[], String> modelGetSettings(Model model, UserEntity profileUser,
-                                       User user, HttpServletRequest request) {
-        return modelGetSettings(model, profileUser, user, request, true);
+    private void modelGetSettings(Model model, UserEntity profileUser,
+                                  User user, HttpServletRequest request) {
+        modelGetSettings(model, profileUser, user, request, true);
     }
 
     private Pair<Boolean[], String> modelGetSettings(Model model, UserEntity profileUser,
@@ -397,6 +397,7 @@ public class ProfileController {
 
     /**
      * User settings page
+     * (only for your profile)
      */
     @GetMapping("/{username}/settings")
     public String profileSettingsGet(Model model,
@@ -462,6 +463,9 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    /**
+     * Update user's links one by one
+     */
     @PostMapping("/linksUpdate")
     public @ResponseBody ResponseEntity<Object> linksUpdate(@RequestBody String data,
                                                             HttpSession session) {
@@ -488,6 +492,9 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    /**
+     * Update user's 'about me' info
+     */
     @PostMapping("/aboutUpdate")
     public @ResponseBody ResponseEntity<Object> aboutUpdate(@RequestBody String data,
                                                             HttpSession session) {
@@ -549,6 +556,9 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
+    /**
+     * Post request to update user's settings
+     */
     @PostMapping("/{username}/settings")
     public String saveSettings(@ModelAttribute User user,
                                HttpSession session) {

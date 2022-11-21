@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
+/**
+ * Client socket class
+ */
 public class ClientSocket {
     private Socket socket;
     private DataOutputStream dout;

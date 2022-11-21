@@ -7,6 +7,9 @@ import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 
 import java.sql.Timestamp;
 
+/**
+ * Model of draft course (DraftCourseEntity + additional model fields)
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

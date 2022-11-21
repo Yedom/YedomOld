@@ -9,6 +9,9 @@ import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+/**
+ * Model of course (CourseEntity + additional model fields)
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

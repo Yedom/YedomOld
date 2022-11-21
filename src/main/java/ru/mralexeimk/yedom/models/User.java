@@ -8,6 +8,9 @@ import ru.mralexeimk.yedom.utils.custom.Pair;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * Model of user (UserEntity + additional model fields)
+ */
 @Data
 @AllArgsConstructor
 @Component

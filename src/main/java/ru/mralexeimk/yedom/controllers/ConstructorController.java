@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Controller for courses constructor (user's draft courses)
+ */
 @Controller
 @RequestMapping("/constructor")
 public class ConstructorController {
@@ -57,18 +60,7 @@ public class ConstructorController {
     }
 
     /**
-     * Check if UserEntity has access to DraftCourse
-     */
-    private boolean checkAccess(UserEntity userEntity, DraftCourseEntity draftCourseEntity) {
-        if(!draftCourseEntity.isByOrganization()) {
-            return userEntity.getId() == draftCourseEntity.getCreatorId();
-        } else {
-            return organizationsService.isMember(userEntity, draftCourseEntity.getCreatorId());
-        }
-    }
-
-    /**
-     * Get draft courses by section value
+     * Get draft courses list by user or organization
      */
     @GetMapping()
     public String index(Model model,
@@ -86,13 +78,16 @@ public class ConstructorController {
         utilsService.addOptions(model, userEntity);
 
         try {
+            // Get draft courses by user
             if (sectionValue.equals("0")) {
                 for (Integer id : utilsService.splitToListInt(userEntity.getDraftCoursesIds())) {
                     DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);
                     if (draftCourseEntity == null) continue;
                     draftCourses.add(new DraftCourse(draftCourseEntity));
                 }
-            } else {
+            }
+            // Get draft courses by organization
+            else {
                 int orgId = Integer.parseInt(sectionValue);
                 OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
                 if(organizationEntity != null && organizationsService.isMember(userEntity, orgId)) {
@@ -126,7 +121,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -163,7 +158,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -185,7 +180,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -207,7 +202,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -229,7 +224,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         draftCourseEntityChanges.setTags(utilsService.clearSpacesAroundSymbol(
                         draftCourseEntityChanges.getTags().replaceAll(", ", "@"), "@")
@@ -265,7 +260,7 @@ public class ConstructorController {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
-        if(!checkAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+        if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         draftCourseRepository.delete(draftCourseEntity);
 
@@ -289,7 +284,7 @@ public class ConstructorController {
 
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
-        if(draftCourseEntity == null || draftCoursesService.HasNoAccess(userEntity, draftCourseEntity))
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         try {
@@ -332,7 +327,7 @@ public class ConstructorController {
 
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
-        if(draftCourseEntity == null || draftCoursesService.HasNoAccess(userEntity, draftCourseEntity))
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return bad;
 
         var modules = draftCoursesService.getModulesFromString(draftCourseEntity.getModules());

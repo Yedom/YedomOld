@@ -8,6 +8,9 @@ import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 
 import java.util.*;
 
+/**
+ * Model of organization (OrganizationEntity + additional model fields)
+ */
 @Data
 @AllArgsConstructor
 @Component

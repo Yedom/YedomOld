@@ -2,6 +2,9 @@ package ru.mralexeimk.yedom.models;
 
 import lombok.Data;
 
+/**
+ * Model for user's profile preliminary quantitative information
+ */
 @Data
 public class Amounts {
     private int friendsCount = 0;

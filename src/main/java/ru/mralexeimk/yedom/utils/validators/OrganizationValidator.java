@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.validators;
 
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -9,6 +10,9 @@ import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 
+/**
+ * Organization model validator
+ */
 @Component
 public class OrganizationValidator implements Validator {
     private final UtilsService utilsService;
@@ -22,7 +26,7 @@ public class OrganizationValidator implements Validator {
     }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(@NonNull Class<?> aClass) {
         return Organization.class.equals(aClass);
     }
 
@@ -40,7 +44,7 @@ public class OrganizationValidator implements Validator {
     }
 
     @Override
-    public void validate(Object o, Errors errors) {
+    public void validate(@NonNull Object o, @NonNull Errors errors) {
         if(o instanceof Organization org) {
             if(org.getArgs().contains("add")) {
                 addValidator(org, errors);

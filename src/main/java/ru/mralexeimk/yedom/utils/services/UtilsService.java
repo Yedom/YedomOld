@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Service for common utils
+ */
 @Service
 public class UtilsService {
     private final LanguageUtil languageUtil;
@@ -65,6 +68,9 @@ public class UtilsService {
         return null;
     }
 
+    /**
+     * @return hash sha-256 of string
+     */
     private String hashSHA256(String str) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -74,6 +80,9 @@ public class UtilsService {
         return null;
     }
 
+    /**
+     * @return hash md5 of string
+     */
     private String hashMD5(String str) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
@@ -87,6 +96,9 @@ public class UtilsService {
         return null;
     }
 
+    /**
+     * Check if user's profiles links is correct
+     */
     public boolean isCorrectLinks(String links) {
         try {
             var pairs = parseLinks(links);
@@ -108,6 +120,9 @@ public class UtilsService {
         return true;
     }
 
+    /**
+     * Check if string is valid url
+     */
     public boolean isValidURL(String urlString) {
         try {
             URL url = new URL(urlString);
@@ -118,6 +133,9 @@ public class UtilsService {
         }
     }
 
+    /**
+     * Parse user's profile links to list of pairs (name and link)
+     */
     public List<Pair<String, String>> parseLinks(String links) {
         List<Pair<String, String>> res = new ArrayList<>();
         if (links != null && !links.isEmpty()) {
@@ -141,20 +159,20 @@ public class UtilsService {
     }
 
     /**
-     * models validator
+     * @return hash of int
+     */
+    public String hash(int num, HashAlg hashAlg) {
+        return hash(String.valueOf(num), hashAlg);
+    }
+
+    /**
+     * Models validation reject
      */
     public void reject(String field, String msg, Errors errors) {
         if(!errors.hasFieldErrors(field)) {
             errors.rejectValue(field, msg,
                     languageUtil.getLocalizedMessage(msg));
         }
-    }
-
-    /**
-     * @return hash of int
-     */
-    public String hash(int num, HashAlg hashAlg) {
-        return hash(String.valueOf(num), hashAlg);
     }
 
     /**

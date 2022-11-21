@@ -1,6 +1,5 @@
 package ru.mralexeimk.yedom.utils.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import ru.mralexeimk.yedom.config.configs.AbstractServerConfig;
@@ -11,6 +10,9 @@ import ru.mralexeimk.yedom.utils.multithreading.ClientSocket;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Abstract class for socket services
+ */
 public abstract class AbstractService {
     private final AbstractServerConfig serverConfig;
     private final ConcurrentHashMap<String, ClientSocket> clientSocketByKey = new ConcurrentHashMap<>();

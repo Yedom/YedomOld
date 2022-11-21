@@ -1,6 +1,6 @@
 package ru.mralexeimk.yedom.utils.language;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
@@ -10,10 +10,12 @@ import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Component for resolving locale from request header or user setting
+ */
 @Component
 public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
     private final UtilsService utilsService;
@@ -25,7 +27,7 @@ public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
     }
 
     @Override
-    public Locale resolveLocale(HttpServletRequest request) {
+    public @NonNull Locale resolveLocale(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if(session != null) {
             String check = utilsService.preventUnauthorizedAccess(session);
@@ -35,7 +37,7 @@ public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
                 if(!lang.equals("auto")) return new Locale(lang);
             }
         }
-        if (StringUtils.isEmpty(request.getHeader("Accept-Language"))) {
+        if (!StringUtils.hasLength(request.getHeader("Accept-Language"))) {
             return Locale.getDefault();
         }
         List<Locale.LanguageRange> list = Locale.LanguageRange.parse(request.getHeader("Accept-Language"));

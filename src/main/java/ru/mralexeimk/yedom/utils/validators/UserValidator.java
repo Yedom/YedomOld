@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.utils.validators;
 
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,9 @@ import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
+/**
+ * User model validator
+ */
 @Component
 public class UserValidator implements Validator {
     private final UtilsService utilsService;
@@ -31,7 +35,7 @@ public class UserValidator implements Validator {
     }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(@NonNull Class<?> aClass) {
         return User.class.equals(aClass);
     }
 
@@ -132,7 +136,7 @@ public class UserValidator implements Validator {
     }
 
     @Override
-    public void validate(Object o, Errors errors) {
+    public void validate(@NonNull Object o, @NonNull Errors errors) {
         if(o instanceof User user) {
             if(user.getArgs().contains("onReg")) {
                 regValidator(user, errors);

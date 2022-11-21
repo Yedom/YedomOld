@@ -4,6 +4,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * Model of sending code (to confirm email)
+ */
 @Data
 public class Code {
 
