@@ -64,8 +64,12 @@
         }
         .btn-primary {
             background: transparent;
-            margin-top: 40px;
             border-style: none !important;
+        }
+        .btn-desc {
+            position: absolute;
+            top: 80%;
+            left: 3%;
         }
         @media only screen and (max-width: 600px) {
             h1 {
@@ -120,7 +124,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_1.title}">Course Constructor</h4>
                             <p class="descriptions" th:text="#{index.f_1.desc}">Create your own course!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -132,7 +136,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_2.title}">Smart Search System</h4>
                             <p class="descriptions" th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -144,7 +148,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_3.title}">Profile/Friends System</h4>
                             <p class="descriptions" th:text="#{index.f_3.desc}">Follow me!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -161,7 +165,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_4.title}">AR</h4>
                             <p class="descriptions" th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
-                            <button th:text="#{index.go}" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -173,7 +177,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_5.title}">Organizations</h4>
                             <p class="descriptions" th:text="#{index.f_5.desc}">Create your organization!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -185,7 +189,7 @@
                         <div class="card-img-overlay">
                             <h4 class="descriptions" th:text="#{index.f_6.title}">Profile Settings</h4>
                             <p class="descriptions" th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-primary" type="button">Перейти&nbsp;
+                            <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
