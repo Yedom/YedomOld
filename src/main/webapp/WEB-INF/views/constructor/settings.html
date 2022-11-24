@@ -13,14 +13,15 @@
     <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
     <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/collapse.css" th:href="@{/resources/css/collapse.css}">
 
     <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+    <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -39,10 +40,21 @@
     <br />
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div th:replace="../resources/common/modules.html :: modules-fragment" w3-include-html="../../resources/common/modules.html"></div>
-        <div class="col-7 col-sm-9 bg unselectable">
+        <div th:fragment="modules-fragment" class="col-5 col-sm-3">
+            <div class="col-md-12 bg unselectable">
+                <div class="main mx-auto text-center" id="modules-container">
+                    <!-- Modules from modules.html updated by modules.js -->
+                    <script th:inline="javascript">
+                        let hash = /*[[${course.hash}]]*/ '';
+                        let activeIDS = new Set(/*[[${activeModules}]]*/ []);
+                        updateModules();
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="col-7 col-sm-8 bg unselectable">
             <div class="main mx-auto text-center">
                 <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
                 <input type="button" id="delBtn" onclick="deleteCourse()" class="btn btn-red"
@@ -68,21 +80,12 @@
 
 <script>
     w3.includeHTML();
-
-    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
-        console.log('particles-js loaded!');
-    });
 </script>
+
 <script th:inline="javascript">
-    let hash = /*[[${course.hash}]]*/ '';
     let deleting = /*[[#{draft_courses.deleting}]]*/ 'Удаление...';
 
     $('#settings').addClass('btn-primary');
-
-    function clickButton(value) {
-        if(hash === '') window.location = '/constructor/';
-        window.location = '/constructor/' + hash + '/' + value;
-    }
 
     function deleteCourse() {
         $('#delBtn').val(deleting);

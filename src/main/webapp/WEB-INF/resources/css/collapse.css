@@ -7,12 +7,12 @@ h1, h2, h3, h4, h5 {
     cursor: pointer;
     padding: 5px;
     width: 100%;
-    border: none;
+    border: 1px solid black;
     text-align: left;
     outline: none;
     font-size: 15px;
 }
-.active, .collapsible:hover {
+.active, .collapsible:hover, .collapsible-dis:hover {
     background-color: #ccc;
 }
 .content-collapse {
@@ -21,7 +21,7 @@ h1, h2, h3, h4, h5 {
     overflow: hidden;
     background-color: #f1f1f1;
 }
-#addModule, #addLesson {
+.addModuleInput, .addLessonInput {
     display: inline-block;
     width: 100%;
     text-align: center;
@@ -31,23 +31,26 @@ h1, h2, h3, h4, h5 {
     font-size: 30px;
     vertical-align: middle;
 }
-#last-module > #addModule, #last-module > #addLesson {
+.plus-model > .addModuleInput, .plus-lesson > .addLesson {
     text-align: center;
 }
-.add-icon, .save-icon, .delete-icon {
+.save-icon, .delete-icon {
     padding-top: 10px;
 }
 .add-module {
     width: 95%;
     align-content: center;
 }
-#last {
+#current {
     padding-bottom: 5px;
     padding-top: 5px;
 }
-#addModule:hover {
+.addModuleInput:hover {
     color: green;
 }
-#addLesson:hover {
+.addLessonInput:hover {
     color: green;
+}
+.lesson {
+    padding-top: 2px;
 }

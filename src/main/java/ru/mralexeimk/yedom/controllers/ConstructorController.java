@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.config.configs.DraftCoursesConfig;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
@@ -18,6 +19,7 @@ import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.database.repositories.TagRepository;
 import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.DraftCourse;
+import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.DraftCoursesService;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
@@ -27,6 +29,7 @@ import ru.mralexeimk.yedom.utils.validators.DraftCourseValidator;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,19 +43,17 @@ public class ConstructorController {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final CoursesConfig coursesConfig;
-    private final DraftCoursesConfig draftCoursesConfig;
     private final OrganizationsService organizationsService;
     private final DraftCoursesService draftCoursesService;
     private final DraftCourseValidator draftCourseValidator;
     private final TagRepository tagRepository;
 
-    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, DraftCoursesConfig draftCoursesConfig, OrganizationsService organizationsService, DraftCoursesService draftCoursesService, DraftCourseValidator draftCourseValidator, TagRepository tagRepository) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, DraftCoursesService draftCoursesService, DraftCourseValidator draftCourseValidator, TagRepository tagRepository) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.coursesConfig = coursesConfig;
-        this.draftCoursesConfig = draftCoursesConfig;
         this.organizationsService = organizationsService;
         this.draftCoursesService = draftCoursesService;
         this.draftCourseValidator = draftCourseValidator;
@@ -106,11 +107,25 @@ public class ConstructorController {
         return "constructor/index";
     }
 
+    private void addActiveModules(Model model, String activeModules) {
+        List<Integer> activeModulesList = new ArrayList<>();
+        try {
+            if (activeModules != null) {
+                for (int i : utilsService.splitToListInt(activeModules)) {
+                    if (i >= 0) activeModulesList.add(i);
+                }
+            }
+        } catch (Exception ignored) {}
+        model.addAttribute("activeModules", activeModulesList);
+    }
+
     /**
      * Open draft course constructor page
      */
     @GetMapping("/{hash}")
-    public String draftCourse(Model model, @PathVariable String hash,
+    public String draftCourse(Model model,
+                              @RequestParam(required = false, name = "active") String activeModules,
+                              @PathVariable String hash,
                               HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
@@ -138,6 +153,8 @@ public class ConstructorController {
             }
         } catch (Exception ignored) {}
 
+        addActiveModules(model, activeModules);
+
         model.addAttribute("tagsCountCourses", tagsCountCourses);
 
         return "constructor/draftcourse";
@@ -147,7 +164,9 @@ public class ConstructorController {
      * Open draft courses edit page
      */
     @GetMapping("/{hash}/edit")
-    public String draftCourseEdit(Model model, @PathVariable String hash,
+    public String draftCourseEdit(Model model,
+                                  @RequestParam(required = false, name = "active") String activeModules,
+                                  @PathVariable String hash,
                                       HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
@@ -160,6 +179,8 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
+        addActiveModules(model, activeModules);
+
         model.addAttribute("course", draftCourseEntity);
 
         return "constructor/edit";
@@ -169,8 +190,10 @@ public class ConstructorController {
      * Open draft courses settings page
      */
     @GetMapping("/{hash}/settings")
-    public String draftCourseSettings(Model model, @PathVariable String hash,
-                              HttpSession session) {
+    public String draftCourseSettings(Model model,
+                                      @RequestParam(required = false, name = "active") String activeModules,
+                                      @PathVariable String hash,
+                                        HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
@@ -181,6 +204,8 @@ public class ConstructorController {
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        addActiveModules(model, activeModules);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -191,8 +216,10 @@ public class ConstructorController {
      * Open draft courses publication page
      */
     @GetMapping("/{hash}/public")
-    public String draftCoursePublic(Model model, @PathVariable String hash,
-                              HttpSession session) {
+    public String draftCoursePublic(Model model,
+                                    @RequestParam(required = false, name = "active") String activeModules,
+                                    @PathVariable String hash,
+                                    HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
 
@@ -203,6 +230,8 @@ public class ConstructorController {
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        addActiveModules(model, activeModules);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -262,13 +291,14 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
+        draftCoursesService.removeCourse(hash);
         draftCourseRepository.delete(draftCourseEntity);
 
         return "redirect:/constructor/";
     }
 
     /**
-     * User course avatar
+     * Upload course avatar
      */
     @PostMapping("/{hash}/uploadAvatar")
     public @ResponseBody ResponseEntity<Object> uploadAvatar(@RequestBody String data,
@@ -307,85 +337,154 @@ public class ConstructorController {
     }
 
     /**
-     * Get draft course modules or/and add new module
+     * Get modules by course hash
      */
-    @GetMapping(value = "/{hash}/modules", produces = "application/json; charset=UTF-8")
-    @ResponseBody
-    public String getCourseModules(@RequestParam(required = false, name = "del", defaultValue = "false") boolean del,
-                                   @RequestParam(required = false, name = "module") String module,
-                                   @RequestParam(required = false, name = "lesson") String lesson,
-                                   @PathVariable String hash, HttpSession session) {
-        StringBuilder htmlResponse = new StringBuilder();
+    @GetMapping(value = "/{hash}/modules")
+    public String getCourseModules(Model model, @PathVariable String hash,
+                                         HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return check;
-        String bad = utilsService.jsonToString(htmlResponse, "modules");
 
         User user = (User) session.getAttribute("user");
         UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
-        if(userEntity == null) return bad;
+        if(userEntity == null) return "redirect:/constructor";
 
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
-            return bad;
+            return "redirect:/constructor";
 
-        var modules = draftCoursesService.getModulesFromString(draftCourseEntity.getModules());
-        if(module != null && !module.isEmpty()) {
-            if(!del && module.length() > draftCoursesConfig.getMaxModuleAndLessonNameLength() ||
-                    utilsService.containsSymbols(module, draftCoursesConfig.getModulesDisabledSymbols())) {
-                return bad;
-            }
-            List<String> lessons = modules.getOrDefault(module, new ArrayList<>());
-            if (lesson != null && !lesson.isEmpty()) {
-                if(!del && lesson.length() > draftCoursesConfig.getMaxModuleAndLessonNameLength() ||
-                        utilsService.containsSymbols(lesson, draftCoursesConfig.getModulesDisabledSymbols())) {
-                    return bad;
-                }
-                if(!del) {
-                    lessons.add(lesson);
-                    if (lessons.size() >= draftCoursesConfig.getMaxLessons())
-                        return bad;
-                }
-                else {
-                    lessons.remove(lesson);
-                }
-            }
-            else {
-                if(del) {
-                    modules.remove(module);
-                }
-            }
-            if(!del) {
-                modules.put(module, lessons);
-                if (modules.size() >= draftCoursesConfig.getMaxModules())
-                    return bad;
-            }
-        }
+        model.addAttribute("modules",
+                draftCoursesService.getModules(draftCourseEntity));
 
-        for(String key : modules.keySet()) {
-            htmlResponse.append("<button type='button' class='collapsible' style='width: 80%'>");
-            htmlResponse.append(key);
-            htmlResponse.append("</button>&nbsp;");
-            htmlResponse.append("<i onclick='delModule(\"").append(key).append("\")' class='material-icons centered-icon delete-icon'>delete</i>");
-            htmlResponse.append("<div class='content-collapse'>");
-            for(String lessonName : modules.get(key)) {
-                htmlResponse.append("* <button id='").append(lessonName).
-                        append("' ").append("onclick='loadLesson('").
-                        append(key).append("':").append(lessonName).
-                        append(")' type='button'>");
-                htmlResponse.append(lessonName);
-                htmlResponse.append("</button>");
-            }
-            htmlResponse.append("<button id='addLesson' onclick='addLesson()' type='button' class='collapsible'>");
-            htmlResponse.append("<i class='material-icons add-icon'>add</i>");
-            htmlResponse.append("</button>");
-            htmlResponse.append("</div>");
-        }
+        return "constructor/modules";
+    }
 
-        draftCourseEntity.setModules(draftCoursesService.getModulesFromMap(modules));
-        draftCourseRepository.save(draftCourseEntity);
+    @GetMapping(value = "/{hash}/{moduleId}/{lessonId}")
+    public String getLesson(Model model, @PathVariable String hash,
+                            @RequestParam(required = false, name = "active") String activeModules,
+                            @PathVariable int moduleId, @PathVariable int lessonId,
+                            HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if (check != null) return check;
 
-        return utilsService.jsonToString(htmlResponse, "modules");
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if (userEntity == null) return "redirect:/constructor";
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if (draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
+            return "redirect:/constructor";
+
+        addActiveModules(model, activeModules);
+        model.addAttribute("selected", moduleId + "-" + lessonId);
+        model.addAttribute("course", draftCourseEntity);
+
+        return "constructor/lesson";
+    }
+
+    /**
+     * Post request to delete module
+     */
+    @PostMapping("/{hash}/deleteModule")
+    public @ResponseBody ResponseEntity<Object> deleteModule(@PathVariable String hash,
+                               @RequestParam(value = "moduleId") int moduleId,
+                               HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        draftCoursesService.deleteModule(hash, moduleId);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    /**
+     * Post request to add module by name
+     */
+    @PostMapping("/{hash}/addModule")
+    public @ResponseBody ResponseEntity<Object> addModule(@PathVariable String hash,
+                                                             @RequestParam(value = "module") String moduleName,
+                                                             HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));;
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        draftCoursesService.addModule(hash, moduleName);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    /**
+     * Post request to delete lesson by id
+     */
+    @PostMapping("/{hash}/deleteLesson")
+    public @ResponseBody ResponseEntity<Object> deleteLesson(@PathVariable String hash,
+                                                             @RequestParam(value = "moduleId") int moduleId,
+                                                             @RequestParam(value = "lessonId") int lessonId,
+                                                             HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        draftCoursesService.deleteLesson(hash, moduleId, lessonId);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    /**
+     * Post request to add lesson by name
+     */
+    @PostMapping("/{hash}/addLesson")
+    public @ResponseBody ResponseEntity<Object> addLesson(@PathVariable String hash,
+                                                         @RequestParam(value = "moduleId") int moduleId,
+                                                         @RequestParam(value = "lesson") String lessonName,
+                                                         HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        draftCoursesService.addLesson(hash, moduleId, lessonName);
+
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 }

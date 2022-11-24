@@ -17,5 +17,6 @@ public class DraftCoursesConfig {
     private int maxModuleAndLessonNameLength;
     private int maxModules;
     private int maxLessons;
-    private String modulesDisabledSymbols;
+    private String disabledSymbols;
+    private int saveToDBPeriodMinutes;
 }

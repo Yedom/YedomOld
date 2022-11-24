@@ -283,13 +283,29 @@ public class UtilsService {
         return createdOn.toString().substring(0, 10);
     }
 
+    /**
+     * Split string and add to list of string
+     */
+    public List<String> splitToListString(String s, String delimiter) {
+        return Arrays.stream(s.split(delimiter))
+                .filter(i -> !i.isEmpty())
+                .collect(Collectors.toList());
+    }
 
     /**
      * Split string by comma and add to list of string
      */
     public List<String> splitToListString(String s) {
-        return Arrays.stream(s.split(","))
+        return splitToListString(s, ",");
+    }
+
+    /**
+     * Split string and add to list of integer
+     */
+    public List<Integer> splitToListInt(String s, String delimiter) {
+        return Arrays.stream(s.split(delimiter))
                 .filter(i -> !i.isEmpty())
+                .map(Integer::parseInt)
                 .collect(Collectors.toList());
     }
 
@@ -297,10 +313,7 @@ public class UtilsService {
      * Split string by comma and add to list of integer
      */
     public List<Integer> splitToListInt(String s) {
-        return Arrays.stream(s.split(","))
-                .filter(i -> !i.isEmpty())
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        return splitToListInt(s, ",");
     }
 
     public String listToString(List<String> list) {

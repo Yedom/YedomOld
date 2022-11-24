@@ -1,0 +1,34 @@
+<h3 th:text="#{draft_courses.modules}">Modules</h3>
+<div class="modules">
+    <div class="module" th:each="module,index : ${modules}">
+        <button type="button" class="collapsible"
+                th:classappend="'collapsible-' + ${index.index}">
+            [[${module.name}]] <i th:attr="onclick=|event.stopPropagation();deleteModule('${index.index}')|"
+                                  style="padding-top: unset;"
+                                  class='material-icons centered-icon delete-icon dis-point-events'>delete</i>
+        </button>
+        <div class="content-collapse lessons" th:classappend="'lessons-' + ${index.index}">
+            <div class="lesson" th:each="lesson,index2 : ${module.lessons}">
+                <button type="button" class="collapsible-dis"
+                        th:attr="onclick=|openLesson('${index.index}', '${index2.index}')|"
+                        th:classappend="'lesson-' + ${index.index} + '-' + ${index2.index}"
+                        style="border: none;">
+                    [[${lesson.name}]]  <i th:attr="onclick=|event.stopPropagation();deleteLesson('${index.index}', '${index2.index}')|"
+                                           style="padding-top: unset;"
+                                           class='material-icons centered-icon delete-icon dis-point-events'>delete</i>
+                </button>
+            </div>
+            <div class="plus-lesson">
+                <button th:attr="onclick=|addLessonInput('${module.name}', '${index.index}')|"
+                        style="border: none;" type="button" class="addLessonInput collapsible-dis">
+                    <i class="material-icons add-icon">add</i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="plus-model">
+    <button onclick="addModuleInput()" type="button" class="addModuleInput collapsible-dis">
+        <i class="material-icons add-icon">add</i>
+    </button>
+</div>
