@@ -17,7 +17,6 @@
     <!-- Scripts -->
     <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
     <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
@@ -63,6 +62,7 @@
                     <option th:each="option : ${options}" th:value="${option.value}" th:text="${option.text}">Username</option>
                 </select>
                 <br />
+                <h4 th:text="#{course.tags.recommend}">Recommended tags:</h4>
                 <div id="tagsToAdd" class="unselectable">
                 </div>
                 <br />
@@ -95,10 +95,6 @@
 
 <script>
     w3.includeHTML();
-
-    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
-        console.log('particles-js loaded!');
-    });
 </script>
 
 <script src="../../resources/js/tagsRecommendation.js" th:src="@{/resources/js/tagsRecommendation.js}" rel="stylesheet"></script>

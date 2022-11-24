@@ -192,9 +192,7 @@ public class DraftCoursesService {
                     res.add(new Module(spl[0]));
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ignored) {}
         return res;
     }
 

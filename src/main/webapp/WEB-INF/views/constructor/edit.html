@@ -21,6 +21,7 @@
   <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
   <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
   <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
   <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
 
   <style>
@@ -77,6 +78,7 @@
           <br/>
           <textarea th:inline="text" class="textarea-add" rows="5" name="tags" id="tags">[[${course.tags.replaceAll('@', ', ')}]]</textarea>
           <br />
+          <h4 th:text="#{course.tags.recommend}">Recommended tags:</h4>
           <div id="tagsToAdd" class="unselectable">
           </div>
           <br />
