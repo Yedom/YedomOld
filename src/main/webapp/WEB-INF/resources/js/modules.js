@@ -9,7 +9,8 @@ jQuery.fn.exists = function() { return this.length > 0; }
  */
 function clickButton(value) {
     if(hash === '') window.location = '/constructor/';
-    window.location = '/constructor/' + hash + '/' + value + '?active=' + Array.from(activeIDS).join(',');
+    if(value !== '') value = '/' + value;
+    window.location = '/constructor/' + hash + value + '?active=' + Array.from(activeIDS).join(',');
 }
 
 /**
@@ -63,8 +64,8 @@ function collapseAll() {
  * Add 'active' class to lesson (lesson.html page)
  */
 function selectActive() {
-    if(typeof selected !== 'undefined') {
-        let coll = document.getElementsByClassName("lesson-" + selected);
+    if(typeof MODULE_ID !== 'undefined' && typeof LESSON_ID !== 'undefined') {
+        let coll = document.getElementsByClassName("lesson-" + MODULE_ID + "-" + LESSON_ID);
 
         for (let i = 0; i < coll.length; i++) {
             coll[i].classList.add("active");
@@ -206,6 +207,9 @@ function deleteModule(moduleId) {
         headers: {'Content-Type': 'application/json'},
     }).then(response => {
         if (response.ok) {
+            if(typeof MODULE_ID !== 'undefined' && +moduleId === MODULE_ID) {
+                clickButton('');
+            }
             updateModules();
         }
     });
@@ -220,6 +224,10 @@ function deleteLesson(moduleId, lessonId) {
         headers: {'Content-Type': 'application/json'},
     }).then(response => {
         if (response.ok) {
+            if(typeof MODULE_ID !== 'undefined' && typeof LESSON_ID !== 'undefined' &&
+                +moduleId === MODULE_ID && +lessonId === LESSON_ID) {
+                clickButton('');
+            }
             updateModules();
         }
     });

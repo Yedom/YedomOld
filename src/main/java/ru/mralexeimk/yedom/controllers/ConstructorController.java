@@ -107,12 +107,13 @@ public class ConstructorController {
         return "constructor/index";
     }
 
-    private void addActiveModules(Model model, String activeModules) {
+    private void addActiveModules(Model model, String activeModules, DraftCourseEntity draftCourseEntity) {
         List<Integer> activeModulesList = new ArrayList<>();
         try {
             if (activeModules != null) {
+                int maxModules = draftCoursesService.getModules(draftCourseEntity).size();
                 for (int i : utilsService.splitToListInt(activeModules)) {
-                    if (i >= 0) activeModulesList.add(i);
+                    if (i >= 0 && i < maxModules) activeModulesList.add(i);
                 }
             }
         } catch (Exception ignored) {}
@@ -153,7 +154,7 @@ public class ConstructorController {
             }
         } catch (Exception ignored) {}
 
-        addActiveModules(model, activeModules);
+        addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("tagsCountCourses", tagsCountCourses);
 
@@ -179,7 +180,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules);
+        addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -205,7 +206,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules);
+        addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -231,7 +232,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(draftCoursesService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules);
+        addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -364,7 +365,7 @@ public class ConstructorController {
     @GetMapping(value = "/{hash}/{moduleId}/{lessonId}")
     public String getLesson(Model model, @PathVariable String hash,
                             @RequestParam(required = false, name = "active") String activeModules,
-                            @PathVariable int moduleId, @PathVariable int lessonId,
+                            @PathVariable String moduleId, @PathVariable String lessonId,
                             HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if (check != null) return check;
@@ -379,8 +380,20 @@ public class ConstructorController {
         if (draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return "redirect:/constructor";
 
-        addActiveModules(model, activeModules);
-        model.addAttribute("selected", moduleId + "-" + lessonId);
+        addActiveModules(model, activeModules, draftCourseEntity);
+        try {
+            int mid = Integer.parseInt(moduleId);
+            int lid = Integer.parseInt(lessonId);
+
+            LinkedList<Module> modules = draftCoursesService.getModules(draftCourseEntity);
+            if(mid >= modules.size()) throw new Exception();
+            if(lid >= modules.get(mid).getLessons().size()) throw new Exception();
+
+            model.addAttribute("moduleId", mid);
+            model.addAttribute("lessonId", lid);
+        } catch (Exception ex) {
+            return "redirect:/constructor/" + hash;
+        }
         model.addAttribute("course", draftCourseEntity);
 
         return "constructor/lesson";
@@ -391,7 +404,7 @@ public class ConstructorController {
      */
     @PostMapping("/{hash}/deleteModule")
     public @ResponseBody ResponseEntity<Object> deleteModule(@PathVariable String hash,
-                               @RequestParam(value = "moduleId") int moduleId,
+                               @RequestParam(value = "moduleId") String moduleId,
                                HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));;
@@ -406,7 +419,11 @@ public class ConstructorController {
         if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        draftCoursesService.deleteModule(hash, moduleId);
+        try {
+            draftCoursesService.deleteModule(hash, Integer.parseInt(moduleId));
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
@@ -441,8 +458,8 @@ public class ConstructorController {
      */
     @PostMapping("/{hash}/deleteLesson")
     public @ResponseBody ResponseEntity<Object> deleteLesson(@PathVariable String hash,
-                                                             @RequestParam(value = "moduleId") int moduleId,
-                                                             @RequestParam(value = "lessonId") int lessonId,
+                                                             @RequestParam(value = "moduleId") String moduleId,
+                                                             @RequestParam(value = "lessonId") String lessonId,
                                                              HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -457,7 +474,11 @@ public class ConstructorController {
         if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        draftCoursesService.deleteLesson(hash, moduleId, lessonId);
+        try {
+            draftCoursesService.deleteLesson(hash, Integer.parseInt(moduleId), Integer.parseInt(lessonId));
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
@@ -467,7 +488,7 @@ public class ConstructorController {
      */
     @PostMapping("/{hash}/addLesson")
     public @ResponseBody ResponseEntity<Object> addLesson(@PathVariable String hash,
-                                                         @RequestParam(value = "moduleId") int moduleId,
+                                                         @RequestParam(value = "moduleId") String moduleId,
                                                          @RequestParam(value = "lesson") String lessonName,
                                                          HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
@@ -483,7 +504,11 @@ public class ConstructorController {
         if(draftCourseEntity == null || draftCoursesService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        draftCoursesService.addLesson(hash, moduleId, lessonName);
+        try {
+            draftCoursesService.addLesson(hash, Integer.parseInt(moduleId), lessonName);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
 
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }

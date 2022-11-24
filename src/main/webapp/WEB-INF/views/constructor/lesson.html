@@ -49,7 +49,8 @@
           <script th:inline="javascript">
             let hash = /*[[${course.hash}]]*/ '';
             let activeIDS = new Set(/*[[${activeModules}]]*/ []);
-            let selected = /*[[${selected}]]*/ '';
+            let MODULE_ID = /*[[${moduleId}]]*/ -1;
+            let LESSON_ID = /*[[${lessonId}]]*/ -1;
             updateModules();
           </script>
         </div>
