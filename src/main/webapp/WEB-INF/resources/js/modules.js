@@ -1,4 +1,3 @@
-let placeholderModule = /*[[#{draft_courses.module.add.name]]*/ '';
 let disabledSymbols = /*[[${@environment.getProperty('draft-courses.modules-disabled-symbols')}]]*/ "|:,";
 let maxLength = /*[[${@environment.getProperty('draft-courses.max-module-and-lesson-name-length')}]]*/ 50;
 
@@ -142,7 +141,7 @@ function addLessonInput(moduleName, moduleId) {
 
     lessons.html(lessons.html() + "<div class='lesson' id='current'>" +
         "<input style='padding: 2px; width: 100%;' type='text' id='lesson-input' maxlength='"+maxLength+"' " +
-        "placeholder='"+placeholderModule+"' class='add-lesson'/>  " +
+        "placeholder='"+placeholderLesson+"' class='add-lesson'/>  " +
         "<i onclick='addLesson(\""+moduleId+"\")' class='material-icons centered-icon save-icon'>save</i>&nbsp;&nbsp;" +
         "<i onclick='cancelAdd()' class='material-icons centered-icon delete-icon'>delete</i>" +
         "</div>");

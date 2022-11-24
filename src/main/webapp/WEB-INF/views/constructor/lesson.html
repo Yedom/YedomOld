@@ -49,6 +49,8 @@
           <script th:inline="javascript">
             let hash = /*[[${course.hash}]]*/ '';
             let activeIDS = new Set(/*[[${activeModules}]]*/ []);
+            let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('draft_courses.module.add.name')}]]*/ 'Название модуля';
+            let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('draft_courses.lesson.add.name')}]]*/ 'Название урока';
             let MODULE_ID = /*[[${moduleId}]]*/ -1;
             let LESSON_ID = /*[[${lessonId}]]*/ -1;
             updateModules();
