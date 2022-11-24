@@ -21,15 +21,6 @@
     <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
     <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
     <script src="../../resources/js/bootstrap.bundle.min.js" th:src="@{/resources/js/bootstrap.bundle.min.js}" rel="stylesheet"></script>
-
-    <style>
-        * {
-            box-sizing: unset !important;
-        }
-        .col {
-            padding: 0 !important;
-        }
-    </style>
 </head>
 <body class="index-page sidebar-collapse bg">
 
@@ -51,8 +42,8 @@
         <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
 
         <!-- Friends -->
-        <div class="row">
-            <div class="col col-2" th:each="user : ${users}">
+        <div class="d-flex align-content-end flex-wrap justify-content-around">
+            <div class="" th:each="user : ${users}">
                 <div class="card-plain card-blog card">
                     <div class="avatar avatar-wrapper" style="width: 150px; height: 150px;">
                         <a  th:href="@{'/profile/' + ${user.username}}">
