@@ -17,11 +17,11 @@ public class ErrorsController {
             return null;
         }
 
-        return "/";
+        return "redirect:/";
     }
 
     @ExceptionHandler(Exception.class)
     public String handleException() {
-        return "/";
+        return "redirect:/";
     }
 }

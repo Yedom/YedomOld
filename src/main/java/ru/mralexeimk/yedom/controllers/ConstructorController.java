@@ -32,11 +32,11 @@ import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Controller for courses constructor (user's draft courses)
@@ -469,12 +469,11 @@ public class ConstructorController {
      * Upload video to lesson
      */
     @PostMapping("/{hash}/{moduleId}/{lessonId}")
-    public @ResponseBody ResponseEntity<Object> uploadVideo(@RequestBody String data,
+    public @ResponseBody ResponseEntity<Object> uploadVideo(@RequestBody byte[] bytes,
                                                             @PathVariable String hash,
                                                             @PathVariable String moduleId,
                                                             @PathVariable String lessonId,
                                                             HttpSession session) {
-        System.out.println(data);
         String check = utilsService.preventUnauthorizedAccess(session);
         if (check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
@@ -499,9 +498,22 @@ public class ConstructorController {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
 
+        try {
+            File file = new File(constructorConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                outputStream.write(bytes);
+                outputStream.flush();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
 
-
-        return new ResponseEntity<>(HttpStatus.valueOf(500));
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
     /**

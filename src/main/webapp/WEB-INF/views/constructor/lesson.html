@@ -105,6 +105,7 @@
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script th:inline="javascript">
+  let upload = /*[[#{constructor.upload_video}]]*/ 'Загрузить видео';
   let uploading = /*[[#{constructor.uploading}]]*/ 'Загрузка...';
 
   w3.includeHTML();
@@ -127,17 +128,15 @@
   function uploadVideo() {
     $('#upload-video-label').text(uploading);
 
-    let formData = new FormData();
-    formData.append('file', $('#upload-video')[0].files[0]);
-
     fetch('/constructor/' + hash + '/' + MODULE_ID + '/' + LESSON_ID, {
       method: 'POST',
-      body: formData
+      body: $('#upload-video')[0].files[0]
     }).then(response => {
       if (response.ok) {
         window.location.reload();
       } else {
         $('#error').removeAttr('hidden');
+        $('#upload-video-label').text(upload);
       }
     });
   }
