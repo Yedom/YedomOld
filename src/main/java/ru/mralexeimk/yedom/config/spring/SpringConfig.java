@@ -1,5 +1,7 @@
-package ru.mralexeimk.yedom.config;
+package ru.mralexeimk.yedom.config.spring;
 
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,8 +11,14 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
@@ -26,6 +34,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executors;
 
 /**
  * Spring configuration
@@ -33,6 +42,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("ru.mralexeimk.yedom")
 @EnableWebMvc
+@EnableWebSecurity
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
 
@@ -146,6 +156,19 @@ public class SpringConfig implements WebMvcConfigurer {
         messageSource.setBasename("classpath:language/messages");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
+    }
+
+    /**
+     * Redirect 'http' to 'https'
+     */
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http.cors().and().csrf().disable()
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeRequests(authorize ->
+                        authorize.anyRequest().permitAll())
+                .build();
     }
 
     @Bean

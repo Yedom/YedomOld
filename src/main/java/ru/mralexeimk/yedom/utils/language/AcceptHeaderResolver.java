@@ -27,20 +27,24 @@ public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
     }
 
     @Override
-    public @NonNull Locale resolveLocale(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if(session != null) {
-            String check = utilsService.preventUnauthorizedAccess(session);
-            if(check == null) {
-                User user = (User) session.getAttribute("user");
-                String lang = user.getSettings().getLang();
-                if(!lang.equals("auto")) return new Locale(lang);
+    public Locale resolveLocale(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                String check = utilsService.preventUnauthorizedAccess(session);
+                if (check == null) {
+                    User user = (User) session.getAttribute("user");
+                    String lang = user.getSettings().getLang();
+                    if (!lang.equals("auto")) return new Locale(lang);
+                }
             }
-        }
-        if (!StringUtils.hasLength(request.getHeader("Accept-Language"))) {
+            if (!StringUtils.hasLength(request.getHeader("Accept-Language"))) {
+                return Locale.getDefault();
+            }
+            List<Locale.LanguageRange> list = Locale.LanguageRange.parse(request.getHeader("Accept-Language"));
+            return Locale.lookup(list, LOCALES);
+        } catch (Exception e) {
             return Locale.getDefault();
         }
-        List<Locale.LanguageRange> list = Locale.LanguageRange.parse(request.getHeader("Accept-Language"));
-        return Locale.lookup(list, LOCALES);
     }
 }

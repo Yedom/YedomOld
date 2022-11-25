@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.DraftCoursesConfig;
+import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
@@ -17,21 +17,21 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class DraftCoursesService {
+public class ConstructorService {
     private final UtilsService utilsService;
     private final DraftCourseRepository draftCourseRepository;
     private final OrganizationsService organizationsService;
-    private final DraftCoursesConfig draftCoursesConfig;
+    private final ConstructorConfig constructorConfig;
 
     @Getter
     @Setter
     private ConcurrentHashMap<String, LinkedList<Module>> modulesByHash = new ConcurrentHashMap<>();
 
-    public DraftCoursesService(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationsService organizationsService, DraftCoursesConfig draftCoursesConfig) {
+    public ConstructorService(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationsService organizationsService, ConstructorConfig constructorConfig) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
         this.organizationsService = organizationsService;
-        this.draftCoursesConfig = draftCoursesConfig;
+        this.constructorConfig = constructorConfig;
     }
 
     /**
@@ -39,9 +39,9 @@ public class DraftCoursesService {
      */
     public void addModule(String hash, String moduleName) {
         try {
-            if (moduleName.length() > draftCoursesConfig.getMaxModuleAndLessonNameLength() ||
-                    utilsService.containsSymbols(moduleName, draftCoursesConfig.getDisabledSymbols()) ||
-                    modulesByHash.get(hash).size() >= draftCoursesConfig.getMaxModules()) {
+            if (moduleName.length() > constructorConfig.getMaxModuleAndLessonNameLength() ||
+                    utilsService.containsSymbols(moduleName, constructorConfig.getDisabledSymbols()) ||
+                    modulesByHash.get(hash).size() >= constructorConfig.getMaxModules()) {
                 return;
             }
             if (modulesByHash.containsKey(hash)) {
@@ -89,10 +89,10 @@ public class DraftCoursesService {
      */
     public void addLesson(String hash, int moduleIndex, String lessonName) {
         try {
-            if (lessonName.length() > draftCoursesConfig.getMaxModuleAndLessonNameLength() ||
-                    utilsService.containsSymbols(lessonName, draftCoursesConfig.getDisabledSymbols()) ||
+            if (lessonName.length() > constructorConfig.getMaxModuleAndLessonNameLength() ||
+                    utilsService.containsSymbols(lessonName, constructorConfig.getDisabledSymbols()) ||
                     modulesByHash.get(hash).get(moduleIndex).getLessons().size()
-                            >= draftCoursesConfig.getMaxLessons()) {
+                            >= constructorConfig.getMaxLessons()) {
                 return;
             }
             addCourseIfNotExist(hash);
@@ -141,7 +141,7 @@ public class DraftCoursesService {
         for(DraftCourseEntity draftCourseEntity : draftCourseRepository.findAll()) {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             Timestamp addedOn = draftCourseEntity.getAddedOn();
-            if(now.getTime() - addedOn.getTime() > 1000L * 60 * 60 * 24 * draftCoursesConfig.getDaysAlive()) {
+            if(now.getTime() - addedOn.getTime() > 1000L * 60 * 60 * 24 * constructorConfig.getDaysAlive()) {
                 draftCourseRepository.delete(draftCourseEntity);
                 System.out.println("DraftCourse was deleted: " + draftCourseEntity.getId());
             }
@@ -149,7 +149,7 @@ public class DraftCoursesService {
         new Thread(() -> {
             while(true) {
                 try {
-                    Thread.sleep(1000L * 60 * draftCoursesConfig.getSaveToDBPeriodMinutes());
+                    Thread.sleep(1000L * 60 * constructorConfig.getSaveToDBPeriodMinutes());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

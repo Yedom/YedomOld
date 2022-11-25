@@ -8,9 +8,10 @@ import org.springframework.context.annotation.Configuration;
  * Draft courses configuration
  */
 @Configuration
-@ConfigurationProperties(prefix = "draft-courses")
+@ConfigurationProperties(prefix = "constructor")
 @Data
-public class DraftCoursesConfig {
+public class ConstructorConfig {
+    private String videosPath;
     private int maxPerUser;
     private int maxPerOrganization;
     private int daysAlive;

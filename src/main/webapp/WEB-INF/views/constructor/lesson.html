@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
   <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
   <link rel="stylesheet" href="../../resources/css/collapse.css" th:href="@{/resources/css/collapse.css}">
+  <link rel="stylesheet" href="../../resources/css/mediaelementplayer.min.css" th:href="@{/resources/css/mediaelementplayer.min.css}">
 
   <!-- Scripts -->
   <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
@@ -22,6 +23,7 @@
   <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
   <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
   <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/mediaelement-and-player.min.js" th:src="@{/resources/js/mediaelement-and-player.min.js}"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -49,8 +51,8 @@
           <script th:inline="javascript">
             let hash = /*[[${course.hash}]]*/ '';
             let activeIDS = new Set(/*[[${activeModules}]]*/ []);
-            let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('draft_courses.module.add.name')}]]*/ 'Название модуля';
-            let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('draft_courses.lesson.add.name')}]]*/ 'Название урока';
+            let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('constructor.module.add.name')}]]*/ 'Название модуля';
+            let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('constructor.lesson.add.name')}]]*/ 'Название урока';
             let MODULE_ID = /*[[${moduleId}]]*/ -1;
             let LESSON_ID = /*[[${lessonId}]]*/ -1;
             updateModules();
@@ -63,10 +65,26 @@
         <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
         <br />
 
-        <!-- Video player -->
-        <video id="video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="80%" data-setup="{}">
-          <source src="../../resources/videos/example.mp4" th:src="@{/resources/videos/example.mp4}" type="video/mp4">
-        </video>
+        <!-- Upload video button -->
+        <input style="display:none;" type="file" id="upload-video" name="upload-video"
+               class="btn main-button" accept="video/*" />
+        <label for="upload-video" id="upload-video-label" type="submit" class="btn main-button"
+               th:value="#{constructor.upload_video}">Загрузить видео</label>
+        <br />
+        <h5 id="error" hidden="hidden" style="color: red;" th:text="#{constructor.upload.error}">Ошибка загрузки видео-файла</h5>
+        <br />
+        <br />
+        <br />
+
+        <!-- MediaElementJS video player -->
+        <div class="mx-auto" style="width: 80%; height: 80%;">
+          <video id="player" width="100%" height="100%" preload="metadata">
+            <source type="video/mp4" src="../../resources/videos/example.mp4"
+                th:src="'/constructor/' + ${course.hash} + '/' + ${moduleId} + '/' + ${lessonId} + '/video'" />
+          </video>
+        </div>
+
+        <br />
         <br />
         <br />
         <br />
@@ -86,8 +104,65 @@
 
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
-<script>
+<script th:inline="javascript">
+  let uploading = /*[[#{constructor.uploading}]]*/ 'Загрузка...';
+
   w3.includeHTML();
+
+  // MediaElementJS video player with full screen icon
+  $('video').mediaelementplayer({
+    alwaysShowControls: true,
+    features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+    videoVolume: 'horizontal',
+    audioWidth: 400,
+    audioHeight: 30,
+    startVolume: 0.8,
+    toggleCaptionsButtonWhenOnlyOne: true,
+    iconSprite: /*[[@{/resources/svg/mejs-controls.svg}]]*/ '../../resources/svg/mejs-controls.svg'
+  });
+
+  /**
+   * Upload video by post request with fetch
+   */
+  function uploadVideo() {
+    $('#upload-video-label').text(uploading);
+
+    let formData = new FormData();
+    formData.append('file', $('#upload-video')[0].files[0]);
+
+    fetch('/constructor/' + hash + '/' + MODULE_ID + '/' + LESSON_ID, {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        $('#error').removeAttr('hidden');
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    let readURL = function(input) {
+      if (input.files && input.files[0]) {
+        let reader = new FileReader();
+
+        reader.onload = function () {
+          uploadVideo();
+        }
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    $("#upload-video").on('click', function() {
+      readURL(this);
+    });
+
+    $("#upload-video").on('change', function() {
+      readURL(this);
+    });
+  });
 </script>
 </body>
 </html>

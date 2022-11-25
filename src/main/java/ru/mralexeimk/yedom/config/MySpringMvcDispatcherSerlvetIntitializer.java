@@ -3,6 +3,7 @@ package ru.mralexeimk.yedom.config;
 import lombok.NonNull;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import ru.mralexeimk.yedom.config.spring.SpringConfig;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

@@ -1,13 +1,12 @@
 package ru.mralexeimk.yedom.controllers;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
-import ru.mralexeimk.yedom.config.configs.DraftCoursesConfig;
+import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
 import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
@@ -18,10 +17,8 @@ import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.services.OrganizationsService;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import ru.mralexeimk.yedom.utils.services.RolesService;
 import ru.mralexeimk.yedom.utils.services.TagsService;
-import ru.mralexeimk.yedom.utils.validators.DraftCourseValidator;
+import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -38,25 +35,25 @@ public class CoursesController {
     private final DraftCourseRepository draftCourseRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
-    private final DraftCourseValidator draftCourseValidator;
+    private final ConstructorValidator constructorValidator;
     private final TagRepository tagRepository;
     private final TagsService tagsService;
     private final OrganizationsService organizationsService;
     private final SmartSearchConfig smartSearchConfig;
     private final CoursesConfig coursesConfig;
-    private final DraftCoursesConfig draftCoursesConfig;
+    private final ConstructorConfig constructorConfig;
 
     @Autowired
-    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, DraftCourseValidator draftCourseValidator, TagRepository tagRepository, TagsService tagsService, OrganizationsService organizationsService, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig, DraftCoursesConfig draftCoursesConfig) {
+    public CoursesController(UtilsService utilsService, CourseRepository courseRepository, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, ConstructorValidator constructorValidator, TagRepository tagRepository, TagsService tagsService, OrganizationsService organizationsService, SmartSearchConfig smartSearchConfig, CoursesConfig coursesConfig, ConstructorConfig constructorConfig) {
         this.utilsService = utilsService;
         this.courseRepository = courseRepository;
         this.draftCourseRepository = draftCourseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
-        this.draftCourseValidator = draftCourseValidator;
+        this.constructorValidator = constructorValidator;
         this.tagRepository = tagRepository;
         this.tagsService = tagsService;
-        this.draftCoursesConfig = draftCoursesConfig;
+        this.constructorConfig = constructorConfig;
         this.organizationsService = organizationsService;
         this.smartSearchConfig = smartSearchConfig;
         this.coursesConfig = coursesConfig;
@@ -185,7 +182,7 @@ public class CoursesController {
                 utilsService.clearSpacesAroundSymbol(
                                 cloneCourse.getTags().replaceAll(", ", "@"), "@")
                         .trim());
-        draftCourseValidator.validate(cloneCourse, bindingResult);
+        constructorValidator.validate(cloneCourse, bindingResult);
 
         if(bindingResult.hasErrors()) {
             return "courses/add";
@@ -203,7 +200,7 @@ public class CoursesController {
 
             if(sectionValue.equals("0")) {
                 if(draftCourseRepository.countByCreatorId(userEntity.getId()) >=
-                        draftCoursesConfig.getMaxPerUser()) {
+                        constructorConfig.getMaxPerUser()) {
                     utilsService.reject("name", "courses.limit", bindingResult);
                     return "courses/add";
                 }
@@ -220,7 +217,7 @@ public class CoursesController {
                 OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
                 if(organizationEntity != null && organizationsService.isMember(userEntity, orgId)) {
                     if(draftCourseRepository.countByCreatorId(orgId) >=
-                            draftCoursesConfig.getMaxPerOrganization()) {
+                            constructorConfig.getMaxPerOrganization()) {
                         utilsService.reject("name", "courses.limit", bindingResult);
                         return "courses/add";
                     }

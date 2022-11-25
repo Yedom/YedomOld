@@ -61,8 +61,8 @@
                     <script th:inline="javascript">
                         let hash = /*[[${course.hash}]]*/ '';
                         let activeIDS = new Set(/*[[${activeModules}]]*/ []);
-                        let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('draft_courses.module.add.name')}]]*/ 'Название модуля';
-                        let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('draft_courses.lesson.add.name')}]]*/ 'Название урока';
+                        let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('constructor.module.add.name')}]]*/ 'Название модуля';
+                        let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('constructor.lesson.add.name')}]]*/ 'Название урока';
                         updateModules();
                     </script>
                 </div>
@@ -85,7 +85,7 @@
 
                     <!-- Added on -->
                     <div class="added-on">
-                        <h4 class="profile-label" th:text="#{draft_courses.added_on}">Added on</h4>
+                        <h4 class="profile-label" th:text="#{constructor.added_on}">Added on</h4>
                         <h6 th:text="${@utilsService.getCreatedOnDate(course.addedOn)}">18.11.2022</h6>
                     </div>
 

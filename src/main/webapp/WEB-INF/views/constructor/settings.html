@@ -49,8 +49,8 @@
                     <script th:inline="javascript">
                         let hash = /*[[${course.hash}]]*/ '';
                         let activeIDS = new Set(/*[[${activeModules}]]*/ []);
-                        let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('draft_courses.module.add.name')}]]*/ 'Название модуля';
-                        let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('draft_courses.lesson.add.name')}]]*/ 'Название урока';
+                        let placeholderModule = /*[[${@languageUtil.getLocalizedMessage('constructor.module.add.name')}]]*/ 'Название модуля';
+                        let placeholderLesson = /*[[${@languageUtil.getLocalizedMessage('constructor.lesson.add.name')}]]*/ 'Название урока';
                         updateModules();
                     </script>
                 </div>
@@ -60,7 +60,7 @@
             <div class="main mx-auto text-center">
                 <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
                 <input type="button" id="delBtn" onclick="deleteCourse()" class="btn btn-red"
-                       value="Удалить курс" th:value="#{draft_courses.delete}" />
+                       value="Удалить курс" th:value="#{constructor.delete}" />
 
                 <br />
                 <br />
@@ -85,7 +85,7 @@
 </script>
 
 <script th:inline="javascript">
-    let deleting = /*[[#{draft_courses.deleting}]]*/ 'Удаление...';
+    let deleting = /*[[#{constructor.deleting}]]*/ 'Удаление...';
 
     $('#settings').addClass('btn-primary');
 

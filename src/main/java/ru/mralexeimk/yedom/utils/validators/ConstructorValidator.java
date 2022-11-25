@@ -9,18 +9,17 @@ import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.utils.services.UtilsService;
-import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 /**
  * Draft course model validator
  */
 @Component
-public class DraftCourseValidator implements Validator {
+public class ConstructorValidator implements Validator {
     private final UtilsService utilsService;
     private final CoursesConfig coursesConfig;
 
     @Autowired
-    public DraftCourseValidator(UtilsService utilsService, CoursesConfig coursesConfig) {
+    public ConstructorValidator(UtilsService utilsService, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
         this.coursesConfig = coursesConfig;
     }
