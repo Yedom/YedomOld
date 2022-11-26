@@ -397,3 +397,23 @@ a:active, a:hover, a {
 .ml-5, .mx-5 {
     margin-left: 0 !important;
 }
+.logo-desc {
+    background-color: #2fac66 !important;
+    border-radius: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.logo-content {
+    background-color: #FFFFFF;
+    border-radius: 35px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.logo-content-name {
+    background-color: #FFFFFF;
+    border-radius: 35px;
+    width: 150px;
+    display: block;
+    margin-left: 85px;
+    text-align: center;
+}

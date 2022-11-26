@@ -88,9 +88,9 @@
 
 <!-- Yedom introduction/description and logo -->
 <div id="logo" class="row unselectable">
-    <div class="ml-auto mr-auto text-center">
-        <h2 class="text" th:text="#{title}">Yedom</h2>
-        <h5 class="text" th:text="#{index.description}">Yedom is a platform for online education</h5>
+    <div class="ml-auto mr-auto text-center logo-desc">
+        <h2 class="text logo-content-name" th:text="#{title}">Yedom</h2>
+        <h5 class="text logo-content" th:text="#{index.description}">Yedom is a platform for online education</h5>
     </div>
 </div>
 
@@ -247,7 +247,7 @@
 
     const aLight = new THREE.DirectionalLight(0xffffff, 1.5);
     aLight.position.set(50, 60, -40);
-    scene.add(aLight, new THREE.AmbientLight(0xffffff, 0.5));
+    scene.add(aLight, new THREE.AmbientLight(0xffffff, 0.8));
 
     let loader = new THREE.GLTFLoader();
 
