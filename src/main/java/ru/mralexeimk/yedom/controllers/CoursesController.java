@@ -135,7 +135,23 @@ public class CoursesController {
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
         if(courseEntity == null) return "redirect:/courses";
 
+        String[] tags = courseEntity.getTags().split("@");
+        Integer[] tagsCountCourses = new Integer[tags.length];
+        Arrays.fill(tagsCountCourses, 0);
+
+        try {
+            for (int i = 0; i < tags.length; ++i) {
+                TagEntity tagEntity = tagRepository.findByTag(tags[i]).orElse(null);
+                if (tagEntity != null) {
+                    tagsCountCourses[i] = tagEntity.getCoursesCount();
+                }
+            }
+        } catch (Exception ignored) {}
+
+        model.addAttribute("tagsCountCourses", tagsCountCourses);
+
         model.addAttribute("course", new Course(courseEntity));
+        model.addAttribute("read", true);
 
         return "courses/course";
     }

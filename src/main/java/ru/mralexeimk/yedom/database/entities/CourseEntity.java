@@ -75,6 +75,18 @@ public class CourseEntity {
         this.modules = course.getModules();
     }
 
+    public CourseEntity(DraftCourseEntity draftCourseEntity) {
+        this.title = draftCourseEntity.getTitle();
+        this.byOrganization = draftCourseEntity.isByOrganization();
+        this.creatorId = draftCourseEntity.getCreatorId();
+        this.description = draftCourseEntity.getDescription();
+        this.tags = draftCourseEntity.getTags();
+        this.avatar = draftCourseEntity.getAvatar();
+        this.hash = draftCourseEntity.getHash();
+        this.addedOn = draftCourseEntity.getAddedOn();
+        this.modules = draftCourseEntity.getModules();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

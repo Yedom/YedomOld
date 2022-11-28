@@ -4,8 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.services.LoaderService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -13,6 +14,14 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/")
 public class MainController {
+    private final UtilsService utilsService;
+    private final LoaderService loaderService;
+
+    public MainController(UtilsService utilsService, LoaderService loaderService) {
+        this.utilsService = utilsService;
+        this.loaderService = loaderService;
+    }
+
     @GetMapping()
     public String index(Model model, HttpSession session) {
         return "index";
@@ -34,5 +43,20 @@ public class MainController {
     @RequestMapping("favicon.ico")
     String favicon() {
         return "forward:/resources/favicon.ico";
+    }
+
+    /**
+     * Get file uploading progress
+     */
+    @GetMapping(value = "/uploadingProgress", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public String uploadingProgress(HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        StringBuilder progress = new StringBuilder();
+        User user = (User) session.getAttribute("user");
+        progress.append(loaderService.getProgress(user.getId()));
+        return utilsService.jsonToString(progress, "progress");
     }
 }

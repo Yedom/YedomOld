@@ -24,17 +24,20 @@ public class DraftCourse {
     protected String avatar;
     protected Timestamp addedOn;
     protected String modules;
+    protected boolean publicRequest;
 
     // DraftCourse by DraftCourseEntity
     public DraftCourse(DraftCourseEntity courseEntity) {
         this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
                 courseEntity.isByOrganization(), courseEntity.getCreatorId(),
                 courseEntity.getDescription(), courseEntity.getTags(),
-                courseEntity.getAvatar(), courseEntity.getAddedOn(), courseEntity.getModules());
+                courseEntity.getAvatar(), courseEntity.getAddedOn(), courseEntity.getModules(),
+                courseEntity.isPublicRequest());
     }
 
     public DraftCourse(DraftCourse a) {
         this(a.getId(), a.getHash(), a.getTitle(), a.isByOrganization(), a.getCreatorId(),
-                a.getDescription(), a.getTags(), a.getAvatar(), a.getAddedOn(), a.getModules());
+                a.getDescription(), a.getTags(), a.getAvatar(), a.getAddedOn(), a.getModules(),
+                a.isPublicRequest());
     }
 }

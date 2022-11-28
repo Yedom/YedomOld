@@ -13,16 +13,29 @@
   <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
   <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
   <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/collapse.css" th:href="@{/resources/css/collapse.css}">
 
   <!-- Scripts -->
   <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
   <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
   <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
   <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
   <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+  <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
+
+  <style>
+    @media only screen and (max-width: 500px) {
+      .avatar-course {
+        width: 95%;
+        height: 120px;
+      }
+      .btn {
+        font-size: 10px !important;
+      }
+    }
+  </style>
 </head>
-<body class="index-page sidebar-collapse">
+<body class="bg index-page sidebar-collapse">
 
 <!-- Particles Container -->
 <div id="particles-container"></div>
@@ -35,25 +48,88 @@
   <br />
   <br />
   <br />
+  <br />
+  <br />
 </div>
 
-<div class="bg page-header unselectable">
-  <div class="main main-raised col-md-4 mx-auto text-center section">
-    <div class="container">
-        <h1 th:text="${course.title}">Course name</h1>
-        <h4 class="description" th:text="${course.description}">Description</h4>
+<div class="container-fluid">
+  <div class="row">
+    <div th:fragment="modules-fragment" class="col-5 col-sm-3">
+      <div class="col-md-12 bg unselectable">
+        <div class="main mx-auto text-center" id="modules-container">
+          <!-- Modules from modules.html updated by modules.js -->
+          <script th:inline="javascript">
+            let hash = /*[[${course.hash}]]*/ '';
+            let activeIDS = new Set(/*[[${activeModules}]]*/ []);
+            updateModules();
+          </script>
+        </div>
+      </div>
+    </div>
+    <div class="col-7 col-sm-8 bg unselectable">
+      <div class="main mx-auto text-center">
+        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <div class="container">
+          <br />
+          <br />
+          <div class="avatar avatar-course">
+            <img class="profile-pic" src="../../resources/images/screen.png"
+                 th:src="${course.avatar}" alt=""/>
+            <div class="upload-button">
+              <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+            </div>
+            <input disabled="disabled" id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
+          </div>
+          <br />
+
+          <!-- Added on -->
+          <div class="added-on">
+            <h4 class="profile-label" th:text="#{constructor.added_on}">Added on</h4>
+            <h6 th:text="${@utilsService.getCreatedOnDate(course.addedOn)}">18.11.2022</h6>
+          </div>
+
+          <!-- Description -->
+          <div class="description">
+            <h4 class="profile-label" th:text="#{course.description}">Description</h4>
+            <h6 th:text="${course.description}">description</h6>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags">
+            <h4 class="profile-label" th:text="#{course.tags.title}">Tags</h4>
+            <br />
+            <span class="tag" th:each="tag,index : ${course.tags.split('@')}">
+                            <a target="_blank" rel="noopener noreferrer" class="link-href" href="#"
+                               th:href="@{'/courses?search='+${tag}+'&tag=true'}"
+                               th:text="${tag}">programming</a>
+                            <span th:text="'(' + ${tagsCountCourses[index.index]} + ')'">(0)</span><span th:if="${!index.last}">, </span>
+                        </span>
+          </div>
+          <br />
+        </div>
+        <br />
+      </div>
     </div>
   </div>
+</div>
+
+<div class="bg">
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
 </div>
 
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script>
-    w3.includeHTML();
+  w3.includeHTML();
+</script>
 
-    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
-        console.log('particles-js loaded!');
-    });
+<script th:inline="javascript">
+
 </script>
 </body>
 </html>

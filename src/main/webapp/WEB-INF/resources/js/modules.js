@@ -120,7 +120,7 @@ function addModuleInput() {
     modules.html(modules.html() + "<div class='module' id='current'>" +
         "<input style='padding: 2px;' type='text' id='module-input' maxlength='"+maxLength+"' " +
         "placeholder='"+placeholderModule+"' class='add-module'/>  " +
-        "<i onclick='addModule()' class='material-icons centered-icon save-icon'>save</i>&nbsp;&nbsp;" +
+        "<i id='saveIconModule' onclick='addModule()' class='material-icons centered-icon save-icon'>save</i>&nbsp;&nbsp;" +
         "<i onclick='cancelAdd()' class='material-icons centered-icon delete-icon'>delete</i>" +
         "</div>");
     $('#module-input').on('keydown', function(e) {
@@ -142,7 +142,7 @@ function addLessonInput(moduleName, moduleId) {
     lessons.html(lessons.html() + "<div class='lesson' id='current'>" +
         "<input style='padding: 2px; width: 100%;' type='text' id='lesson-input' maxlength='"+maxLength+"' " +
         "placeholder='"+placeholderLesson+"' class='add-lesson'/>  " +
-        "<i onclick='addLesson(\""+moduleId+"\")' class='material-icons centered-icon save-icon'>save</i>&nbsp;&nbsp;" +
+        "<i id='saveIconLesson' onclick='addLesson(\""+moduleId+"\")' class='material-icons centered-icon save-icon'>save</i>&nbsp;&nbsp;" +
         "<i onclick='cancelAdd()' class='material-icons centered-icon delete-icon'>delete</i>" +
         "</div>");
     $('#lesson-input').on('keydown', function(e) {
@@ -152,6 +152,18 @@ function addLessonInput(moduleName, moduleId) {
     });
     $('.plus-lesson').hide();
 }
+
+document.addEventListener("keypress", function(e) {
+    if(e.key === "Enter") {
+        let cur = $('#current');
+        if(cur.hasClass("module")) {
+            $('#saveIconModule').click();
+        }
+        else if(cur.hasClass('lesson')) {
+            $('#saveIconLesson').click();
+        }
+    }
+});
 
 function cancelAdd() {
     $('#current').remove();

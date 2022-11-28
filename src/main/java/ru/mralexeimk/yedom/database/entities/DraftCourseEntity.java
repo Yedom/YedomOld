@@ -48,6 +48,9 @@ public class DraftCourseEntity {
     @Column(name = "modules")
     private String modules;
 
+    @Column(name = "public_request")
+    private boolean publicRequest;
+
     // Add to database constructor
     public DraftCourseEntity(DraftCourse draftCourse) {
         this.title = draftCourse.getTitle();

@@ -33,7 +33,7 @@ public class Course extends DraftCourse {
                   String description, String tags, String avatar, Timestamp addedOn,
                   String modules, int views, int likes,
                   int investments, boolean acceptTasks, String completeRequestsUsersIds) {
-        super(id, hash, title, byOrganization, creatorId, description, tags, avatar, addedOn, modules);
+        super(id, hash, title, byOrganization, creatorId, description, tags, avatar, addedOn, modules, false);
         this.views = views;
         this.likes = likes;
         this.investments = investments;

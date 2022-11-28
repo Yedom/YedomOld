@@ -87,7 +87,8 @@
 <div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../resources/common/header.html"></div>
 
 <!-- Yedom introduction/description and logo -->
-<div id="logo" class="row unselectable">
+<div id="logo" hidden="hidden" class="row unselectable">
+    <br />
     <div class="ml-auto mr-auto text-center logo-desc">
         <h2 class="text logo-content-name" th:text="#{title}">Yedom</h2>
         <h5 class="text logo-content" th:text="#{index.description}">Yedom is a platform for online education</h5>
@@ -260,6 +261,7 @@
         gltf.animations.forEach((clip) => {
             mixer.clipAction(clip).play();
         } );
+        $('#logo').removeAttr('hidden');
     });
 
     renderer.setAnimationLoop(_ => {

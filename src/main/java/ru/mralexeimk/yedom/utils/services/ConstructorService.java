@@ -2,6 +2,7 @@ package ru.mralexeimk.yedom.utils.services;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
 import ru.mralexeimk.yedom.models.Lesson;
 import ru.mralexeimk.yedom.models.Module;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,6 +81,7 @@ public class ConstructorService {
      */
     public void deleteModule(String hash, int moduleIndex) {
         try {
+            deleteAllLessonsFromModule(hash, moduleIndex);
             addCourseIfNotExist(hash);
             modulesByHash.get(hash).remove(moduleIndex);
         } catch (Exception ignored) {}
@@ -105,9 +108,20 @@ public class ConstructorService {
      */
     public void deleteLesson(String hash, int moduleIndex, int lessonIndex) {
         try {
+            deleteVideo(hash, moduleIndex, lessonIndex);
             addCourseIfNotExist(hash);
             modulesByHash.get(hash).get(moduleIndex).getLessons().remove(lessonIndex);
         } catch (Exception ignored) {}
+    }
+
+    /**
+     * Save all modules of single draft course to database
+     */
+    public void saveToDB(String hash) {
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+        if(draftCourseEntity == null) return;
+        draftCourseEntity.setModules(getStringFromModules(modulesByHash.get(hash)));
+        draftCourseRepository.save(draftCourseEntity);
     }
 
     /**
@@ -115,10 +129,7 @@ public class ConstructorService {
      */
     public void saveToDB() {
         for(String hashCourse : modulesByHash.keySet()) {
-            DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hashCourse).orElse(null);
-            if(draftCourseEntity == null) continue;
-            draftCourseEntity.setModules(getStringFromModules(modulesByHash.get(hashCourse)));
-            draftCourseRepository.save(draftCourseEntity);
+            saveToDB(hashCourse);
         }
         System.out.println("Was saved " + modulesByHash.size() + " draft courses");
         modulesByHash.clear();
@@ -128,6 +139,7 @@ public class ConstructorService {
      * Remove draft course from 'modulesByHash' (prevent to save to database)
      */
     public void removeCourse(String hashCourse) {
+        deleteAllLessons(hashCourse);
         modulesByHash.remove(hashCourse);
     }
 
@@ -156,6 +168,56 @@ public class ConstructorService {
                 saveToDB();
             }
         }).start();
+    }
+
+    /**
+     * Void to delete lesson video from disk
+     */
+    private void deleteVideo(String hash, int moduleId, int lessonId) {
+        try {
+            File file = new File(constructorConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
+            if (file.exists()) file.delete();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Void to delete all lesson from module folder
+     */
+    private void deleteAllLessonsFromModule(String hash, int moduleId) {
+        try {
+            File moduleFolder = new File(constructorConfig.getVideosPath() + hash + "/" + moduleId);
+            if (moduleFolder.exists()) {
+                File[] files = moduleFolder.listFiles();
+                if(files == null) return;
+                for (File lesson : files) {
+                    lesson.delete();
+                }
+                moduleFolder.delete();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Delete all modules with videos from course folder
+     */
+    public void deleteAllLessons(String hash) {
+        try {
+            File courseFolder = new File(constructorConfig.getVideosPath() + hash);
+            if(courseFolder.exists()) {
+                File[] files = courseFolder.listFiles();
+                if(files == null) return;
+                for(File module : files) {
+                    deleteModule(hash, Integer.parseInt(module.getName()));
+                }
+                courseFolder.delete();
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**

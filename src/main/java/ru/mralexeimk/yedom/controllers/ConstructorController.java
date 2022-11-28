@@ -1,10 +1,8 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,20 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
-import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
-import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
-import ru.mralexeimk.yedom.database.entities.TagEntity;
-import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
-import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
-import ru.mralexeimk.yedom.database.repositories.TagRepository;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.entities.*;
+import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.services.ConstructorService;
-import ru.mralexeimk.yedom.utils.services.UtilsService;
-import ru.mralexeimk.yedom.utils.services.OrganizationsService;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
+import ru.mralexeimk.yedom.utils.services.*;
 import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
 import javax.servlet.http.HttpSession;
@@ -34,8 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -46,23 +35,29 @@ import java.util.*;
 public class ConstructorController {
     private final UtilsService utilsService;
     private final DraftCourseRepository draftCourseRepository;
+    private final CourseRepository courseRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final CoursesConfig coursesConfig;
     private final OrganizationsService organizationsService;
     private final ConstructorService constructorService;
+    private final RolesService rolesService;
+    private final LoaderService loaderService;
     private final ConstructorValidator constructorValidator;
     private final ConstructorConfig constructorConfig;
     private final TagRepository tagRepository;
 
-    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, ConstructorService constructorService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig, TagRepository tagRepository) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, CourseRepository courseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig, TagRepository tagRepository) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
+        this.courseRepository = courseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.coursesConfig = coursesConfig;
         this.organizationsService = organizationsService;
         this.constructorService = constructorService;
+        this.rolesService = rolesService;
+        this.loaderService = loaderService;
         this.constructorValidator = constructorValidator;
         this.constructorConfig = constructorConfig;
         this.tagRepository = tagRepository;
@@ -245,6 +240,38 @@ public class ConstructorController {
         model.addAttribute("course", draftCourseEntity);
 
         return "constructor/public";
+    }
+
+    /**
+     * Send draft course on moderation
+     */
+    @PostMapping("/{hash}/public")
+    public String sendToModeration(@PathVariable String hash,
+                                   HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+
+        if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
+        if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
+
+        if(rolesService.hasPermission(userEntity, "courses.add")) {
+            CourseEntity courseEntity = new CourseEntity(draftCourseEntity);
+            if(courseRepository.isNotEmpty())
+                courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1,
+                        HashAlg.SHA256));
+            else
+                courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
+            courseRepository.save(courseEntity);
+        }
+        else {
+            draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
+            draftCourseRepository.save(draftCourseEntity);
+        }
+        return "redirect:/constructor/" + hash + "/public";
     }
 
     /**
@@ -504,12 +531,10 @@ public class ConstructorController {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
-            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(bytes);
-                outputStream.flush();
-            }
+
+            loaderService.addFile(userEntity, file, bytes);
+            loaderService.startFileUploading(userEntity);
         } catch (Exception ex) {
-            ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
 

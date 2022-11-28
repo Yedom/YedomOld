@@ -252,13 +252,16 @@ public class UtilsService {
      */
     public void addAuth(Model model, HttpSession session) {
         boolean auth = false;
+        String role = "user";
         if(session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
             if(user.isEmailConfirmed()) {
                 auth = true;
+                role = user.getRole();
             }
         }
         model.addAttribute("auth", auth);
+        model.addAttribute("role", role);
     }
 
     /**

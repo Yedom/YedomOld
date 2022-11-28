@@ -60,6 +60,12 @@
       <div class="main mx-auto text-center">
         <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
         <br />
+
+        <input type="button" onclick="sendPublic()" id="moderBtn" class="btn btn-green"
+               value="Отправить на проверку для публикации" th:value="#{constructor.public.button}" />
+        <br />
+        <br />
+        </div>
       </div>
     </div>
   </div>
@@ -81,7 +87,35 @@
 </script>
 
 <script th:inline="javascript">
+  let publicRequest = /*[[${course.publicRequest}]]*/ false;
+  let role = /*[[${role}]]*/ 'user';
+  let cancelMsg = /*[[${@languageUtil.getLocalizedMessage('constructor.public.button.cancel')}]]*/ 'Отменить запрос на публикацию курса';
+  let publicMsg = /*[[${@languageUtil.getLocalizedMessage('constructor.public')}]]*/ 'Публикация';
   $('#public').addClass('btn-primary');
+
+  if(role !== 'user') {
+    $('#moderBtn').val(publicMsg);
+  }
+  else if(publicRequest) {
+    $('#moderBtn').val(cancelMsg);
+    $('#moderBtn').removeClass('btn-green');
+    $('#moderBtn').addClass('btn-red');
+  }
+
+  function sendPublic() {
+    fetch("/constructor/"+hash+"/public", {
+      method: "POST"
+    }).then(response => {
+      if (response.ok) {
+        if(role !== 'user') {
+          window.location = "/constructor/"+hash;
+        }
+        else {
+          window.location.reload();
+        }
+      }
+    });
+  }
 </script>
 </body>
 </html>

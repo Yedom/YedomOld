@@ -85,8 +85,8 @@
         </div>
 
         <br />
-        <br />
-        <br />
+        <progress id="progressBar" hidden="hidden"
+                  style="width: 50%; height: 20px;" max="100"></progress>
         <br />
       </div>
     </div>
@@ -123,6 +123,20 @@
   });
 
   /**
+   * Update video uploading progress
+   */
+  function updateProgress() {
+    fetch("/uploadingProgress")
+            .then((response) => response.json())
+            .then((data) => {
+              $('#progressBar').attr('value', data.progress);
+              if(data.progress >= 100) {
+                window.location.reload();
+              }
+            });
+  }
+
+  /**
    * Upload video by post request with fetch
    */
   function uploadVideo() {
@@ -132,11 +146,13 @@
       method: 'POST',
       body: $('#upload-video')[0].files[0]
     }).then(response => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
+      if (!response.ok) {
         $('#error').removeAttr('hidden');
         $('#upload-video-label').text(upload);
+      }
+      else {
+        $('#progressBar').removeAttr('hidden');
+        setInterval('updateProgress()', 200);
       }
     });
   }
