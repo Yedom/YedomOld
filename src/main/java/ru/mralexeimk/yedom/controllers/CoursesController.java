@@ -218,39 +218,16 @@ public class CoursesController {
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
-        try {
-            File initialFile = new File(coursesConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
 
-            StreamingResponseBody stream = out -> {
-                try(InputStream inputStream = new FileInputStream(initialFile)) {
-                    byte[] bytes = new byte[1024];
-                    int length;
-                    while ((length = inputStream.read(bytes)) >= 0) {
-                        out.write(bytes, 0, length);
-                    }
-                    out.flush();
-                } catch (Exception ignored) {}
-            };
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "video/mp4");
-            headers.add("Content-Length", Long.toString(initialFile.length()));
-            headers.add("X-Frames-Options", "SameOrigin");
-            headers.add("Accept-Ranges", "bytes");
-            headers.add("Content-Range", "bytes 0-" + (initialFile.length() - 1) + "/" + initialFile.length());
-
-            return ResponseEntity.ok().headers(headers).body(stream);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.valueOf(500));
-        }
+        return utilsService.getVideoHtmlContent(
+                coursesConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
     }
 
     /**
      * Get modules by course hash
      */
     @GetMapping(value = "/{hash}/modules")
-    public String getCourseModules(Model model, @PathVariable String hash,
-                                   HttpSession session) {
+    public String getCourseModules(Model model, @PathVariable String hash) {
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
         if(courseEntity == null) return "redirect:/courses";
 

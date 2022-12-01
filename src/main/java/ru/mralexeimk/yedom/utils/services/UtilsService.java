@@ -2,11 +2,14 @@ package ru.mralexeimk.yedom.utils.services;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
@@ -19,6 +22,9 @@ import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -390,5 +396,37 @@ public class UtilsService {
         }
         if(res.charAt(res.length() - 1) == '|') res.deleteCharAt(res.length() - 1);
         return res.toString();
+    }
+
+    /**
+     * Get html page with video from 'videoPath'
+     */
+    public ResponseEntity<StreamingResponseBody> getVideoHtmlContent(String videoPath){
+        try {
+            File initialFile = new File(videoPath);
+
+            StreamingResponseBody stream = out -> {
+                try (InputStream inputStream = new FileInputStream(initialFile)) {
+                    byte[] bytes = new byte[1024 * 10000];
+                    int length;
+                    while ((length = inputStream.read(bytes)) >= 0) {
+                        out.write(bytes, 0, length);
+                    }
+                    out.flush();
+                } catch (Exception ignored) {}
+            };
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "video/mp4");
+            headers.add("Content-Length", Long.toString(initialFile.length()));
+            headers.add("X-Frames-Options", "SameOrigin");
+            headers.add("Accept-Ranges", "bytes");
+            headers.add("Content-Range", "bytes 0-" +
+                    (initialFile.length() - 1) + "/" + initialFile.length());
+
+            return ResponseEntity.ok().headers(headers).body(stream);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
     }
 }
