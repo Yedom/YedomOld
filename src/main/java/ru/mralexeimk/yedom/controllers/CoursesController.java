@@ -251,14 +251,6 @@ public class CoursesController {
     @GetMapping(value = "/{hash}/modules")
     public String getCourseModules(Model model, @PathVariable String hash,
                                    HttpSession session) {
-        String check = utilsService.preventUnauthorizedAccess(session);
-        if(check != null) return check;
-
-        User user = (User) session.getAttribute("user");
-        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
-
-        if(userEntity == null) return "redirect:/courses";
-
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
         if(courseEntity == null) return "redirect:/courses";
 
