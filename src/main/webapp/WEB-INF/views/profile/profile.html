@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
     <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
     <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/bootstrap-select.min.css" th:href="@{/resources/css/libs/bootstrap-select.min.css}">
 
     <!-- Scripts -->
     <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
@@ -21,7 +22,19 @@
     <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
     <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
     <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
+    <script src="../../resources/js/libs/bootstrap-select.min.js" th:src="@{/resources/js/libs/bootstrap-select.min.js}"></script>
     <script src="../../resources/js/libs/bootstrap.bundle.min.js" th:src="@{/resources/js/libs/bootstrap.bundle.min.js}"></script>
+
+    <style>
+        .add-name {
+            height: 25px;
+            width: 20%;
+        }
+        .add-href {
+            height: 25px;
+            width: 45%;
+        }
+    </style>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -36,23 +49,20 @@
     <br />
     <br />
     <br />
-    <br />
 </div>
 
 <div class="bg unselectable">
     <div class="main col-md-6 mx-auto text-center">
-        <br />
+        <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
+
         <div class="profile-content">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 ml-auto mr-auto">
                         <div class="profile">
-                            <div class="name">
-                                <h2 th:text="${organization.name}">Organization name</h2>
-                            </div>
                             <div class="avatar avatar-wrapper">
                                 <img class="profile-pic" src="../../resources/images/default.png"
-                                     th:src="${organization.avatar}" alt=""/>
+                                th:src="${user.avatar}" alt=""/>
                                 <div class="upload-button">
                                     <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
                                 </div>
@@ -60,6 +70,45 @@
                             </div>
                             <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
                             <br />
+
+                            <!-- Email -->
+                            <div class="email" th:if="${show_email}">
+                                <h4 class="profile-label" th:text="#{auth.email}">Email</h4>
+                                <h6 class="selectable" style="text-transform: none; font-size: 20px;" th:text="${user.email}">yedom@yedom.ru</h6>
+                            </div>
+
+                            <!-- Last login -->
+                            <div class="created-on" th:if="${show_online}">
+                                <h4 class="profile-label" th:text="#{profile.last_login}">Last login</h4>
+                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
+                            </div>
+
+                            <!-- Links -->
+                            <div class="links-container" th:if="${relation == 'self' || (show_links && user.links.length() > 0)}">
+                                <h4 class="profile-label" th:text="#{profile.links}">Links</h4>
+                                <div class="links">
+                                    <div class="link" th:each="link : ${@utilsService.parseLinks(user.links)}" th:id="${link.first}">
+                                        <a target="_blank" rel="noopener noreferrer" class="link-href"
+                                           href="#" th:text="${link.first}" th:href="${link.second}">GitHub profile</a>
+                                        <i th:attr="onclick=|deleteLink('${link.first}')|" class="material-icons centered-icon">delete</i>
+                                    </div>
+                                </div>
+                                <i onclick="addLink()" id="add" class="material-icons centered-icon">add</i>
+                            </div>
+
+                            <!-- About -->
+                            <div class="about" th:if="${relation == 'self' || user.about.length() > 0}">
+                                <h4 class="profile-label" th:text="#{profile.about}">About me</h4>
+                                <textarea maxlength="400" th:text="${user.about}" rows="7" id="textarea-about"></textarea>
+                            </div>
+                            <br />
+
+                            <!-- Add to friends -->
+                            <div class="add-to-friends" id="add_friend">
+                                <input type="button" onclick="follow()"
+                                       class="btn" th:classappend="${btn_properties.second}" value="Подписаться"
+                                       th:value="${btn_properties.first}" />
+                            </div>
                             <br />
                         </div>
                     </div>
@@ -81,9 +130,9 @@
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script th:inline="javascript">
-    let organizationEntityName = /*[[${organization.name}]]*/ '';
-    let organizationEntityAdminId = /*[[${organization.adminId}]]*/ '';
-    let userId = /*[[${session_user_id}]]*/ 0;
+    let userEntityName = /*[[${user.username}]]*/ '';
+    let userName = /*[[${session_username}]]*/ '';
+    let btnClass = /*[[${btn_properties.second}]]*/ '';
 
     w3.includeHTML();
 
@@ -92,8 +141,8 @@
     });
 </script>
 
-<script src="../../resources/js/pages/organization/organization.js"
-        th:src="@{/resources/js/pages/organization/organization.js}"></script>
+<script src="../../resources/js/pages/profile/profile.js"
+        th:src="@{/resources/js/pages/profile/profile.js}"></script>
 
 </body>
 </html>

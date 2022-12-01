@@ -7,7 +7,7 @@ jQuery.fn.exists = function() { return this.length > 0; }
  * Click draft courses menus buttons
  */
 function clickButton(value) {
-    if(hash === '') window.location = '/constructor/';
+    if(hash === '') window.location = '../../../..';
     if(value !== '') value = '/' + value;
     window.location = '/constructor/' + hash + value + '?active=' + Array.from(activeIDS).join(',');
 }
@@ -16,7 +16,7 @@ function clickButton(value) {
  * Redirect to lesson edit page
  */
 function openLesson(moduleId, lessonId) {
-    if(hash === '') window.location = '/constructor/';
+    if(hash === '') window.location = '../../../..';
     if (moduleId === undefined || lessonId === undefined ||
         moduleId === '' || lessonId === '') return;
     window.location = '/constructor/' + hash + '/' + moduleId + '/' + lessonId + '?active=' + Array.from(activeIDS).join(',');

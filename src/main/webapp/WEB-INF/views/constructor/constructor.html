@@ -10,19 +10,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
-  <link rel="stylesheet" href="../../resources/css/bootstrap-select.min.css" th:href="@{/resources/css/bootstrap-select.min.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
+  <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/bootstrap-select.min.css" th:href="@{/resources/css/libs/bootstrap-select.min.css}">
 
   <!-- Scripts -->
-  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
+  <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
+  <script src="../../resources/js/libs/particles.js" th:src="@{/resources/js/libs/particles.js}"></script>
+  <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
+  <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
+  <script src="../../resources/js/libs/bootstrap-select.min.js" th:src="@{/resources/js/libs/bootstrap-select.min.js}"></script>
+  <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
@@ -109,22 +109,8 @@
   });
 </script>
 
-<script th:inline="javascript">
-  $('select').on('change', function() {
-    optionSelect(this.value);
-  });
+<script src="../../resources/js/pages/constructor/constructor.js"
+        th:src="@{/resources/js/pages/constructor/constructor.js}"></script>
 
-  function clickAdd() {
-    window.location.href = '/courses/add';
-  }
-
-  function clickCourse(hash) {
-    window.location.href = '/constructor/' + hash;
-  }
-
-  function optionSelect(value) {
-    window.location.href = '/constructor?section=' + value;
-  }
-</script>
 </body>
 </html>

@@ -124,7 +124,7 @@ public class CoursesController {
 
         model.addAttribute("courses", courses);
 
-        return "courses/index";
+        return "courses/courses";
     }
 
     /**

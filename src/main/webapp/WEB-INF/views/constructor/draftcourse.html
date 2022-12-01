@@ -10,18 +10,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
-    <link rel="stylesheet" href="../../resources/css/collapse.css" th:href="@{/resources/css/collapse.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/collapse.css" th:href="@{/resources/css/collapse.css}">
 
     <!-- Scripts -->
-    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
-    <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
+    <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
+    <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
+    <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
+    <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
+    <script src="../../resources/js/tools/modules.js" th:src="@{/resources/js/tools/modules.js}"></script>
 
     <style>
         @media only screen and (max-width: 500px) {
@@ -129,47 +129,8 @@
     w3.includeHTML();
 </script>
 
-<script th:inline="javascript">
-    $('#main').addClass('btn-primary');
+<script src="../../resources/js/pages/constructor/draftcourse.js"
+        th:src="@{/resources/js/pages/constructor/draftcourse.js}"></script>
 
-    function uploadAvatar(baseImg) {
-        let data = {baseImg: baseImg};
-        fetch("/constructor/"+hash+"/uploadAvatar", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        }).then(response => {
-            if(response.ok) {
-                window.location.reload();
-                $('#error').attr('hidden', 'hidden');
-            }
-            else {
-                $('#error').removeAttr('hidden');
-            }
-        });
-    }
-
-    $(document).ready(function() {
-        let readURL = function(input) {
-            if (input.files && input.files[0]) {
-                let reader = new FileReader();
-
-                reader.onload = function () {
-                    uploadAvatar(reader.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        $(".file-upload").on('change', function(){
-            readURL(this);
-        });
-
-        $(".upload-button").on('click', function() {
-            $(".file-upload").click();
-        });
-    });
-</script>
 </body>
 </html>

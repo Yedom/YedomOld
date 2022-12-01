@@ -9,18 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-    <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-    <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
+    <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
+    <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
 
     <!-- Scripts -->
-    <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
-    <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
+    <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
+    <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
+    <script src="../../resources/js/libs/particles.js" th:src="@{/resources/js/libs/particles.js}"></script>
+    <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
+    <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
+    <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
+    <script src="../../resources/js/tools/common.js" th:src="@{/resources/js/tools/common.js}"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
@@ -102,78 +102,8 @@
     w3.includeHTML();
 </script>
 
-<script th:inline="javascript">
-    let search = $('#search');
-    let els = $('.perspective');
-    let titles = $('.titles');
+<script src="../../resources/js/pages/courses/courses.js"
+        th:src="@{/resources/js/pages/courses/courses.js}"></script>
 
-    titles.each(function() {
-        if(this.text.length > 34) {
-            this.text = this.text.substring(0, 34) + '...';
-        }
-    });
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
-    search.val(searchParam);
-
-    document.addEventListener("keypress", function(e) {
-        if(e.key === "Enter") {
-            if (search.val().length > 0) {
-                clickSearch()
-            }
-        }
-    });
-
-    els.each(function () {
-        const height = this.clientHeight
-        const width = this.clientWidth
-        $(this).on('mousemove', function(e) {
-            let xVal = e.clientX - e.target.getBoundingClientRect().x - width/2;
-            let yVal = e.clientY - e.target.getBoundingClientRect().y - height/2;
-            const yRotation = 4 * ((xVal - width / 2) / width)
-            const xRotation = -4 * ((yVal - height / 2) / height)
-            this.style.transform =
-                'perspective(500px) scale(1.01) rotateX(' + xRotation + 'deg) rotateY(' + yRotation + 'deg)'
-        });
-        $(this).on('mouseout', function() {
-            this.style.transform = ' perspective(500px) scale(1) rotateX(0) rotateY(0) ';
-            this.style.transition = 'all 3s ease-out';
-        });
-        $(this).on('mouseover', function() {
-            this.style.transform = ' perspective(500px) scale(1.03) rotateX(0) rotateY(0) ';
-            this.style.transition = 'all 3s ease-out';
-        });
-        $(this).on('hover', function() {
-            this.style.transform = 'perspective(500px) scale(1.1) rotateX(0) rotateY(0)';
-            this.style.transition = 'all 0s ease-out';
-        });
-    });
-
-    fetch("/courses/popularTags")
-        .then((response) => response.json())
-        .then((data) => {
-            //console.log(data.tags);
-            $('#tagsToAdd').html(data.tags);
-        });
-
-    function clickSearch() {
-        let text = search.val();
-        if(text === '') {
-            window.location.href = '/courses';
-        }
-        else {
-            window.location.href = "/courses?search=" + text;
-        }
-    }
-    function clickAddCourse() {
-        window.location.href = '/courses/add';
-    }
-
-    function spanClick(span) {
-        $('.tag').attr('hidden', 'hidden');
-        window.location.href = "/courses?search=" + span.innerText + "&tag=true";
-    }
-</script>
 </body>
 </html>

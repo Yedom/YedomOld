@@ -9,18 +9,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
+  <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
 
   <!-- Scripts -->
-  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/particles.js" th:src="@{/resources/js/particles.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
+  <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
+  <script src="../../resources/js/libs/particles.js" th:src="@{/resources/js/libs/particles.js}"></script>
+  <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
+  <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
+  <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
+  <script src="../../resources/js/tools/common.js" th:src="@{/resources/js/tools/common.js}"></script>
 </head>
 <body class="index-page sidebar-collapse">
 
@@ -68,7 +68,9 @@
 </div>
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
-<script>
+<script th:inline="javascript">
+  let incorrectEmail = /*[[#{auth.email.incorrect}]]*/ '';
+
   w3.includeHTML();
 
   particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
@@ -76,31 +78,7 @@
   });
 </script>
 
-<script th:inline="javascript">
-  document.addEventListener("keypress", function(e) {
-    if(e.key === "Enter") {
-      clickRestore();
-    }
-  });
+<script src="../../resources/js/pages/auth/restore.js" th:src="@{/resources/js/pages/auth/restore.js}"></script>
 
-  function clickRestore() {
-    let data = {operation: "restore", email: $('#email').val()};
-    const response = fetch("/auth/restore", {
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    $('#error').text("");
-    response.then(function (response) {
-      if(response.status === 200) {
-        $('#label').removeAttr("hidden");
-        $('#restore').attr('hidden', 'hidden');
-      }
-      else if(response.status === 500) {
-        $('#error').text([[#{auth.email.incorrect}]]);
-      }
-    });
-  }
-</script>
 </body>
 </html>

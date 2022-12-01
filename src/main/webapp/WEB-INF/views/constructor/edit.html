@@ -10,19 +10,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../resources/css/material-kit.css" th:href="@{/resources/css/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/common.css" th:href="@{/resources/css/common.css}">
-  <link rel="stylesheet" href="../../resources/css/icons.css" th:href="@{/resources/css/icons.css}">
-  <link rel="stylesheet" href="../../resources/css/collapse.css" th:href="@{/resources/css/collapse.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
+  <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/collapse.css" th:href="@{/resources/css/collapse.css}">
 
   <!-- Scripts -->
-  <script src="../../resources/js/jquery.js" th:src="@{/resources/js/jquery.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-kit.js" th:src="@{/resources/js/material-kit.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/popper.js" th:src="@{/resources/js/popper.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/material-design.js" th:src="@{/resources/js/material-design.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/w3.js" th:src="@{/resources/js/w3.js}" rel="stylesheet"></script>
-  <script src="../../resources/js/common.js" th:src="@{/resources/js/common.js}" rel="stylesheet"></script>
-  <script th:inline="javascript" src="../../resources/js/modules.js" th:src="@{/resources/js/modules.js}" rel="stylesheet"></script>
+  <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
+  <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
+  <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
+  <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
+  <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
+  <script src="../../resources/js/tools/common.js" th:src="@{/resources/js/tools/common.js}"></script>
+  <script src="../../resources/js/tools/modules.js" th:src="@{/resources/js/tools/modules.js}"></script>
 
   <style>
     .textarea-add {
@@ -117,10 +117,10 @@
   w3.includeHTML();
 </script>
 
-<script th:inline="javascript">
-  $('#edit').addClass('btn-primary');
-</script>
+<script src="../../resources/js/pages/constructor/edit.js"
+        th:src="@{/resources/js/pages/constructor/edit.js}"></script>
+<script src="../../resources/js/tools/tagsRecommendation.js"
+        th:src="@{/resources/js/tools/tagsRecommendation.js}"></script>
 
-<script src="../../resources/js/tagsRecommendation.js" th:src="@{/resources/js/tagsRecommendation.js}" rel="stylesheet"></script>
 </body>
 </html>

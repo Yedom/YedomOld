@@ -1,0 +1,1 @@
+$('#edit').addClass('btn-primary');

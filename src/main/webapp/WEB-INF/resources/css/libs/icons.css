@@ -3,10 +3,10 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(format.woff2); /* For IE6-8 */
+  src: url(../../assets/format.woff2); /* For IE6-8 */
   src: local('Material Icons'),
     local('MaterialIcons-Regular'),
-    url(format.woff2) format('woff2');
+    url(../../assets/format.woff2) format('woff2');
 }
 
 .material-icons {

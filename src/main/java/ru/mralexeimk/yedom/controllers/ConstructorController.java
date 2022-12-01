@@ -23,7 +23,6 @@ import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -107,7 +106,7 @@ public class ConstructorController {
         model.addAttribute("draft_courses", draftCourses);
         model.addAttribute("section_value", sectionValue);
 
-        return "constructor/index";
+        return "constructor/constructor";
     }
 
     private void addActiveModules(Model model, String activeModules, DraftCourseEntity draftCourseEntity) {
@@ -479,7 +478,7 @@ public class ConstructorController {
                 } catch (Exception ignored) {}
             };
 
-            final HttpHeaders headers = new HttpHeaders();
+            HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "video/mp4");
             headers.add("Content-Length", Long.toString(initialFile.length()));
             headers.add("X-Frames-Options", "SameOrigin");

@@ -249,7 +249,7 @@ public class ProfileController {
 
         model.addAttribute("btn_properties", pair);
 
-        return "profile/index";
+        return "profile/profile";
     }
 
     /**
