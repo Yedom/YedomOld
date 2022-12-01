@@ -19,7 +19,6 @@ public class BigFile {
     public BigFile(File file, byte[] bytes, int sizeOfPart) {
         parts = new LinkedList<>();
         this.sizeOfPart = sizeOfPart;
-        System.out.println(bytes);
         for(int i = 0; i < bytes.length; i += sizeOfPart) {
             int minLen = Math.min(sizeOfPart, bytes.length - i);
             byte[] sub = new byte[minLen];

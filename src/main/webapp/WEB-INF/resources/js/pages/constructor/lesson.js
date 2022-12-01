@@ -7,7 +7,7 @@ $('video').mediaelementplayer({
     audioHeight: 30,
     startVolume: 0.8,
     toggleCaptionsButtonWhenOnlyOne: true,
-    iconSprite: /*[[@{/resources/svg/mejs-controls.svg}]]*/ '../../resources/svg/mejs-controls.svg'
+    iconSprite: iconPath
 });
 
 /**

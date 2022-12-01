@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
   <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
   <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
-  <link rel="stylesheet" href="../../resources/css/libs/collapse.css" th:href="@{/resources/css/collapse.css}">
-  <link rel="stylesheet" href="../../resources/css/libs/mediaelementplayer.min.css" th:href="@{/resources/css/mediaelementplayer.min.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/collapse.css" th:href="@{/resources/css/libs/collapse.css}">
+  <link rel="stylesheet" href="../../resources/css/libs/mediaelementplayer.min.css" th:href="@{/resources/css/libs/mediaelementplayer.min.css}">
 
   <!-- Scripts -->
   <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
@@ -109,6 +109,7 @@
 <div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
 
 <script th:inline="javascript">
+  let iconPath = /*[[@{/resources/svg/mejs-controls.svg}]]*/ '../../resources/svg/mejs-controls.svg';
   let upload = /*[[#{constructor.upload_video}]]*/ 'Загрузить видео';
   let uploading = /*[[#{constructor.uploading}]]*/ 'Загрузка...';
 
