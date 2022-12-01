@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "courses")
 @Data
 public class CoursesConfig {
+    private String videosPath;
     private int minTitleLength;
     private int maxTitleLength;
     private int maxDescriptionLength;

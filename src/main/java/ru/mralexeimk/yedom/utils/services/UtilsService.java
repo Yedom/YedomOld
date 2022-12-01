@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import ru.mralexeimk.yedom.database.entities.CourseEntity;
+import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.models.CourseOption;
+import ru.mralexeimk.yedom.models.Lesson;
+import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
@@ -313,6 +317,13 @@ public class UtilsService {
     }
 
     /**
+     * Get count of symbol in string
+     */
+    public int symbolCount(String str, String sym) {
+        return str.length() - str.replace(sym, "").length();
+    }
+
+    /**
      * Split string by comma and add to list of integer
      */
     public List<Integer> splitToListInt(String s) {
@@ -325,5 +336,59 @@ public class UtilsService {
 
     public String jsonToString(StringBuilder str, String key) {
         return new JSONObject(Map.of(key, str.toString())).toString();
+    }
+
+    public void addActiveModules(Model model, String activeModules, CourseEntity courseEntity) {
+        List<Integer> activeModulesList = new ArrayList<>();
+        try {
+            if (activeModules != null) {
+                int maxModules = symbolCount(courseEntity.getModules(), ":");
+                for (int i : splitToListInt(activeModules)) {
+                    if (i >= 0 && i < maxModules) activeModulesList.add(i);
+                }
+            }
+        } catch (Exception ignored) {}
+        model.addAttribute("activeModules", activeModulesList);
+    }
+
+    /**
+     * Parse draft course modules from db string
+     */
+    public LinkedList<Module> getModulesFromString(String modules) {
+        LinkedList<Module> res = new LinkedList<>();
+        try {
+            for (String row : modules.split("\\|")) {
+                String[] spl = row.split(":");
+                try {
+                    if(!spl[0].equals("")) {
+                        Module module = new Module();
+                        module.setName(spl[0]);
+                        for (String lesson : spl[1].split(",")) {
+                            if(!lesson.equals("")) {
+                                module.getLessons().add(new Lesson(lesson));
+                            }
+                        }
+                        res.add(module);
+                    }
+                } catch(Exception ex) {
+                    res.add(new Module(spl[0]));
+                }
+            }
+        } catch (Exception ignored) {}
+        return res;
+    }
+
+    public String getStringFromModules(List<Module> modules) {
+        StringBuilder res = new StringBuilder();
+        for(Module module : modules) {
+            res.append(module.getName()).append(":");
+            for(Lesson lesson : module.getLessons()) {
+                res.append(lesson.getName()).append(",");
+            }
+            if(res.charAt(res.length() - 1) == ',') res.deleteCharAt(res.length() - 1);
+            res.append("|");
+        }
+        if(res.charAt(res.length() - 1) == '|') res.deleteCharAt(res.length() - 1);
+        return res.toString();
     }
 }

@@ -2,17 +2,23 @@ package ru.mralexeimk.yedom.utils.services;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.event.ContextClosedEvent;
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
+import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.CourseRepository;
 import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
 import ru.mralexeimk.yedom.models.Lesson;
 import ru.mralexeimk.yedom.models.Module;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
@@ -22,18 +28,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConstructorService {
     private final UtilsService utilsService;
     private final DraftCourseRepository draftCourseRepository;
+    private final CourseRepository courseRepository;
     private final OrganizationsService organizationsService;
     private final ConstructorConfig constructorConfig;
+    private final CoursesConfig coursesConfig;
 
     @Getter
     @Setter
     private ConcurrentHashMap<String, LinkedList<Module>> modulesByHash = new ConcurrentHashMap<>();
 
-    public ConstructorService(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationsService organizationsService, ConstructorConfig constructorConfig) {
+    public ConstructorService(UtilsService utilsService, DraftCourseRepository draftCourseRepository, CourseRepository courseRepository, OrganizationsService organizationsService, ConstructorConfig constructorConfig, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
+        this.courseRepository = courseRepository;
         this.organizationsService = organizationsService;
         this.constructorConfig = constructorConfig;
+        this.coursesConfig = coursesConfig;
     }
 
     /**
@@ -61,8 +71,40 @@ public class ConstructorService {
             DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
             if(draftCourseEntity == null) return;
             modulesByHash.put(hash,
-                    getModulesFromString(draftCourseEntity.getModules()));
+                    utilsService.getModulesFromString(draftCourseEntity.getModules()));
         }
+    }
+
+    @PreDestroy
+    public void stop() {
+        saveToDB();
+    }
+
+    /**
+     * 1. Drop old courses from 'draft_courses' table
+     * 2. Start timer to save all modules of draft courses to database
+     */
+    @EventListener(ContextRefreshedEvent.class)
+    public void init() {
+        System.out.println("DraftCoursesService started!");
+        for(DraftCourseEntity draftCourseEntity : draftCourseRepository.findAll()) {
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            Timestamp addedOn = draftCourseEntity.getAddedOn();
+            if(now.getTime() - addedOn.getTime() > 1000L * 60 * 60 * 24 * constructorConfig.getDaysAlive()) {
+                draftCourseRepository.delete(draftCourseEntity);
+                System.out.println("DraftCourse was deleted: " + draftCourseEntity.getId());
+            }
+        }
+        new Thread(() -> {
+            while(true) {
+                try {
+                    Thread.sleep(1000L * 60 * constructorConfig.getSaveToDBPeriodMinutes());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                saveToDB();
+            }
+        }).start();
     }
 
     /**
@@ -71,7 +113,7 @@ public class ConstructorService {
     public LinkedList<Module> getModules(DraftCourseEntity draftCourseEntity) {
         if(!modulesByHash.containsKey(draftCourseEntity.getHash())) {
             modulesByHash.put(draftCourseEntity.getHash(),
-                    getModulesFromString(draftCourseEntity.getModules()));
+                    utilsService.getModulesFromString(draftCourseEntity.getModules()));
         }
         return modulesByHash.get(draftCourseEntity.getHash());
     }
@@ -120,7 +162,7 @@ public class ConstructorService {
     public void saveToDB(String hash) {
         DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
         if(draftCourseEntity == null) return;
-        draftCourseEntity.setModules(getStringFromModules(modulesByHash.get(hash)));
+        draftCourseEntity.setModules(utilsService.getStringFromModules(modulesByHash.get(hash)));
         draftCourseRepository.save(draftCourseEntity);
     }
 
@@ -141,33 +183,6 @@ public class ConstructorService {
     public void removeCourse(String hashCourse) {
         deleteAllLessons(hashCourse);
         modulesByHash.remove(hashCourse);
-    }
-
-    /**
-     * 1. Drop old courses from 'draft_courses' table
-     * 2. Start timer to save all modules of draft courses to database
-     */
-    @EventListener(ContextRefreshedEvent.class)
-    public void init() {
-        System.out.println("DraftCoursesService started!");
-        for(DraftCourseEntity draftCourseEntity : draftCourseRepository.findAll()) {
-            Timestamp now = new Timestamp(System.currentTimeMillis());
-            Timestamp addedOn = draftCourseEntity.getAddedOn();
-            if(now.getTime() - addedOn.getTime() > 1000L * 60 * 60 * 24 * constructorConfig.getDaysAlive()) {
-                draftCourseRepository.delete(draftCourseEntity);
-                System.out.println("DraftCourse was deleted: " + draftCourseEntity.getId());
-            }
-        }
-        new Thread(() -> {
-            while(true) {
-                try {
-                    Thread.sleep(1000L * 60 * constructorConfig.getSaveToDBPeriodMinutes());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                saveToDB();
-            }
-        }).start();
     }
 
     /**
@@ -231,44 +246,45 @@ public class ConstructorService {
         }
     }
 
-    /**
-     * Parse draft course modules from db string
-     */
-    public LinkedList<Module> getModulesFromString(String modules) {
-        LinkedList<Module> res = new LinkedList<>();
+    public void addActiveModules(Model model, String activeModules, DraftCourseEntity draftCourseEntity) {
+        List<Integer> activeModulesList = new ArrayList<>();
         try {
-            for (String row : modules.split("\\|")) {
-                String[] spl = row.split(":");
-                try {
-                    if(!spl[0].equals("")) {
-                        Module module = new Module();
-                        module.setName(spl[0]);
-                        for (String lesson : spl[1].split(",")) {
-                            if(!lesson.equals("")) {
-                                module.getLessons().add(new Lesson(lesson));
-                            }
-                        }
-                        res.add(module);
-                    }
-                } catch(Exception ex) {
-                    res.add(new Module(spl[0]));
+            if (activeModules != null) {
+                int maxModules = getModules(draftCourseEntity).size();
+                for (int i : utilsService.splitToListInt(activeModules)) {
+                    if (i >= 0 && i < maxModules) activeModulesList.add(i);
                 }
             }
         } catch (Exception ignored) {}
-        return res;
+        model.addAttribute("activeModules", activeModulesList);
     }
 
-    public String getStringFromModules(List<Module> modules) {
-        StringBuilder res = new StringBuilder();
-        for(Module module : modules) {
-            res.append(module.getName()).append(":");
-            for(Lesson lesson : module.getLessons()) {
-                res.append(lesson.getName()).append(",");
+    /**
+     * Public course to public courses
+     */
+    public void publicCourse(DraftCourseEntity draftCourseEntity) {
+        CourseEntity courseEntity = new CourseEntity(draftCourseEntity);
+        courseEntity.setModules(
+                utilsService.getStringFromModules(getModules(draftCourseEntity)));
+        if(courseRepository.isNotEmpty())
+            courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1,
+                    HashAlg.SHA256));
+        else
+            courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
+
+        // Copy videos from constructor to course
+        new Thread(() -> {
+            try {
+                File constructorFolder = new File(constructorConfig.getVideosPath() + draftCourseEntity.getHash());
+                File courseFolder = new File(coursesConfig.getVideosPath() + courseEntity.getHash());
+
+                courseFolder.mkdirs();
+                FileUtils.copyDirectory(constructorFolder, courseFolder);
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
-            if(res.charAt(res.length() - 1) == ',') res.deleteCharAt(res.length() - 1);
-            res.append("|");
-        }
-        if(res.charAt(res.length() - 1) == '|') res.deleteCharAt(res.length() - 1);
-        return res.toString();
+        }).start();
+
+        courseRepository.save(courseEntity);
     }
 }

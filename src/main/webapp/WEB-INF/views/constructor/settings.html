@@ -21,7 +21,7 @@
     <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
     <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
     <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
-    <script src="../../resources/js/tools/modules.js" th:src="@{/resources/js/tools/modules.js}"></script>
+    <script src="../../resources/js/tools/modulesConstructor.js" th:src="@{/resources/js/tools/modulesConstructor.js}"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
@@ -45,7 +45,7 @@
         <div th:fragment="modules-fragment" class="col-5 col-sm-3">
             <div class="col-md-12 bg unselectable">
                 <div class="main mx-auto text-center" id="modules-container">
-                    <!-- Modules from modules.html updated by modules.js -->
+                    <!-- Modules from modules.html updated by modulesConstructor.js -->
                     <script th:inline="javascript">
                         let hash = /*[[${course.hash}]]*/ '';
                         let activeIDS = new Set(/*[[${activeModules}]]*/ []);

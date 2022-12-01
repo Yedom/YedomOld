@@ -109,19 +109,6 @@ public class ConstructorController {
         return "constructor/constructor";
     }
 
-    private void addActiveModules(Model model, String activeModules, DraftCourseEntity draftCourseEntity) {
-        List<Integer> activeModulesList = new ArrayList<>();
-        try {
-            if (activeModules != null) {
-                int maxModules = constructorService.getModules(draftCourseEntity).size();
-                for (int i : utilsService.splitToListInt(activeModules)) {
-                    if (i >= 0 && i < maxModules) activeModulesList.add(i);
-                }
-            }
-        } catch (Exception ignored) {}
-        model.addAttribute("activeModules", activeModulesList);
-    }
-
     /**
      * Open draft course constructor page
      */
@@ -156,7 +143,7 @@ public class ConstructorController {
             }
         } catch (Exception ignored) {}
 
-        addActiveModules(model, activeModules, draftCourseEntity);
+        constructorService.addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("tagsCountCourses", tagsCountCourses);
 
@@ -182,7 +169,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules, draftCourseEntity);
+        constructorService.addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -208,7 +195,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules, draftCourseEntity);
+        constructorService.addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -234,7 +221,7 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        addActiveModules(model, activeModules, draftCourseEntity);
+        constructorService.addActiveModules(model, activeModules, draftCourseEntity);
 
         model.addAttribute("course", draftCourseEntity);
 
@@ -258,13 +245,7 @@ public class ConstructorController {
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         if(rolesService.hasPermission(userEntity, "courses.add")) {
-            CourseEntity courseEntity = new CourseEntity(draftCourseEntity);
-            if(courseRepository.isNotEmpty())
-                courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1,
-                        HashAlg.SHA256));
-            else
-                courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
-            courseRepository.save(courseEntity);
+            constructorService.publicCourse(draftCourseEntity);
         }
         else {
             draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
@@ -396,6 +377,9 @@ public class ConstructorController {
         return "constructor/modules";
     }
 
+    /**
+     * Get lesson page
+     */
     @GetMapping(value = "/{hash}/{moduleId}/{lessonId}")
     public String getLesson(Model model, @PathVariable String hash,
                             @RequestParam(required = false, name = "active") String activeModules,
@@ -414,7 +398,7 @@ public class ConstructorController {
         if (draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return "redirect:/constructor";
 
-        addActiveModules(model, activeModules, draftCourseEntity);
+        constructorService.addActiveModules(model, activeModules, draftCourseEntity);
         try {
             int mid = Integer.parseInt(moduleId);
             int lid = Integer.parseInt(lessonId);

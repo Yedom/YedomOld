@@ -1,16 +1,21 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
 import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.DraftCourse;
+import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.enums.SocketType;
 import ru.mralexeimk.yedom.models.Course;
@@ -22,6 +27,9 @@ import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -131,9 +139,14 @@ public class CoursesController {
      * Get course page by hash
      */
     @GetMapping("/{hash}")
-    public String course(Model model, @PathVariable String hash) {
+    public String course(Model model,
+                         @RequestParam(required = false, name = "active") String activeModules,
+                         @PathVariable String hash) {
         CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
         if(courseEntity == null) return "redirect:/courses";
+
+        model.addAttribute("course", courseEntity);
+        utilsService.addActiveModules(model, activeModules, courseEntity);
 
         String[] tags = courseEntity.getTags().split("@");
         Integer[] tagsCountCourses = new Integer[tags.length];
@@ -150,10 +163,109 @@ public class CoursesController {
 
         model.addAttribute("tagsCountCourses", tagsCountCourses);
 
-        model.addAttribute("course", new Course(courseEntity));
-        model.addAttribute("read", true);
-
         return "courses/course";
+    }
+
+    /**
+     * Get lesson page
+     */
+    @GetMapping(value = "/{hash}/{moduleId}/{lessonId}")
+    public String getLesson(Model model, @PathVariable String hash,
+                            @RequestParam(required = false, name = "active") String activeModules,
+                            @PathVariable String moduleId, @PathVariable String lessonId) {
+        CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
+        if(courseEntity == null) return "redirect:/courses";
+
+        model.addAttribute("course", courseEntity);
+        utilsService.addActiveModules(model, activeModules, courseEntity);
+
+        try {
+            int mid = Integer.parseInt(moduleId);
+            int lid = Integer.parseInt(lessonId);
+
+            LinkedList<Module> modules =
+                    utilsService.getModulesFromString(courseEntity.getModules());
+            if(mid >= modules.size()) throw new Exception();
+            if(lid >= modules.get(mid).getLessons().size()) throw new Exception();
+
+            model.addAttribute("moduleId", mid);
+            model.addAttribute("lessonId", lid);
+        } catch (Exception ex) {
+            return "redirect:/courses/" + hash;
+        }
+
+        return "courses/lesson";
+    }
+
+    /**
+     * Get video of lesson
+     */
+    @GetMapping(value = "/{hash}/{moduleId}/{lessonId}/video")
+    @ResponseBody
+    public ResponseEntity<StreamingResponseBody> getVideo(@PathVariable String hash,
+                                                          @PathVariable String moduleId, @PathVariable String lessonId) {
+        CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
+        if(courseEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+        try {
+            int mid = Integer.parseInt(moduleId);
+            int lid = Integer.parseInt(lessonId);
+
+            LinkedList<Module> modules =
+                    utilsService.getModulesFromString(courseEntity.getModules());
+            if(mid >= modules.size()) throw new Exception();
+            if(lid >= modules.get(mid).getLessons().size()) throw new Exception();
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
+        try {
+            File initialFile = new File(coursesConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
+
+            StreamingResponseBody stream = out -> {
+                try(InputStream inputStream = new FileInputStream(initialFile)) {
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while ((length = inputStream.read(bytes)) >= 0) {
+                        out.write(bytes, 0, length);
+                    }
+                    out.flush();
+                } catch (Exception ignored) {}
+            };
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "video/mp4");
+            headers.add("Content-Length", Long.toString(initialFile.length()));
+            headers.add("X-Frames-Options", "SameOrigin");
+            headers.add("Accept-Ranges", "bytes");
+            headers.add("Content-Range", "bytes 0-" + (initialFile.length() - 1) + "/" + initialFile.length());
+
+            return ResponseEntity.ok().headers(headers).body(stream);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.valueOf(500));
+        }
+    }
+
+    /**
+     * Get modules by course hash
+     */
+    @GetMapping(value = "/{hash}/modules")
+    public String getCourseModules(Model model, @PathVariable String hash,
+                                   HttpSession session) {
+        String check = utilsService.preventUnauthorizedAccess(session);
+        if(check != null) return check;
+
+        User user = (User) session.getAttribute("user");
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
+        if(userEntity == null) return "redirect:/courses";
+
+        CourseEntity courseEntity = courseRepository.findByHash(hash).orElse(null);
+        if(courseEntity == null) return "redirect:/courses";
+
+        model.addAttribute("modules",
+                utilsService.getModulesFromString(courseEntity.getModules()));
+
+        return "courses/modules";
     }
 
     /**

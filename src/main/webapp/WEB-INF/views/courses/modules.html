@@ -1,0 +1,19 @@
+<h3 th:text="#{constructor.modules}">Modules</h3>
+<div class="modules">
+    <div class="module" th:each="module,index : ${modules}">
+        <button type="button" class="collapsible"
+                th:classappend="'collapsible-' + ${index.index}">
+            [[${module.name}]]
+        </button>
+        <div class="content-collapse lessons" th:classappend="'lessons-' + ${index.index}">
+            <div class="lesson" th:each="lesson,index2 : ${module.lessons}">
+                <button type="button" class="collapsible-dis"
+                        th:attr="onclick=|openLesson('${index.index}', '${index2.index}')|"
+                        th:classappend="'lesson-' + ${index.index} + '-' + ${index2.index}"
+                        style="border: none;">
+                    [[${lesson.name}]]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

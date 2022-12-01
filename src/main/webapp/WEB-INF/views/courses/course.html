@@ -57,7 +57,7 @@
     <div th:fragment="modules-fragment" class="col-5 col-sm-3">
       <div class="col-md-12 bg unselectable">
         <div class="main mx-auto text-center" id="modules-container">
-          <!-- Modules from modules.html updated by modules.js -->
+          <!-- Modules from modules.html updated by modulesConstructor.js -->
           <script th:inline="javascript">
             let hash = /*[[${course.hash}]]*/ '';
             let activeIDS = new Set(/*[[${activeModules}]]*/ []);
@@ -68,7 +68,6 @@
     </div>
     <div class="col-7 col-sm-8 bg unselectable">
       <div class="main mx-auto text-center">
-        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
         <div class="container">
           <br />
           <br />
