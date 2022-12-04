@@ -34,7 +34,6 @@ import java.util.*;
 public class ConstructorController {
     private final UtilsService utilsService;
     private final DraftCourseRepository draftCourseRepository;
-    private final CourseRepository courseRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final CoursesConfig coursesConfig;
@@ -46,10 +45,9 @@ public class ConstructorController {
     private final ConstructorConfig constructorConfig;
     private final TagRepository tagRepository;
 
-    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, CourseRepository courseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig, TagRepository tagRepository) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig, TagRepository tagRepository) {
         this.utilsService = utilsService;
         this.draftCourseRepository = draftCourseRepository;
-        this.courseRepository = courseRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.coursesConfig = coursesConfig;

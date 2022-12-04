@@ -39,6 +39,8 @@ import java.util.concurrent.Executors;
 /**
  * Spring configuration
  */
+@PropertySource("classpath:/application.properties")
+@PropertySource("classpath:/application-${spring.profiles.active}.properties")
 @Configuration
 @ComponentScan("ru.mralexeimk.yedom")
 @EnableWebMvc
