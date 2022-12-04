@@ -31,5 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-!/src/main/resources/cert/keystore-prod.p12
-!/src/main/resources/application-prod.properties
+
+/src/main/resources/cert/keystore-prod.p12
+/src/main/resources/application-prod.properties
