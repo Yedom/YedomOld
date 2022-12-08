@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils.services;
+package ru.mralexeimk.yedom.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -9,20 +9,21 @@ import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.models.Code;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class EmailService {
     private final UtilsService utilsService;
+    private final LogsService logsService;
     private final JavaMailSender emailSender;
     private final EmailConfig emailConfig;
 
     private final ConcurrentHashMap<String, Code> codeByUsername = new ConcurrentHashMap<>();
 
     @Autowired
-    public EmailService(UtilsService utilsService, JavaMailSender emailSender, EmailConfig emailConfig) {
+    public EmailService(UtilsService utilsService, LogsService logsService, JavaMailSender emailSender, EmailConfig emailConfig) {
         this.utilsService = utilsService;
+        this.logsService = logsService;
         this.emailSender = emailSender;
         this.emailConfig = emailConfig;
     }
@@ -43,7 +44,7 @@ public class EmailService {
      */
     @EventListener(ContextRefreshedEvent.class)
     public void start() {
-        System.out.println("Email service started!");
+        logsService.info("Service started: " + this.getClass().getSimpleName());
         new Thread(() -> {
             while(true) {
                 try {

@@ -8,8 +8,8 @@ import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("draftCourseRepository")
-public interface DraftCourseRepository extends JpaRepository<DraftCourseEntity, Integer> {
+@Repository("draftCoursesRepository")
+public interface DraftCoursesRepository extends JpaRepository<DraftCourseEntity, Integer> {
     Optional<DraftCourseEntity> findByHash(String hash);
 
     List<DraftCourseEntity> findAllByCreatorId(int creatorId);

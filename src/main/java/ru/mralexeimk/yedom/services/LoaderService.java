@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils.services;
+package ru.mralexeimk.yedom.services;
 
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.configs.BigFileConfig;

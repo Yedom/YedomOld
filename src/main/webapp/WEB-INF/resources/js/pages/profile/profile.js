@@ -3,7 +3,7 @@ let links = $('.links');
 
 $('#profile').addClass('btn-primary');
 
-if(btnClass === 'btn-disabled') {
+if(relation === 'self') {
     $('#add_friend').hide();
 }
 

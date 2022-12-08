@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.utils.services;
+package ru.mralexeimk.yedom.services;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +12,8 @@ import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.CourseRepository;
-import ru.mralexeimk.yedom.database.repositories.DraftCourseRepository;
+import ru.mralexeimk.yedom.database.repositories.CoursesRepository;
+import ru.mralexeimk.yedom.database.repositories.DraftCoursesRepository;
 import ru.mralexeimk.yedom.models.Lesson;
 import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
@@ -27,8 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ConstructorService {
     private final UtilsService utilsService;
-    private final DraftCourseRepository draftCourseRepository;
-    private final CourseRepository courseRepository;
+    private final CoursesService coursesService;
+    private final LogsService logsService;
+    private final DraftCoursesRepository draftCoursesRepository;
+    private final CoursesRepository coursesRepository;
     private final OrganizationsService organizationsService;
     private final ConstructorConfig constructorConfig;
     private final CoursesConfig coursesConfig;
@@ -37,10 +39,12 @@ public class ConstructorService {
     @Setter
     private ConcurrentHashMap<String, LinkedList<Module>> modulesByHash = new ConcurrentHashMap<>();
 
-    public ConstructorService(UtilsService utilsService, DraftCourseRepository draftCourseRepository, CourseRepository courseRepository, OrganizationsService organizationsService, ConstructorConfig constructorConfig, CoursesConfig coursesConfig) {
+    public ConstructorService(UtilsService utilsService, CoursesService coursesService, LogsService logsService, DraftCoursesRepository draftCoursesRepository, CoursesRepository coursesRepository, OrganizationsService organizationsService, ConstructorConfig constructorConfig, CoursesConfig coursesConfig) {
         this.utilsService = utilsService;
-        this.draftCourseRepository = draftCourseRepository;
-        this.courseRepository = courseRepository;
+        this.coursesService = coursesService;
+        this.logsService = logsService;
+        this.draftCoursesRepository = draftCoursesRepository;
+        this.coursesRepository = coursesRepository;
         this.organizationsService = organizationsService;
         this.constructorConfig = constructorConfig;
         this.coursesConfig = coursesConfig;
@@ -52,7 +56,7 @@ public class ConstructorService {
     public void addModule(String hash, String moduleName) {
         try {
             if (moduleName.length() > constructorConfig.getMaxModuleAndLessonNameLength() ||
-                    utilsService.containsSymbols(moduleName, constructorConfig.getDisabledSymbols()) ||
+                    utilsService.containsAnySymbols(moduleName, constructorConfig.getDisabledSymbols()) ||
                     modulesByHash.get(hash).size() >= constructorConfig.getMaxModules()) {
                 return;
             }
@@ -68,10 +72,10 @@ public class ConstructorService {
 
     private void addCourseIfNotExist(String hash) {
         if(!modulesByHash.containsKey(hash)) {
-            DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+            DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
             if(draftCourseEntity == null) return;
             modulesByHash.put(hash,
-                    utilsService.getModulesFromString(draftCourseEntity.getModules()));
+                    coursesService.getModulesFromString(draftCourseEntity.getModules()));
         }
     }
 
@@ -86,15 +90,17 @@ public class ConstructorService {
      */
     @EventListener(ContextRefreshedEvent.class)
     public void init() {
-        System.out.println("DraftCoursesService started!");
-        for(DraftCourseEntity draftCourseEntity : draftCourseRepository.findAll()) {
+        logsService.info("Service started: " + this.getClass().getSimpleName());
+        List<Integer> deletedCourses = new ArrayList<>();
+        for(DraftCourseEntity draftCourseEntity : draftCoursesRepository.findAll()) {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             Timestamp addedOn = draftCourseEntity.getAddedOn();
             if(now.getTime() - addedOn.getTime() > 1000L * 60 * 60 * 24 * constructorConfig.getDaysAlive()) {
-                draftCourseRepository.delete(draftCourseEntity);
-                System.out.println("DraftCourse was deleted: " + draftCourseEntity.getId());
+                draftCoursesRepository.delete(draftCourseEntity);
+                deletedCourses.add(draftCourseEntity.getId());
             }
         }
+        logsService.info("Deleted courses list: " + deletedCourses);
         new Thread(() -> {
             while(true) {
                 try {
@@ -113,7 +119,7 @@ public class ConstructorService {
     public LinkedList<Module> getModules(DraftCourseEntity draftCourseEntity) {
         if(!modulesByHash.containsKey(draftCourseEntity.getHash())) {
             modulesByHash.put(draftCourseEntity.getHash(),
-                    utilsService.getModulesFromString(draftCourseEntity.getModules()));
+                    coursesService.getModulesFromString(draftCourseEntity.getModules()));
         }
         return modulesByHash.get(draftCourseEntity.getHash());
     }
@@ -135,7 +141,7 @@ public class ConstructorService {
     public void addLesson(String hash, int moduleIndex, String lessonName) {
         try {
             if (lessonName.length() > constructorConfig.getMaxModuleAndLessonNameLength() ||
-                    utilsService.containsSymbols(lessonName, constructorConfig.getDisabledSymbols()) ||
+                    utilsService.containsAnySymbols(lessonName, constructorConfig.getDisabledSymbols()) ||
                     modulesByHash.get(hash).get(moduleIndex).getLessons().size()
                             >= constructorConfig.getMaxLessons()) {
                 return;
@@ -160,10 +166,10 @@ public class ConstructorService {
      * Save all modules of single draft course to database
      */
     public void saveToDB(String hash) {
-        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
         if(draftCourseEntity == null) return;
-        draftCourseEntity.setModules(utilsService.getStringFromModules(modulesByHash.get(hash)));
-        draftCourseRepository.save(draftCourseEntity);
+        draftCourseEntity.setModules(coursesService.getStringFromModules(modulesByHash.get(hash)));
+        draftCoursesRepository.save(draftCourseEntity);
     }
 
     /**
@@ -173,7 +179,7 @@ public class ConstructorService {
         for(String hashCourse : modulesByHash.keySet()) {
             saveToDB(hashCourse);
         }
-        System.out.println("Was saved " + modulesByHash.size() + " draft courses");
+        logsService.info("Was saved " + modulesByHash.size() + " draft courses");
         modulesByHash.clear();
     }
 
@@ -265,9 +271,9 @@ public class ConstructorService {
     public void publicCourse(DraftCourseEntity draftCourseEntity) {
         CourseEntity courseEntity = new CourseEntity(draftCourseEntity);
         courseEntity.setModules(
-                utilsService.getStringFromModules(getModules(draftCourseEntity)));
-        if(courseRepository.isNotEmpty())
-            courseEntity.setHash(utilsService.hash(courseRepository.getLastId() + 1,
+                coursesService.getStringFromModules(getModules(draftCourseEntity)));
+        if(coursesRepository.isNotEmpty())
+            courseEntity.setHash(utilsService.hash(coursesRepository.getLastId() + 1,
                     HashAlg.SHA256));
         else
             courseEntity.setHash(utilsService.hash(1, HashAlg.SHA256));
@@ -285,6 +291,6 @@ public class ConstructorService {
             }
         }).start();
 
-        courseRepository.save(courseEntity);
+        coursesRepository.save(courseEntity);
     }
 }

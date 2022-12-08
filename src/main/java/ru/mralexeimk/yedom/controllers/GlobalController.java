@@ -5,29 +5,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.services.FriendsService;
-import ru.mralexeimk.yedom.utils.services.TagsService;
-import ru.mralexeimk.yedom.utils.services.UtilsService;
+import ru.mralexeimk.yedom.services.UtilsService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 
 @ControllerAdvice
 public class GlobalController {
     private final UtilsService utilsService;
-    private final UserRepository userRepository;
-    private final TagsService tagsService;
-    private final FriendsService friendsService;
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public GlobalController(UtilsService utilsService, UserRepository userRepository, TagsService tagsService, FriendsService friendsService) {
+    public GlobalController(UtilsService utilsService, UsersRepository usersRepository) {
         this.utilsService = utilsService;
-        this.userRepository = userRepository;
-        this.tagsService = tagsService;
-        this.friendsService = friendsService;
+        this.usersRepository = usersRepository;
     }
 
     /**
@@ -38,25 +31,29 @@ public class GlobalController {
      * 3. Attempt to create socket connection between user and server if it is not exist
      */
     @ModelAttribute
-    public void global(Model model, HttpSession session, HttpServletRequest request) {
+    public void global(Model model, HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
-        utilsService.addAuth(model, session);
+        boolean auth = false;
+        String role = "user";
+
         if(check == null) {
             User user = (User) session.getAttribute("user");
+            auth = true;
+            role = user.getRole();
 
             Timestamp now = new Timestamp(System.currentTimeMillis());
             Timestamp lastLogin = user.getLastLogin();
             if(now.getTime() - lastLogin.getTime() > 1000*60) {
-                UserEntity userEntity = userRepository.findByEmail(user.getEmail()).orElse(null);
+                UserEntity userEntity = usersRepository.findByEmail(user.getEmail()).orElse(null);
                 if(userEntity != null) {
                     user.setLastLogin(now);
                     userEntity.setLastLogin(now);
-                    userRepository.save(userEntity);
+                    usersRepository.save(userEntity);
                     session.setAttribute("user", user);
                 }
             }
         }
-        tagsService.createConnection(request.getSession().getId());
-        friendsService.createConnection(request.getSession().getId());
+        model.addAttribute("auth", auth);
+        model.addAttribute("role", role);
     }
 }

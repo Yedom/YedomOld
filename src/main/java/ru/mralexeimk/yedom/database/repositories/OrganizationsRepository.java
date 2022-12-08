@@ -6,8 +6,8 @@ import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 
 import java.util.Optional;
 
-@Repository("organizationRepository")
-public interface OrganizationRepository extends JpaRepository<OrganizationEntity, Integer> {
+@Repository("organizationsRepository")
+public interface OrganizationsRepository extends JpaRepository<OrganizationEntity, Integer> {
     Optional<OrganizationEntity> findByName(String name);
 }
 

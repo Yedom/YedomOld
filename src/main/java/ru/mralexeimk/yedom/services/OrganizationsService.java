@@ -1,11 +1,11 @@
-package ru.mralexeimk.yedom.utils.services;
+package ru.mralexeimk.yedom.services;
 
 import org.springframework.stereotype.Service;
 import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
-import ru.mralexeimk.yedom.database.repositories.UserRepository;
+import ru.mralexeimk.yedom.database.repositories.OrganizationsRepository;
+import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
@@ -15,15 +15,15 @@ import java.util.List;
 @Service
 public class OrganizationsService {
     private final UtilsService utilsService;
-    private final UserRepository userRepository;
-    private final OrganizationRepository organizationRepository;
+    private final UsersRepository usersRepository;
+    private final OrganizationsRepository organizationsRepository;
     private final OrganizationConfig organizationConfig;
     private final LanguageUtil languageUtil;
 
-    public OrganizationsService(UtilsService utilsService, UserRepository userRepository, OrganizationRepository organizationRepository, OrganizationConfig organizationConfig, LanguageUtil languageUtil) {
+    public OrganizationsService(UtilsService utilsService, UsersRepository usersRepository, OrganizationsRepository organizationsRepository, OrganizationConfig organizationConfig, LanguageUtil languageUtil) {
         this.utilsService = utilsService;
-        this.userRepository = userRepository;
-        this.organizationRepository = organizationRepository;
+        this.usersRepository = usersRepository;
+        this.organizationsRepository = organizationsRepository;
         this.organizationConfig = organizationConfig;
         this.languageUtil = languageUtil;
     }
@@ -41,13 +41,13 @@ public class OrganizationsService {
     }
 
     public int getCoursesCount(int orgId) {
-        OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
+        OrganizationEntity organizationEntity = organizationsRepository.findById(orgId).orElse(null);
         if (organizationEntity == null) return 0;
         return utilsService.splitToListInt(organizationEntity.getCoursesIds()).size();
     }
 
     public String getUserRoleInOrganization(int orgId, User user) {
-        OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
+        OrganizationEntity organizationEntity = organizationsRepository.findById(orgId).orElse(null);
         if (organizationEntity == null) return null;
         int id = user.getId();
         if (organizationEntity.getAdminId() == id)
@@ -65,7 +65,7 @@ public class OrganizationsService {
         organization.setAvatar(organizationConfig.getBaseBannerDefault());
         organization.setAdminId(userEntity.getId());
         OrganizationEntity organizationEntity = new OrganizationEntity(organization);
-        organizationRepository.save(organizationEntity);
+        organizationsRepository.save(organizationEntity);
 
         List<String> organizationsInIds =
                 utilsService.splitToListString(userEntity.getInOrganizationsIds());
@@ -79,14 +79,14 @@ public class OrganizationsService {
         userEntity.setInOrganizationsIds(String.join(",", organizationsInIds));
         userEntity.setOrganizationsIds(String.join(",", organizationsIds));
 
-        userRepository.save(userEntity);
+        usersRepository.save(userEntity);
     }
 
     /**
      * Delete organization from database and remove it from user
      */
     public void deleteOrganization(int organizationId, UserEntity userEntity) {
-        organizationRepository.deleteById(organizationId);
+        organizationsRepository.deleteById(organizationId);
 
         List<String> organizationsInIds =
                 utilsService.splitToListString(userEntity.getInOrganizationsIds());
@@ -100,6 +100,6 @@ public class OrganizationsService {
         userEntity.setInOrganizationsIds(String.join(",", organizationsInIds));
         userEntity.setOrganizationsIds(String.join(",", organizationsIds));
 
-        userRepository.save(userEntity);
+        usersRepository.save(userEntity);
     }
 }
