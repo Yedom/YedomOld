@@ -5,27 +5,24 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
-import ru.mralexeimk.yedom.database.repositories.OrganizationsRepository;
+import ru.mralexeimk.yedom.database.entities.UserEntity;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
 import ru.mralexeimk.yedom.models.Organization;
-import ru.mralexeimk.yedom.utils.enums.OrganizationValidationType;
-import ru.mralexeimk.yedom.services.OrganizationsService;
-import ru.mralexeimk.yedom.services.ValidationService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 /**
  * Organization model validator
  */
 @Component
 public class OrganizationValidator implements Validator {
-    private final ValidationService validationService;
+    private final UtilsService utilsService;
     private final OrganizationConfig organizationConfig;
-    private final OrganizationsService organizationsService;
-    private final OrganizationsRepository organizationsRepository;
+    private final OrganizationRepository organizationRepository;
 
-    public OrganizationValidator(ValidationService validationService, OrganizationConfig organizationConfig, OrganizationsService organizationsService, OrganizationsRepository organizationsRepository) {
-        this.validationService = validationService;
+    public OrganizationValidator(UtilsService utilsService, OrganizationConfig organizationConfig, OrganizationRepository organizationRepository) {
+        this.utilsService = utilsService;
         this.organizationConfig = organizationConfig;
-        this.organizationsService = organizationsService;
-        this.organizationsRepository = organizationsRepository;
+        this.organizationRepository = organizationRepository;
     }
 
     @Override
@@ -34,26 +31,22 @@ public class OrganizationValidator implements Validator {
     }
 
     public void addValidator(Organization org, Errors errors) {
-        if(organizationsService.getOrganizationsCount(org.getCreator())
-                >= organizationConfig.getMaxOrganizationsPerUser()) {
-            validationService.reject("name", "organizations.limit", errors);
-        }
-        else if(org.getName() == null || org.getName().isEmpty()) {
-            validationService.reject("name", "organization.name.not.empty", errors);
+        if(org.getName() == null || org.getName().isEmpty()) {
+            utilsService.reject("name", "organization.name.not.empty", errors);
         }
         else if(org.getName().length() < organizationConfig.getMinNameLength() ||
                 org.getName().length() > organizationConfig.getMaxNameLength()) {
-            validationService.reject("name", "organization.name.size", errors);
+            utilsService.reject("name", "organization.name.size", errors);
         }
-        else if(organizationsRepository.findByName(org.getName()).isPresent()) {
-            validationService.reject("name", "organization.name.unique", errors);
+        else if(organizationRepository.findByName(org.getName()).isPresent()) {
+            utilsService.reject("name", "organization.name.unique", errors);
         }
     }
 
     @Override
     public void validate(@NonNull Object o, @NonNull Errors errors) {
         if(o instanceof Organization org) {
-            if(org.getValidationType() == OrganizationValidationType.CREATE) {
+            if(org.getArgs().contains("add")) {
                 addValidator(org, errors);
             }
         }

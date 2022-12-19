@@ -1,7 +1,9 @@
 package ru.mralexeimk.yedom.config.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -19,12 +21,13 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.utils.language.AcceptHeaderResolver;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import ru.mralexeimk.yedom.services.UtilsService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import java.util.Properties;
 
@@ -40,19 +43,24 @@ import java.util.Properties;
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
 
+    private final ThymeleafProperties thymeleafProperties;
+    @Value("${spring.thymeleaf.templates_root:}")
+    private String templatesRoot;
+
     @Autowired
-    public SpringConfig(ApplicationContext applicationContext) {
+    public SpringConfig(ApplicationContext applicationContext, ThymeleafProperties thymeleafProperties) {
         this.applicationContext = applicationContext;
+        this.thymeleafProperties = thymeleafProperties;
     }
 
     @Bean
-    public SpringResourceTemplateResolver templateResolver() {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/WEB-INF/views/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setCharacterEncoding("UTF-8");
-        return templateResolver;
+    public ITemplateResolver defaultTemplateResolver() {
+        FileTemplateResolver resolver = new FileTemplateResolver();
+        resolver.setSuffix(".html");
+        resolver.setPrefix(templatesRoot);
+        resolver.setTemplateMode(thymeleafProperties.getMode());
+        resolver.setCacheable(thymeleafProperties.isCache());
+        return resolver;
     }
 
     @Bean
@@ -65,7 +73,7 @@ public class SpringConfig implements WebMvcConfigurer {
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.setTemplateResolver(defaultTemplateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
     }
@@ -74,6 +82,8 @@ public class SpringConfig implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(templateEngine());
+        resolver.setOrder(1);
+        resolver.setViewNames(new String[]{"*.html"});
         resolver.setCharacterEncoding("UTF-8");
         registry.viewResolver(resolver);
     }

@@ -1,10 +1,11 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.services.LoaderService;
-import ru.mralexeimk.yedom.services.UtilsService;
+import ru.mralexeimk.yedom.utils.services.LoaderService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;

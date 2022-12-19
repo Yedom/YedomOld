@@ -1,11 +1,12 @@
 package ru.mralexeimk.yedom.utils.language;
 
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import ru.mralexeimk.yedom.config.configs.LanguageConfig;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.services.UtilsService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

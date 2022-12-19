@@ -10,21 +10,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
-    <link rel="stylesheet" href="../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
-    <link rel="stylesheet" href="../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
-    <link rel="stylesheet" href="../resources/css/tools/interactive-cards.css" th:href="@{/resources/css/tools/interactive-cards.css}">
+    <link rel="stylesheet" th:href="@{/resources/libs/material-kit.css}">
+    <link rel="stylesheet" th:href="@{/resources/libs/material-icons.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/common.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/interactive-cards.css}">
 
     <!-- Scripts -->
-    <script src="../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
-    <script src="../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
-    <script src="../resources/js/libs/particles.js" th:src="@{/resources/js/libs/particles.js}"></script>
-    <script src="../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
-    <script src="../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
-    <script src="../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
-    <script src="../resources/js/libs/three.min.js" th:src="@{/resources/js/libs/three.min.js}"></script>
-    <script src="../resources/js/libs/OrbitControls.js" th:src="@{/resources/js/libs/OrbitControls.js}"></script>
-    <script src="../resources/js/libs/GLTFLoader.js" th:src="@{/resources/js/libs/GLTFLoader.js}"></script>
+    <script th:src="@{/resources/libs/jquery.js}"></script>
+    <script th:src="@{/resources/libs/material-kit.js}"></script>
+    <script th:src="@{/resources/libs/popper.js}"></script>
+    <script th:src="@{/resources/libs/material-design.js}"></script>
+    <script th:src="@{/resources/libs/three.min.js}"></script>
+    <script th:src="@{/resources/libs/OrbitControls.js}"></script>
+    <script th:src="@{/resources/libs/GLTFLoader.js}"></script>
 
     <style>
         html, body {
@@ -47,9 +45,9 @@
             background-color: #eeeeee;
         }
         .text {
-             font-family: 'Source Code Pro', monospace;
-             color: #000000;
-         }
+            font-family: 'Source Code Pro', monospace;
+            color: #000000;
+        }
         #model-3d {
             height: 100% !important;
         }
@@ -84,14 +82,14 @@
 </head>
 <body class="bg">
 
-<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../resources/common/header.html"></div>
+<div th:replace="../resources/components/header.html :: header-fragment"></div>
 
 <!-- Yedom introduction/description and logo -->
 <div id="logo" hidden="hidden" class="row unselectable">
     <br />
     <div class="ml-auto mr-auto text-center logo-desc">
-        <h2 class="text logo-content-name" th:text="#{title}">Yedom</h2>
-        <h5 class="text logo-content" th:text="#{index.description}">Yedom is a platform for online education</h5>
+        <h2 class="text logo-content-name" th:text="#{title}"></h2>
+        <h5 class="text logo-content" th:text="#{index.description}"></h5>
     </div>
 </div>
 
@@ -101,7 +99,7 @@
 <div class="container unselectable">
     <!-- Demonstration -->
     <div class="ml-auto mr-auto text-center">
-        <h1 class="text" th:text="#{index.demo}">Demonstration</h1>
+        <h1 class="text" th:text="#{index.demo}"></h1>
     </div>
     <div class="row">
         <div class="col-xl-8 col-lg-8">
@@ -109,8 +107,8 @@
                     width="90%" height="371"></iframe>
         </div>
         <div class="col-xl-4 col-lg-3">
-            <h2 class="text" th:text="#{index.f_0.title}">Напряги извилины</h2>
-            <h5 class ="text" th:text="#{index.f_0.desc}">Ваше понимание - наша работа</h5>
+            <h2 class="text" th:text="#{index.f_0.title}"></h2>
+            <h5 class ="text" th:text="#{index.f_0.desc}"></h5>
         </div>
     </div>
     <br />
@@ -120,16 +118,16 @@
 
     <!-- Feature description -->
     <div class="features">
-        <h1 class="text" style="text-align: center;" th:text="#{index.features}">Features</h1>
+        <h1 class="text" style="text-align: center;" th:text="#{index.features}"></h1>
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
                     <div class="card card-1 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-1_1.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_1.title}">Course Constructor</h4>
-                            <p class="descriptions" th:text="#{index.f_1.desc}">Create your own course!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_1.title}"></h4>
+                            <p class="descriptions" th:text="#{index.f_1.desc}"></p>
+                            <button th:text="#{index.go}" onclick="window.open('/courses/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -139,9 +137,9 @@
                     <div class="card card-2 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-2_3.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_2.title}">Smart Search System</h4>
-                            <p class="descriptions" th:text="#{index.f_2.desc}">Easy search for courses by tags system!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_2.title}"></h4>
+                            <p class="descriptions" th:text="#{index.f_2.desc}"></p>
+                            <button th:text="#{index.go}" onclick="window.open('/courses', '_blank').focus();" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -151,9 +149,9 @@
                     <div class="card card-3 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-3_3.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_3.title}">Profile/Friends System</h4>
-                            <p class="descriptions" th:text="#{index.f_3.desc}">Follow me!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_3.title}"></h4>
+                            <p class="descriptions" th:text="#{index.f_3.desc}"></p>
+                            <button th:text="#{index.go}" onclick="window.open('/profile/mralexeimk', '_blank').focus();" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -168,9 +166,9 @@
                     <div class="card card-4 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-4_3.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_4.title}">AR</h4>
-                            <p class="descriptions desc-4" th:text="#{index.f_4.desc}">Add AR technologies to your course!</p>
-                            <button th:text="#{index.go}" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_4.title}"></h4>
+                            <p class="descriptions desc-4" th:text="#{index.f_4.desc}"></p>
+                            <button th:text="#{index.go}" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -180,9 +178,9 @@
                     <div class="card card-5 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-5.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_5.title}">Organizations</h4>
-                            <p class="descriptions" th:text="#{index.f_5.desc}">Create your organization!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_5.title}"></h4>
+                            <p class="descriptions" th:text="#{index.f_5.desc}"></p>
+                            <button th:text="#{index.go}" onclick="window.open('/organization/add', '_blank').focus();" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -192,9 +190,9 @@
                     <div class="card card-6 text-white">
                         <img class="card-img w-100 d-block card" src="../resources/images/card-6.png" alt="">
                         <div class="card-img-overlay">
-                            <h4 class="descriptions" th:text="#{index.f_6.title}">Profile Settings</h4>
-                            <p class="descriptions" th:text="#{index.f_6.desc}">Private settings and language easy to change!</p>
-                            <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-desc btn-primary" type="button">Перейти&nbsp;
+                            <h4 class="descriptions" th:text="#{index.f_6.title}"></h4>
+                            <p class="descriptions" th:text="#{index.f_6.desc}"></p>
+                            <button th:text="#{index.go}" onclick="window.open('/profile/settings', '_blank').focus();" class="btn btn-desc btn-primary" type="button">&nbsp;
                                 <i class="fas fa-long-arrow-alt-right"></i>
                             </button>
                         </div>
@@ -207,17 +205,9 @@
 
 <br />
 
-<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../resources/common/footer.html"></div>
+<div th:replace="../resources/components/footer.html :: footer-fragment"></div>
 
-<script src="../resources/js/pages/index.js" th:src="@{/resources/js/pages/index.js}"></script>
-
-<script>
-    w3.includeHTML();
-
-    particlesJS.load('model-container', '../resources/assets/particles_home.json', function () {
-        console.log('particles-js loaded!');
-    });
-</script>
+<script th:src="@{/resources/js/index.js}"></script>
 
 </body>
 </html>

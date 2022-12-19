@@ -7,10 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.UsersRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.enums.UserValidationType;
-import ru.mralexeimk.yedom.services.UtilsService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
 
 import javax.servlet.http.HttpSession;
@@ -18,18 +17,18 @@ import javax.servlet.http.HttpSession;
 /**
  * Controller for account page (where user can change username and password)
  */
-@Controller
+@RestController
 @RequestMapping("/account")
 public class AccountController {
     private final UtilsService utilsService;
-    private final UsersRepository usersRepository;;
+    private final UserRepository userRepository;;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AccountController(UtilsService utilsService, UsersRepository usersRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public AccountController(UtilsService utilsService, UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.utilsService = utilsService;
-        this.usersRepository = usersRepository;
+        this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
     }
@@ -37,16 +36,15 @@ public class AccountController {
     /**
      * Account user page
      */
-    @GetMapping
-    public String accountGet(Model model, HttpSession session) {
+    @GetMapping(produces = "application/json; charset=UTF-8")
+    public User accountGet(HttpSession session) {
         String check = utilsService.preventUnauthorizedAccess(session);
-        if(check != null) return check;
+        if(check != null) return null;
 
         User user = (User) session.getAttribute("user");
         user.setPassword(""); // to prevent password from showing in form
-        model.addAttribute("user", user);
 
-        return "auth/account";
+        return user;
     }
 
     /**
@@ -70,14 +68,14 @@ public class AccountController {
         user.setPassword(userModel.getPassword());
         user.setUsername(userModel.getUsername());
 
-        UserEntity userEntity = usersRepository.findByEmail(user.getEmail()).orElse(null);
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail()).orElse(null);
 
         if(userEntity == null) {
             session.removeAttribute("user");
             return "redirect:auth/login";
         }
 
-        userValidator.validate(user.checkFor(UserValidationType.UPDATE), bindingResult);
+        userValidator.validate(user.withArgs("onUpdate"), bindingResult);
 
         if (bindingResult.hasErrors())
             return "auth/account";
@@ -88,7 +86,7 @@ public class AccountController {
 
         userEntity.setUsername(user.getUsername());
 
-        usersRepository.save(userEntity);
+        userRepository.save(userEntity);
         session.setAttribute("user", user);
 
         return "redirect:/account";

@@ -2,7 +2,9 @@ package ru.mralexeimk.yedom.database.entities;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Value;
 import ru.mralexeimk.yedom.models.User;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -53,6 +55,9 @@ public class UserEntity {
 
     @Column(name = "following_ids")
     private String followingIds = "";
+
+    @Column(name = "followers_ids")
+    private String followersIds = "";
 
     @Column(name = "organizations_ids")
     private String organizationsIds = "";
@@ -113,6 +118,7 @@ public class UserEntity {
                 ", draftCoursesIds='" + draftCoursesIds + '\'' +
                 ", friendsIds='" + friendsIds + '\'' +
                 ", followingIds='" + followingIds + '\'' +
+                ", followersIds='" + followersIds + '\'' +
                 ", organizationsIds='" + organizationsIds + '\'' +
                 ", inOrganizationsIds='" + inOrganizationsIds + '\'' +
                 ", organizationsFollowingIds='" + organizationsFollowingIds + '\'' +

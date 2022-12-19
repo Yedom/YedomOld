@@ -9,25 +9,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
-    <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
-    <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
+    <link rel="stylesheet" th:href="@{/resources/libs/material-icons.css}">
+    <link rel="stylesheet" th:href="@{/resources/libs/material-kit.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/common.css}">
 
     <!-- Scripts -->
-    <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
-    <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
-    <script src="../../resources/js/libs/particles.js" th:src="@{/resources/js/libs/particles.js}"></script>
-    <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
-    <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
-    <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
-    <script src="../../resources/js/libs/bootstrap.bundle.min.js" th:src="@{/resources/js/libs/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/resources/libs/jquery.js}"></script>
+    <script th:src="@{/resources/libs/material-kit.js}"></script>
+    <script th:src="@{/resources/libs/popper.js}"></script>
+    <script th:src="@{/resources/libs/material-design.js}"></script>
+    <script th:src="@{/resources/libs/bootstrap.bundle.min.js}"></script>
 </head>
 <body class="bg index-page sidebar-collapse">
 
-<!-- Particles Container -->
-<div id="particles-container"></div>
-
-<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
+<div th:replace="../resources/components/header.html :: header-fragment"></div>
 
 <div class="bg">
     <br />
@@ -39,7 +34,7 @@
 
 <div class="bg unselectable">
     <div class="main col-md-6 mx-auto text-center">
-        <div th:replace="../resources/common/profilemenus.html :: profile-fragment" w3-include-html="../../resources/common/profilemenus.html"></div>
+        <div th:replace="../resources/components/profilemenus.html :: profile-fragment"></div>
 
         <div id="orgCreate">
             <br />
@@ -100,21 +95,14 @@
     <br />
 </div>
 
-<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+<div th:replace="../resources/components/footer.html :: footer-fragment"></div>
 
 <script th:inline="javascript">
     let userEntityName = /*[[${user.username}]]*/ '';
     let userName = /*[[${session_username}]]*/ '';
-
-    w3.includeHTML();
-
-    particlesJS.load('particles-container', '../../resources/assets/particles.json', function () {
-        console.log('particles-js loaded!');
-    });
 </script>
 
-<script src="../../resources/js/pages/profile/organizations.js"
-        th:src="@{/resources/js/pages/profile/organizations.js}"></script>
+<script th:src="@{/resources/js/profile/organizations.js}"></script>
 
 </body>
 </html>

@@ -10,20 +10,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../resources/css/libs/material-kit.css" th:href="@{/resources/css/libs/material-kit.css}">
-  <link rel="stylesheet" href="../../resources/css/tools/common.css" th:href="@{/resources/css/tools/common.css}">
-  <link rel="stylesheet" href="../../resources/css/libs/icons.css" th:href="@{/resources/css/libs/icons.css}">
-  <link rel="stylesheet" href="../../resources/css/libs/collapse.css" th:href="@{/resources/css/libs/collapse.css}">
-  <link rel="stylesheet" href="../../resources/css/libs/mediaelementplayer.min.css" th:href="@{/resources/css/libs/mediaelementplayer.min.css}">
+  <link rel="stylesheet" th:href="@{/resources/libs/material-kit.css}">
+  <link rel="stylesheet" th:href="@{/resources/libs/material-icons.css}">
+  <link rel="stylesheet" th:href="@{/resources/libs/collapse.css}">
+  <link rel="stylesheet" th:href="@{/resources/libs/mediaelementplayer.min.css}">
+  <link rel="stylesheet" th:href="@{/resources/css/common.css}">
 
   <!-- Scripts -->
-  <script src="../../resources/js/libs/jquery.js" th:src="@{/resources/js/libs/jquery.js}"></script>
-  <script src="../../resources/js/libs/material-kit.js" th:src="@{/resources/js/libs/material-kit.js}"></script>
-  <script src="../../resources/js/libs/popper.js" th:src="@{/resources/js/libs/popper.js}"></script>
-  <script src="../../resources/js/libs/material-design.js" th:src="@{/resources/js/libs/material-design.js}"></script>
-  <script src="../../resources/js/libs/w3.js" th:src="@{/resources/js/libs/w3.js}"></script>
-  <script src="../../resources/js/tools/modulesConstructor.js" th:src="@{/resources/js/tools/modulesConstructor.js}"></script>
-  <script src="../../resources/js/libs/mediaelement-and-player.min.js" th:src="@{/resources/js/libs/mediaelement-and-player.min.js}"></script>
+  <script th:src="@{/resources/libs/jquery.js}"></script>
+  <script th:src="@{/resources/libs/material-kit.js}"></script>
+  <script th:src="@{/resources/libs/popper.js}"></script>
+  <script th:src="@{/resources/libs/material-design.js}"></script>
+  <script th:src="@{/resources/libs/mediaelement-and-player.min.js}"></script>
+  <script th:src="@{/resources/js/tools/modulesConstructor.js}"></script>
 
   <style>
     .mejs__cannotplay {
@@ -33,10 +32,7 @@
 </head>
 <body class="bg index-page sidebar-collapse">
 
-<!-- Particles Container -->
-<div id="particles-container"></div>
-
-<div th:replace="../resources/common/header.html :: header-fragment" w3-include-html="../../resources/common/header.html"></div>
+<div th:replace="../resources/components/header.html :: header-fragment"></div>
 
 <div class="bg">
   <br />
@@ -68,7 +64,7 @@
     </div>
     <div class="col-7 col-sm-8 bg unselectable">
       <div class="main mx-auto text-center">
-        <div th:replace="../resources/common/draftcoursesmenus.html :: draftcourse-fragment" w3-include-html="../../resources/common/draftcoursesmenus.html"></div>
+        <div th:replace="../resources/components/draftcoursesmenus.html :: draftcourse-fragment"></div>
         <br />
 
         <!-- Upload video button -->
@@ -106,18 +102,15 @@
   <br />
 </div>
 
-<div th:replace="../resources/common/footer.html :: footer-fragment" w3-include-html="../../resources/common/footer.html"></div>
+<div th:replace="../resources/components/footer.html :: footer-fragment"></div>
 
 <script th:inline="javascript">
   let iconPath = /*[[@{/resources/svg/mejs-controls.svg}]]*/ '../../resources/svg/mejs-controls.svg';
   let upload = /*[[#{constructor.upload_video}]]*/ 'Загрузить видео';
   let uploading = /*[[#{constructor.uploading}]]*/ 'Загрузка...';
-
-  w3.includeHTML();
 </script>
 
-<script src="../../resources/js/pages/constructor/lesson.js"
-        th:src="@{/resources/js/pages/constructor/lesson.js}"></script>
+<script th:src="@{/resources/js/constructor/lesson.js}"></script>
 
 </body>
 </html>

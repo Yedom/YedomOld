@@ -1,6 +1,7 @@
 package ru.mralexeimk.yedom.controllers;
 
 import org.json.JSONObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,11 +16,14 @@ import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.services.*;
+import ru.mralexeimk.yedom.utils.enums.HashAlg;
+import ru.mralexeimk.yedom.utils.services.*;
 import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -29,29 +33,31 @@ import java.util.*;
 @RequestMapping("/constructor")
 public class ConstructorController {
     private final UtilsService utilsService;
-    private final CoursesService coursesService;
-    private final DraftCoursesRepository draftCoursesRepository;
-    private final UsersRepository usersRepository;
+    private final DraftCourseRepository draftCourseRepository;
+    private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
     private final CoursesConfig coursesConfig;
+    private final OrganizationsService organizationsService;
     private final ConstructorService constructorService;
     private final RolesService rolesService;
     private final LoaderService loaderService;
-    private final TagsService tagsService;
     private final ConstructorValidator constructorValidator;
     private final ConstructorConfig constructorConfig;
+    private final TagRepository tagRepository;
 
-    public ConstructorController(UtilsService utilsService, CoursesService coursesService, DraftCoursesRepository draftCoursesRepository, UsersRepository usersRepository, CoursesConfig coursesConfig, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, TagsService tagsService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig) {
+    public ConstructorController(UtilsService utilsService, DraftCourseRepository draftCourseRepository, OrganizationRepository organizationRepository, UserRepository userRepository, CoursesConfig coursesConfig, OrganizationsService organizationsService, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig, TagRepository tagRepository) {
         this.utilsService = utilsService;
-        this.coursesService = coursesService;
-        this.draftCoursesRepository = draftCoursesRepository;
-        this.usersRepository = usersRepository;
+        this.draftCourseRepository = draftCourseRepository;
+        this.organizationRepository = organizationRepository;
+        this.userRepository = userRepository;
         this.coursesConfig = coursesConfig;
+        this.organizationsService = organizationsService;
         this.constructorService = constructorService;
         this.rolesService = rolesService;
         this.loaderService = loaderService;
-        this.tagsService = tagsService;
         this.constructorValidator = constructorValidator;
         this.constructorConfig = constructorConfig;
+        this.tagRepository = tagRepository;
     }
 
     /**
@@ -65,13 +71,37 @@ public class ConstructorController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        List<DraftCourse> draftCourses = new ArrayList<>();
 
         if(userEntity == null) return "redirect:/";
 
-        coursesService.generateOptions(model, userEntity);
-        coursesService.generateDraftCourses(model, userEntity, sectionValue);
+        utilsService.addOptions(model, userEntity);
 
+        try {
+            // Get draft courses by user
+            if (sectionValue.equals("0")) {
+                for (Integer id : utilsService.splitToListInt(userEntity.getDraftCoursesIds())) {
+                    DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);
+                    if (draftCourseEntity == null) continue;
+                    draftCourses.add(new DraftCourse(draftCourseEntity));
+                }
+            }
+            // Get draft courses by organization
+            else {
+                int orgId = Integer.parseInt(sectionValue);
+                OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElse(null);
+                if(organizationEntity != null && organizationsService.isMember(userEntity, orgId)) {
+                    for (Integer id : utilsService.splitToListInt(organizationEntity.getDraftCoursesIds())) {
+                        DraftCourseEntity draftCourseEntity = draftCourseRepository.findById(id).orElse(null);
+                        if (draftCourseEntity == null) continue;
+                        draftCourses.add(new DraftCourse(draftCourseEntity));
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        model.addAttribute("draft_courses", draftCourses);
         model.addAttribute("section_value", sectionValue);
 
         return "constructor/constructor";
@@ -90,8 +120,8 @@ public class ConstructorController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -102,11 +132,14 @@ public class ConstructorController {
         Integer[] tagsCountCourses = new Integer[tags.length];
         Arrays.fill(tagsCountCourses, 0);
 
-        for (int i = 0; i < tags.length; ++i) {
-            try {
-                tagsCountCourses[i] = tagsService.getGraphInfo().get(tags[i]).getCourses().size();
-            } catch (Exception ignored) {}
-        }
+        try {
+            for (int i = 0; i < tags.length; ++i) {
+                TagEntity tagEntity = tagRepository.findByTag(tags[i]).orElse(null);
+                if (tagEntity != null) {
+                    tagsCountCourses[i] = tagEntity.getCoursesCount();
+                }
+            }
+        } catch (Exception ignored) {}
 
         constructorService.addActiveModules(model, activeModules, draftCourseEntity);
 
@@ -128,8 +161,8 @@ public class ConstructorController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -154,8 +187,8 @@ public class ConstructorController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -180,8 +213,8 @@ public class ConstructorController {
 
         User user = (User) session.getAttribute("user");
 
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -203,8 +236,8 @@ public class ConstructorController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -214,7 +247,7 @@ public class ConstructorController {
         }
         else {
             draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
-            draftCoursesRepository.save(draftCourseEntity);
+            draftCourseRepository.save(draftCourseEntity);
         }
         return "redirect:/constructor/" + hash + "/public";
     }
@@ -230,8 +263,8 @@ public class ConstructorController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
@@ -250,7 +283,7 @@ public class ConstructorController {
         draftCourseEntity.setDescription(draftCourseEntityChanges.getDescription());
         draftCourseEntity.setTags(draftCourseEntityChanges.getTags());
 
-        draftCoursesRepository.save(draftCourseEntity);
+        draftCourseRepository.save(draftCourseEntity);
 
         return "redirect:/constructor/" + hash + "/edit";
     }
@@ -266,14 +299,14 @@ public class ConstructorController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
         constructorService.removeCourse(hash);
-        draftCoursesRepository.delete(draftCourseEntity);
+        draftCourseRepository.delete(draftCourseEntity);
 
         return "redirect:/constructor/";
     }
@@ -289,11 +322,11 @@ public class ConstructorController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -308,7 +341,7 @@ public class ConstructorController {
             }
 
             draftCourseEntity.setAvatar(baseImg);
-            draftCoursesRepository.save(draftCourseEntity);
+            draftCourseRepository.save(draftCourseEntity);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -327,11 +360,11 @@ public class ConstructorController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return "redirect:/constructor";
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return "redirect:/constructor";
@@ -354,11 +387,11 @@ public class ConstructorController {
         if (check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if (userEntity == null) return "redirect:/constructor";
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if (draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return "redirect:/constructor";
@@ -394,11 +427,11 @@ public class ConstructorController {
         if (check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if (userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if (draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -414,7 +447,7 @@ public class ConstructorController {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
 
-        return coursesService.getVideoHtmlContent(
+        return utilsService.getVideoHtmlContent(
                 constructorConfig.getVideosPath() + hash + "/" + moduleId + "/" + lessonId + ".mp4");
     }
 
@@ -431,11 +464,11 @@ public class ConstructorController {
         if (check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if (userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if (draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -478,11 +511,11 @@ public class ConstructorController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -507,11 +540,11 @@ public class ConstructorController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));;
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -533,11 +566,11 @@ public class ConstructorController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -563,11 +596,11 @@ public class ConstructorController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
 
         if(userEntity == null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
-        DraftCourseEntity draftCourseEntity = draftCoursesRepository.findByHash(hash).orElse(null);
+        DraftCourseEntity draftCourseEntity = draftCourseRepository.findByHash(hash).orElse(null);
 
         if(draftCourseEntity == null || constructorService.hasNoAccess(userEntity, draftCourseEntity))
             return new ResponseEntity<>(HttpStatus.valueOf(500));

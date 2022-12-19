@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.OrganizationsRepository;
-import ru.mralexeimk.yedom.database.repositories.UsersRepository;
+import ru.mralexeimk.yedom.database.repositories.OrganizationRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.enums.OrganizationValidationType;
-import ru.mralexeimk.yedom.services.OrganizationsService;
-import ru.mralexeimk.yedom.services.UtilsService;
+import ru.mralexeimk.yedom.utils.services.OrganizationsService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
 import ru.mralexeimk.yedom.utils.validators.OrganizationValidator;
 
 import javax.servlet.http.HttpSession;
@@ -29,18 +28,18 @@ import javax.servlet.http.HttpSession;
 public class OrganizationController {
     private final UtilsService utilsService;
     private final OrganizationValidator organizationValidator;
-    private final OrganizationsRepository organizationsRepository;
+    private final OrganizationRepository organizationRepository;
     private final OrganizationsService organizationsService;
     private final OrganizationConfig organizationConfig;
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
 
-    public OrganizationController(UtilsService utilsService, OrganizationValidator organizationValidator, OrganizationsRepository organizationsRepository, OrganizationsService organizationsService, OrganizationConfig organizationConfig, UsersRepository usersRepository) {
+    public OrganizationController(UtilsService utilsService, OrganizationValidator organizationValidator, OrganizationRepository organizationRepository, OrganizationsService organizationsService, OrganizationConfig organizationConfig, UserRepository userRepository) {
         this.utilsService = utilsService;
         this.organizationValidator = organizationValidator;
-        this.organizationsRepository = organizationsRepository;
+        this.organizationRepository = organizationRepository;
         this.organizationsService = organizationsService;
         this.organizationConfig = organizationConfig;
-        this.usersRepository = usersRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -69,7 +68,7 @@ public class OrganizationController {
     @GetMapping("/{organization}")
     public String getOrganization(Model model, @PathVariable String organization,
                                   HttpSession session) {
-        OrganizationEntity organizationEntity = organizationsRepository.findByName(organization).orElse(null);
+        OrganizationEntity organizationEntity = organizationRepository.findByName(organization).orElse(null);
         if(organizationEntity == null) return "redirect:/profile/organizations";
 
         int id = 0;
@@ -98,12 +97,17 @@ public class OrganizationController {
         if(check != null) return check;
 
         User user = (User) session.getAttribute("user");
-        UserEntity userEntity = usersRepository.findById(user.getId()).orElse(null);
+        UserEntity userEntity = userRepository.findById(user.getId()).orElse(null);
+
         if(userEntity == null) return "redirect:/profile/organizations";
 
-        organization.setCreator(userEntity);
-        organizationValidator.validate(
-                organization.checkFor(OrganizationValidationType.CREATE), bindingResult);
+        if(organizationsService.getOrganizationsCount(userEntity)
+                >= organizationConfig.getMaxOrganizationsPerUser()) {
+            utilsService.reject("name", "organizations.limit", bindingResult);
+            return "organization/add";
+        }
+
+        organizationValidator.validate(organization.withArgs("add"), bindingResult);
 
         if (bindingResult.hasErrors())
             return "organization/add";
@@ -124,7 +128,7 @@ public class OrganizationController {
         if(check != null) return new ResponseEntity<>(HttpStatus.valueOf(500));
 
         User user = (User) session.getAttribute("user");
-        OrganizationEntity organizationEntity = organizationsRepository.findByName(orgName).orElse(null);
+        OrganizationEntity organizationEntity = organizationRepository.findByName(orgName).orElse(null);
 
         if(organizationEntity == null || user.getId() != organizationEntity.getAdminId())
             return new ResponseEntity<>(HttpStatus.valueOf(500));
@@ -140,7 +144,7 @@ public class OrganizationController {
             }
 
             organizationEntity.setAvatar(baseImg);
-            organizationsRepository.save(organizationEntity);
+            organizationRepository.save(organizationEntity);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.valueOf(500));

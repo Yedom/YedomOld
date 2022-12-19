@@ -9,26 +9,26 @@ import org.springframework.validation.Validator;
 import ru.mralexeimk.yedom.config.configs.AuthConfig;
 import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
-import ru.mralexeimk.yedom.database.repositories.UsersRepository;
+import ru.mralexeimk.yedom.database.repositories.UserRepository;
 import ru.mralexeimk.yedom.models.User;
-import ru.mralexeimk.yedom.utils.enums.UserValidationType;
-import ru.mralexeimk.yedom.services.ValidationService;
+import ru.mralexeimk.yedom.utils.services.UtilsService;
+import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
 /**
  * User model validator
  */
 @Component
 public class UserValidator implements Validator {
-    private final ValidationService validationService;
-    private final UsersRepository usersRepository;
+    private final UtilsService utilsService;
+    private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final AuthConfig authConfig;
     private final EmailConfig emailConfig;
 
     @Autowired
-    public UserValidator(ValidationService validationService, UsersRepository usersRepository, PasswordEncoder encoder, AuthConfig authConfig, EmailConfig emailConfig) {
-        this.validationService = validationService;
-        this.usersRepository = usersRepository;
+    public UserValidator(UtilsService utilsService, UserRepository userRepository, PasswordEncoder encoder, AuthConfig authConfig, EmailConfig emailConfig) {
+        this.utilsService = utilsService;
+        this.userRepository = userRepository;
         this.encoder = encoder;
         this.authConfig = authConfig;
         this.emailConfig = emailConfig;
@@ -39,56 +39,56 @@ public class UserValidator implements Validator {
         return User.class.equals(aClass);
     }
 
-    public void commonValidator(User user, Errors errors) {
+    private void commonValidator(User user, Errors errors) {
         if(user.getUsername() == null || user.getUsername().isEmpty()) {
-            validationService.reject("username", "auth.username.empty", errors);
+            utilsService.reject("username", "auth.username.empty", errors);
         }
         else if(user.getUsername().length() < authConfig.getMinUsernameLength() ||
                 user.getUsername().length() > authConfig.getMaxUsernameLength()) {
-            validationService.reject("username", "auth.username.size", errors);
+            utilsService.reject("username", "auth.username.size", errors);
         }
         if(user.getPassword() == null || user.getPassword().isEmpty()) {
-            validationService.reject("password", "auth.password.empty", errors);
+            utilsService.reject("password", "auth.password.empty", errors);
         }
         else if(user.getPassword().length() < authConfig.getMinPasswordLength()) {
-            validationService.reject("password", "auth.password.size", errors);
+            utilsService.reject("password", "auth.password.size", errors);
         }
         else if(user.getPassword().length() > authConfig.getMaxPasswordLength()) {
-            validationService.reject("password", "auth.password.large", errors);
+            utilsService.reject("password", "auth.password.large", errors);
         }
         if(user.getEmail() == null || user.getEmail().isEmpty()) {
-            validationService.reject("email", "auth.email.empty", errors);
+            utilsService.reject("email", "auth.email.empty", errors);
         }
-        else if(!validationService.regexMatch(emailConfig.getRegexp(), user.getEmail())) {
-            validationService.reject("email", "auth.email.incorrect", errors);
+        else if(!utilsService.regexMatch(emailConfig.getRegexp(), user.getEmail())) {
+            utilsService.reject("email", "auth.email.incorrect", errors);
         }
     }
 
     public void regValidator(User user, Errors errors) {
         commonValidator(user, errors);
-        if (usersRepository.findByEmail(user.getEmail()).isPresent()) {
-            validationService.reject("email", "auth.email.in_use", errors);
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            utilsService.reject("email", "auth.email.in_use", errors);
         }
-        if (usersRepository.findByUsername(user.getUsername()).isPresent()) {
-            validationService.reject("username", "auth.username.in_use", errors);
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            utilsService.reject("username", "auth.username.in_use", errors);
         }
     }
 
     public void loginValidator(User user, Errors errors) {
         if(user.getUsername() == null || user.getUsername().isEmpty()) {
-            validationService.reject("username", "auth.username.empty", errors);
+            utilsService.reject("username", "auth.username.empty", errors);
         }
         else if(user.getPassword() == null || user.getPassword().isEmpty()) {
-            validationService.reject("password", "auth.password.empty", errors);
+            utilsService.reject("password", "auth.password.empty", errors);
         }
         else {
-            if(usersRepository.findByUsername(user.getUsername()).isEmpty()) {
-                validationService.reject("username", "auth.user_not_found", errors);
+            if(userRepository.findByUsername(user.getUsername()).isEmpty()) {
+                utilsService.reject("username", "auth.user_not_found", errors);
             }
             else {
-                UserEntity userEntity = usersRepository.findByUsername(user.getUsername()).orElse(null);
+                UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElse(null);
                 if (userEntity != null && !encoder.matches(user.getPassword(), userEntity.getPassword())) {
-                    validationService.reject("password", "auth.password.incorrect", errors);
+                    utilsService.reject("password", "auth.password.incorrect", errors);
                 }
             }
         }
@@ -96,55 +96,55 @@ public class UserValidator implements Validator {
 
     public void updateValidator(User user, Errors errors) {
         if(user.getUsername() == null || user.getUsername().isEmpty()) {
-            validationService.reject("username", "auth.username.empty", errors);
+            utilsService.reject("username", "auth.username.empty", errors);
         }
         else if(user.getUsername().length() < authConfig.getMinUsernameLength() ||
                 user.getUsername().length() > authConfig.getMaxUsernameLength()) {
-            validationService.reject("username", "auth.username.size", errors);
+            utilsService.reject("username", "auth.username.size", errors);
         }
-        else if (usersRepository.findByUsername(user.getUsername()).isPresent()
-                && usersRepository.findByEmail(user.getEmail()).isPresent()
-                && usersRepository.findByUsername(user.getUsername()).get().getId() !=
-                usersRepository.findByEmail(user.getEmail()).get().getId()) {
-            validationService.reject("username", "auth.username.in_use", errors);
+        else if (userRepository.findByUsername(user.getUsername()).isPresent()
+                && userRepository.findByEmail(user.getEmail()).isPresent()
+                && userRepository.findByUsername(user.getUsername()).get().getId() !=
+                userRepository.findByEmail(user.getEmail()).get().getId()) {
+            utilsService.reject("username", "auth.username.in_use", errors);
         }
         if(user.getNewPassword() != null && !user.getNewPassword().equals("")) {
             if (user.getNewPassword().length() < authConfig.getMinPasswordLength()) {
-                validationService.reject("newPassword", "auth.lk.new_password.size", errors);
+                utilsService.reject("newPassword", "auth.lk.new_password.size", errors);
             }
             else if(user.getNewPassword().length() > authConfig.getMaxPasswordLength()) {
-                validationService.reject("newPassword", "auth.lk.new_password.large", errors);
+                utilsService.reject("newPassword", "auth.lk.new_password.large", errors);
             }
             else if (user.getNewPasswordRepeat() == null ||
                     !user.getNewPassword().equals(user.getNewPasswordRepeat())) {
-                validationService.reject("newPassword", "auth.lk.new_password.different", errors);
+                utilsService.reject("newPassword", "auth.lk.new_password.different", errors);
             }
         }
-        UserEntity userEntity = usersRepository.findByEmail(user.getEmail()).orElse(null);
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail()).orElse(null);
         if(user.getPassword() == null || user.getPassword().equals("")) {
-            validationService.reject("password", "auth.password.empty", errors);
+            utilsService.reject("password", "auth.password.empty", errors);
         }
         else if(user.getPassword().length() < authConfig.getMinPasswordLength()) {
-            validationService.reject("password", "auth.password.size", errors);
+            utilsService.reject("password", "auth.password.size", errors);
         }
         else if(user.getPassword().length() > authConfig.getMaxPasswordLength()) {
-            validationService.reject("password", "auth.password.large", errors);
+            utilsService.reject("password", "auth.password.large", errors);
         }
         else if (userEntity != null && !encoder.matches(user.getPassword(), userEntity.getPassword())) {
-            validationService.reject("password", "auth.password.incorrect", errors);
+            utilsService.reject("password", "auth.password.incorrect", errors);
         }
     }
 
     @Override
     public void validate(@NonNull Object o, @NonNull Errors errors) {
         if(o instanceof User user) {
-            if(user.getValidationType() == UserValidationType.REG) {
+            if(user.getArgs().contains("onReg")) {
                 regValidator(user, errors);
             }
-            else if(user.getValidationType() == UserValidationType.LOGIN) {
+            else if(user.getArgs().contains("onLogin")) {
                 loginValidator(user, errors);
             }
-            else if(user.getValidationType() == UserValidationType.UPDATE) {
+            else if(user.getArgs().contains("onUpdate")) {
                 updateValidator(user, errors);
             }
         }

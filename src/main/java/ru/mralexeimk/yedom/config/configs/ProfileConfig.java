@@ -14,5 +14,4 @@ import org.springframework.context.annotation.Configuration;
 public class ProfileConfig {
     private String baseAvatarDefault;
     private int baseAvatarMaxSize;
-    private int maxLinks;
 }
