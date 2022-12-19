@@ -23,7 +23,7 @@ public class Course extends DraftCourse {
     protected boolean acceptTasks = false;
     protected String completeRequestsUsersIds = "";
 
-    // Model fields
+    // additional fields
     private String creatorName = "";
     private String creatorAvatar = "";
     private String creatorType = "";

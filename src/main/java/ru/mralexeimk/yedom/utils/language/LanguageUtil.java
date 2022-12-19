@@ -17,6 +17,14 @@ public class LanguageUtil {
         return LocaleContextHolder.getLocale();
     }
 
+    public void setLocale(Locale locale) {
+        LocaleContextHolder.setLocale(locale);
+    }
+
+    public void setLocale(String locale) {
+        LocaleContextHolder.setLocale(new Locale(locale));
+    }
+
     public String getLocalizedMessage(String messageKey) {
         return messageSource.getMessage(messageKey, null, getLocale());
     }

@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class DraftCourse {
     private int id;
-    protected String hash = "";
+    protected String hash;
     protected String title;
     protected boolean byOrganization;
     protected int creatorId;
@@ -26,7 +26,6 @@ public class DraftCourse {
     protected String modules;
     protected boolean publicRequest;
 
-    // DraftCourse by DraftCourseEntity
     public DraftCourse(DraftCourseEntity courseEntity) {
         this(courseEntity.getId(), courseEntity.getHash(), courseEntity.getTitle(),
                 courseEntity.isByOrganization(), courseEntity.getCreatorId(),

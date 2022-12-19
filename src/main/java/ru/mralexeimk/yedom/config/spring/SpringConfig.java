@@ -1,5 +1,7 @@
 package ru.mralexeimk.yedom.config.spring;
 
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -11,6 +13,9 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,11 +30,14 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import ru.mralexeimk.yedom.config.configs.LanguageConfig;
+import ru.mralexeimk.yedom.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.AcceptHeaderResolver;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import ru.mralexeimk.yedom.utils.services.UtilsService;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executors;
 
 /**
  * Spring configuration
