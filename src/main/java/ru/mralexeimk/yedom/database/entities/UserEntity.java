@@ -39,37 +39,37 @@ public class UserEntity {
     @Column(name = "balance")
     private int balance = 0;
 
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar = "";
 
-    @Column(name = "courses_ids")
+    @Column(name = "courses_ids", columnDefinition = "TEXT")
     private String coursesIds = "";
 
-    @Column(name = "draft_courses_ids")
+    @Column(name = "draft_courses_ids", columnDefinition = "TEXT")
     private String draftCoursesIds = "";
 
-    @Column(name = "friends_ids")
+    @Column(name = "friends_ids", columnDefinition = "TEXT")
     private String friendsIds = "";
 
-    @Column(name = "following_ids")
+    @Column(name = "following_ids", columnDefinition = "TEXT")
     private String followingIds = "";
 
-    @Column(name = "organizations_ids")
+    @Column(name = "organizations_ids", columnDefinition = "TEXT")
     private String organizationsIds = "";
 
-    @Column(name = "in_organizations_ids")
+    @Column(name = "in_organizations_ids", columnDefinition = "TEXT")
     private String inOrganizationsIds = "";
 
-    @Column(name = "organizations_following_ids")
+    @Column(name = "organizations_following_ids", columnDefinition = "TEXT")
     private String organizationsFollowingIds = "";
 
-    @Column(name = "settings")
-    private String settings = "lang=auto&strangersShowEmail=false&strangersShowLinks=false&strangersShowCompletedCourses=false&strangersShowOrganizations=false&friendsShowEmail=false&friendsShowLinks=false&friendsShowCompletedCourses=false&friendsShowOrganizations=true";
+    @Column(name = "settings", columnDefinition = "TEXT")
+    private String settings = "";
 
-    @Column(name = "links")
+    @Column(name = "links", columnDefinition = "TEXT")
     private String links = "";
 
-    @Column(name = "about")
+    @Column(name = "about", columnDefinition = "TEXT")
     private String about = "";
 
     // Add to database constructor
@@ -82,6 +82,7 @@ public class UserEntity {
         this.avatar = user.getAvatar();
         this.links = user.getLinks();
         this.about = user.getAbout();
+        this.settings = user.getSettings().toString();
     }
 
     @Override

@@ -231,8 +231,8 @@ public class TagsService {
         }
     }
 
-    private List<String> parseInputToTags(String input) {
-        List<String> tags = new ArrayList<>();
+    public Set<String> parseInputToTags(String input) {
+        Set<String> tags = new HashSet<>();
 
         input = input.replaceAll("\\s+", " ");
         List<String> words = Arrays.asList(input.split(" "));
@@ -241,20 +241,32 @@ public class TagsService {
                 String hypothesisTag = String.join(" ", combination);
 
                 // binary search in 'sortedTags' closest to 'hypothesisTag' by Levenshtein distance
-                int l = 0, r = sortedTags.size() - 1;
-                while (l < r) {
+                int l = 0, r = sortedTags.size();
+                while (r - l > 1) {
                     int m = (l + r) / 2;
-                    if (levenshteinDistance(hypothesisTag, sortedTags.get(m)) <
-                            levenshteinDistance(hypothesisTag, sortedTags.get(m + 1))) {
+                    if(sortedTags.get(m).compareTo(hypothesisTag) > 0) {
                         r = m;
                     }
                     else {
-                        l = m + 1;
+                        l = m;
                     }
                 }
-                if (levenshteinDistance(hypothesisTag, sortedTags.get(l)) <=
-                        smartSearchConfig.getMaxLevenshteinDistance()) {
-                    tags.add(sortedTags.get(l));
+
+                int minDistance = Integer.MAX_VALUE;
+                int M = l;
+
+                for(int m = Math.max(0, l - smartSearchConfig.getBinarySearchSpread());
+                    m <= Math.min(l + smartSearchConfig.getBinarySearchSpread(), sortedTags.size()-1); ++m) {
+
+                    int distance = levenshteinDistance(hypothesisTag, sortedTags.get(m));
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        M = m;
+                    }
+                }
+
+                if (minDistance <= smartSearchConfig.getMaxLevenshteinDistance()) {
+                    tags.add(sortedTags.get(M));
                 }
             });
         }
@@ -293,7 +305,7 @@ public class TagsService {
      */
     public Set<String> searchRelatedTags(String inputStr) {
         Set<String> relatedTags = new HashSet<>();
-        List<String> tags = parseInputToTags(inputStr);
+        Set<String> tags = parseInputToTags(inputStr);
         for (String tag : tags) {
             relatedTags.addAll(getRelatedTags(tag));
         }
@@ -317,7 +329,7 @@ public class TagsService {
      */
     public Set<CourseEntity> searchCoursesByInput(String inputStr) {
         Set<CourseEntity> courses = new HashSet<>();
-        List<String> tags = parseInputToTags(inputStr);
+        Set<String> tags = parseInputToTags(inputStr);
         for (String tag : tags) {
             courses.addAll(searchCoursesByTag(tag));
         }

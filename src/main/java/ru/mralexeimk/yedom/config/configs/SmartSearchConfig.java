@@ -18,6 +18,7 @@ public class SmartSearchConfig {
     private int maxPopularTags;
     private int maxWordsInTag;
     private int maxLevenshteinDistance;
+    private int binarySearchSpread;
     private String levenshteinWeights;
     private int maxWordsInRequest;
     private int maxTagsSuggestions;

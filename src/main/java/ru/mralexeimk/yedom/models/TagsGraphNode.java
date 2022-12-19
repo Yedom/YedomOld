@@ -10,4 +10,12 @@ import java.util.List;
 public class TagsGraphNode {
     private int index;
     private List<Integer> courses;
+
+    @Override
+    public String toString() {
+        return "TagsGraphNode{" +
+                "index=" + index +
+                ", courses=" + courses +
+                '}';
+    }
 }

@@ -21,7 +21,8 @@ public class ErrorsController {
     }
 
     @ExceptionHandler(Exception.class)
-    public String handleException() {
+    public String handleException(Exception ex) {
+        ex.printStackTrace();
         return "redirect:/";
     }
 }

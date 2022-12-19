@@ -106,7 +106,7 @@ public class GraphsController {
         for(Integer id : usersIds) {
             JSONObject node = new JSONObject();
             node.put("id", id);
-            node.put("label", "user's id: " + id);
+            node.put("label", id);
             node.put("shape", "dot");
             node.put("size", 10);
             node.put("color", "#97c2fc");

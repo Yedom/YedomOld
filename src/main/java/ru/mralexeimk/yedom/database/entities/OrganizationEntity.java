@@ -19,31 +19,31 @@ public class OrganizationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(name = "admin_id")
     private int adminId;
 
-    @Column(name = "moderators_ids")
+    @Column(name = "moderators_ids", columnDefinition = "TEXT")
     private String moderatorsIds = "";
 
-    @Column(name = "members_ids")
+    @Column(name = "members_ids", columnDefinition = "TEXT")
     private String membersIds = "";
 
     @Column(name = "balance")
     private int balance = 0;
 
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar = "";
 
-    @Column(name = "courses_ids")
+    @Column(name = "courses_ids", columnDefinition = "TEXT")
     private String coursesIds = "";
 
-    @Column(name = "draft_courses_ids")
+    @Column(name = "draft_courses_ids", columnDefinition = "TEXT")
     private String draftCoursesIds = "";
 
-    @Column(name = "followers_ids")
+    @Column(name = "followers_ids", columnDefinition = "TEXT")
     private String followersIds = "";
 
     // Add to database constructor

@@ -14,6 +14,7 @@ import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.utils.enums.UsersConnectionType;
 
+import javax.annotation.PreDestroy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,11 @@ public class FriendsService {
         }).start();
     }
 
+    @PreDestroy
+    public void stop() {
+        saveToDB();
+    }
+
     /**
      * Init graph from database table 'users'
      */
@@ -67,6 +73,8 @@ public class FriendsService {
         usersRepository.findAll().forEach(user -> {
             followingGraph.addVertex(user.getId());
             friendsGraph.addVertex(user.getId());
+        });
+        usersRepository.findAll().forEach(user -> {
             Arrays.stream(user.getFollowingIds().split(",")).forEach(following -> {
                 if(following.equals("")) return;
                 followingGraph.addEdge(user.getId(), Integer.parseInt(following));

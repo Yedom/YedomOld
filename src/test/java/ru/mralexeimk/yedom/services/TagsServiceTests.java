@@ -65,6 +65,20 @@ public class TagsServiceTests {
     }
 
     @Test
+    void parseInputToTags() {
+        assertEquals(Set.of("программирование", "java"),
+                tagsService.parseInputToTags("программирование на java"));
+        assertEquals(Set.of("программирование", "python"),
+                tagsService.parseInputToTags("прогроммированние на pithon"));
+        assertEquals(Set.of("python"),
+                tagsService.parseInputToTags("python"));
+        assertEquals(Set.of("java"),
+                tagsService.parseInputToTags("java"));
+        assertEquals(Set.of("java", "java spring"),
+                tagsService.parseInputToTags("основы java spring"));
+    }
+
+    @Test
     void getRelatedTags() {
         assertEquals(Set.of("python", "pandas", "java", "java spring", "hibernate"),
                 tagsService.getRelatedTags("программирование"));
@@ -78,28 +92,28 @@ public class TagsServiceTests {
     void searchCoursesByTag() {
         assertEquals(List.of(1, 2),
                 tagsService.searchCoursesByTag("программирование").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
         assertEquals(List.of(1),
                 tagsService.searchCoursesByTag("python").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
         assertEquals(List.of(2),
                 tagsService.searchCoursesByTag("java spring").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
     }
 
     @Test
     void searchCoursesByInput() {
         assertEquals(List.of(1, 2),
                 tagsService.searchCoursesByInput("программироване").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
         assertEquals(List.of(1, 2),
                 tagsService.searchCoursesByInput("оснновы программирования на jaava").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
         assertEquals(List.of(1),
                 tagsService.searchCoursesByInput("pithon для новичков").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
         assertEquals(List.of(),
                 tagsService.searchCoursesByInput("йцуроорццукер").stream()
-                        .map(CourseEntity::getId).toList());
+                        .map(CourseEntity::getId).sorted().toList());
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.test.context.ActiveProfiles;
 import ru.mralexeimk.yedom.config.configs.CoursesConfig;
 import ru.mralexeimk.yedom.config.configs.EmailConfig;
 import ru.mralexeimk.yedom.services.ValidationService;
@@ -11,6 +12,7 @@ import ru.mralexeimk.yedom.services.ValidationService;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class ValidationServiceTests {
     private final ValidationService validationService;
     private final EmailConfig emailConfig;

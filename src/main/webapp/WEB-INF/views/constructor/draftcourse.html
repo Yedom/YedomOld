@@ -85,7 +85,7 @@
                     <!-- Added on -->
                     <div class="added-on">
                         <h4 class="profile-label" th:text="#{constructor.added_on}">Added on</h4>
-                        <h6 th:text="${@utilsService.getCreatedOnDate(course.addedOn)}">18.11.2022</h6>
+                        <h6 th:text="${@utilsService.timestampToDate(course.addedOn)}">18.11.2022</h6>
                     </div>
 
                     <!-- Description -->

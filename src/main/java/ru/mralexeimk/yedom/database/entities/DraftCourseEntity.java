@@ -33,19 +33,19 @@ public class DraftCourseEntity {
     @Column(name = "creator_id")
     private int creatorId;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "tags")
+    @Column(name = "tags", columnDefinition = "TEXT")
     private String tags;
 
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
 
     @Column(name = "added_on")
     private Timestamp addedOn;
 
-    @Column(name = "modules")
+    @Column(name = "modules", columnDefinition = "TEXT")
     private String modules;
 
     @Column(name = "public_request")

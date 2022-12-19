@@ -63,7 +63,8 @@
                                 </div>
                                 <input id="avatar-upload" class="file-upload" type="file" accept="image/*"/>
                             </div>
-                            <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">Поврежденное изображение или слишком большой размер</h5>
+                            <h5 id="error" hidden="hidden" style="color: red;" th:text="#{profile.avatar.error}">
+                                Поврежденное изображение или слишком большой размер</h5>
                             <br />
 
                             <!-- Email -->
@@ -75,14 +76,14 @@
                             <!-- Last login -->
                             <div class="created-on" th:if="${show_online}">
                                 <h4 class="profile-label" th:text="#{profile.last_login}">Last login</h4>
-                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
+                                <h6 th:text="${@profileService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
                             </div>
 
                             <!-- Links -->
                             <div class="links-container" th:if="${relation == 'self' || (show_links && user.links.length() > 0)}">
                                 <h4 class="profile-label" th:text="#{profile.links}">Links</h4>
                                 <div class="links">
-                                    <div class="link" th:each="link : ${@utilsService.parseLinks(user.links)}" th:id="${link.first}">
+                                    <div class="link" th:each="link : ${@profileService.parseLinks(user.links)}" th:id="${link.first}">
                                         <a target="_blank" rel="noopener noreferrer" class="link-href"
                                            href="#" th:text="${link.first}" th:href="${link.second}">GitHub profile</a>
                                         <i th:attr="onclick=|deleteLink('${link.first}')|" class="material-icons centered-icon">delete</i>
