@@ -286,9 +286,7 @@ public class ConstructorService {
 
                 courseFolder.mkdirs();
                 FileUtils.copyDirectory(constructorFolder, courseFolder);
-            } catch (Exception ex){
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) {}
         }).start();
 
         coursesRepository.save(courseEntity);
