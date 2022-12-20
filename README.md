@@ -6,9 +6,6 @@ Yedom - образовательная онлайн-платформа
     <li>
         <a href="https://dbdesigner.page.link/Z3VkkUbzMkNAPp4f8"><b>Архитектура БД</b></a>
     </li>
-    <li>
-        <a href=""><b>Настройка проекта у себя</b></a>
-    </li>
 </ul>
 <h1>Стэк:</h1>
 <p><b>Backend</b>: Java 17, Spring Boot 2.7.4, Thymeleaf, Postgresql, Hibernate</p>
