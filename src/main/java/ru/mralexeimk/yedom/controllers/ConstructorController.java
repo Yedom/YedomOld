@@ -34,19 +34,21 @@ public class ConstructorController {
     private final UsersRepository usersRepository;
     private final CoursesConfig coursesConfig;
     private final ConstructorService constructorService;
+    private final ModerationService moderationService;
     private final RolesService rolesService;
     private final LoaderService loaderService;
     private final TagsService tagsService;
     private final ConstructorValidator constructorValidator;
     private final ConstructorConfig constructorConfig;
 
-    public ConstructorController(UtilsService utilsService, CoursesService coursesService, DraftCoursesRepository draftCoursesRepository, UsersRepository usersRepository, CoursesConfig coursesConfig, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, TagsService tagsService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig) {
+    public ConstructorController(UtilsService utilsService, CoursesService coursesService, DraftCoursesRepository draftCoursesRepository, UsersRepository usersRepository, CoursesConfig coursesConfig, ConstructorService constructorService, ModerationService moderationService, RolesService rolesService, LoaderService loaderService, TagsService tagsService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig) {
         this.utilsService = utilsService;
         this.coursesService = coursesService;
         this.draftCoursesRepository = draftCoursesRepository;
         this.usersRepository = usersRepository;
         this.coursesConfig = coursesConfig;
         this.constructorService = constructorService;
+        this.moderationService = moderationService;
         this.rolesService = rolesService;
         this.loaderService = loaderService;
         this.tagsService = tagsService;
@@ -209,13 +211,11 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        if(rolesService.hasPermission(userEntity, "courses.add")) {
-            constructorService.publicCourse(draftCourseEntity);
-        }
-        else {
-            draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
-            draftCoursesRepository.save(draftCourseEntity);
-        }
+        draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
+        draftCoursesRepository.save(draftCourseEntity);
+
+        moderationService.update(draftCourseEntity);
+
         return "redirect:/constructor/" + hash + "/public";
     }
 

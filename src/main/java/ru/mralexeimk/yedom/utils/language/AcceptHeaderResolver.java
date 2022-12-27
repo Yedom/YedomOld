@@ -42,7 +42,7 @@ public class AcceptHeaderResolver extends AcceptHeaderLocaleResolver {
             }
             List<Locale.LanguageRange> list = Locale.LanguageRange.parse(request.getHeader("Accept-Language"));
             return Locale.lookup(list, LOCALES);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return Locale.getDefault();
         }
     }
