@@ -1,8 +1,10 @@
 package ru.mralexeimk.yedom.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,6 @@ import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.enums.UserValidationType;
 import ru.mralexeimk.yedom.services.UtilsService;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * Controller for account page (where user can change username and password)

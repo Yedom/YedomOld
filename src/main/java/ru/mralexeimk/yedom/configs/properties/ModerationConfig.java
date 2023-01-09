@@ -1,4 +1,4 @@
-package ru.mralexeimk.yedom.config.configs;
+package ru.mralexeimk.yedom.configs.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

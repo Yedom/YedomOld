@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.*;
 

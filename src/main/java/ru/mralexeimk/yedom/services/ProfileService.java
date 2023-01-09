@@ -1,9 +1,10 @@
 package ru.mralexeimk.yedom.services;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import ru.mralexeimk.yedom.config.configs.ProfileConfig;
+import ru.mralexeimk.yedom.configs.properties.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.CompletedCoursesRepository;
 import ru.mralexeimk.yedom.database.repositories.UsersRepository;
@@ -14,7 +15,6 @@ import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.custom.Triple;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
-import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;

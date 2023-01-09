@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.Organization;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Comparator;
 
 @Getter

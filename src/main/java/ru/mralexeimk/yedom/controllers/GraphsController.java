@@ -15,7 +15,7 @@ import ru.mralexeimk.yedom.services.RolesService;
 import ru.mralexeimk.yedom.services.TagsService;
 import ru.mralexeimk.yedom.services.UtilsService;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Set;
 

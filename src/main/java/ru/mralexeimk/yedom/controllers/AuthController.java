@@ -1,5 +1,7 @@
 package ru.mralexeimk.yedom.controllers;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,9 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mralexeimk.yedom.config.configs.AuthConfig;
-import ru.mralexeimk.yedom.config.configs.HostConfig;
-import ru.mralexeimk.yedom.config.configs.ProfileConfig;
+import ru.mralexeimk.yedom.configs.properties.AuthConfig;
+import ru.mralexeimk.yedom.configs.properties.HostConfig;
+import ru.mralexeimk.yedom.configs.properties.ProfileConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.models.Code;
@@ -21,9 +23,6 @@ import ru.mralexeimk.yedom.services.UtilsService;
 import ru.mralexeimk.yedom.services.EmailService;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 import ru.mralexeimk.yedom.utils.validators.UserValidator;
-
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 /**
  * Controller for authentication process pages

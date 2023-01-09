@@ -16,7 +16,7 @@ public class ErrorsController {
         if (ex.getClass().getName().equals("org.apache.catalina.connector.ClientAbortException")) {
             return null;
         }
-
+        ex.printStackTrace();
         return "redirect:/";
     }
 

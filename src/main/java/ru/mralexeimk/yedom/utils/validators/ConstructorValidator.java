@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.configs.properties.CoursesConfig;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.DraftCourse;
 import ru.mralexeimk.yedom.services.UtilsService;

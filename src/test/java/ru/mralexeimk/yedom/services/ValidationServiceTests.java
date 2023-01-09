@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
-import ru.mralexeimk.yedom.config.configs.CoursesConfig;
-import ru.mralexeimk.yedom.config.configs.EmailConfig;
-import ru.mralexeimk.yedom.services.ValidationService;
+import ru.mralexeimk.yedom.configs.properties.CoursesConfig;
+import ru.mralexeimk.yedom.configs.properties.EmailConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 

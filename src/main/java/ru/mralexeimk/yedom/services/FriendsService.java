@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.services;
 
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -9,12 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.FriendsConfig;
+import ru.mralexeimk.yedom.configs.properties.FriendsConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.utils.enums.UsersConnectionType;
 
-import javax.annotation.PreDestroy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

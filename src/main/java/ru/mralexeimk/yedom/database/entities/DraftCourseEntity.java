@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.GenericGenerator;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.DraftCourse;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
 
@@ -69,7 +70,7 @@ public class DraftCourseEntity {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         DraftCourseEntity draftCourseEntity = (DraftCourseEntity) o;
-        return Comparator.comparingInt(DraftCourseEntity::getId)
+        return Comparator.comparing(DraftCourseEntity::getHash)
                 .compare(this, draftCourseEntity) == 0;
     }
 
@@ -81,7 +82,7 @@ public class DraftCourseEntity {
     @Override
     public String toString() {
         return "DraftCourseEntity{" +
-                "id=" + id +
+                "hash=" + hash +
                 ", title='" + title + '\'' +
                 ", byOrganization=" + byOrganization +
                 ", creatorId=" + creatorId +

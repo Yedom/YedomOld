@@ -5,7 +5,9 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.concurrent.AsSynchronizedGraph;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AsSynchronizedGraphTests {
     private final AsSynchronizedGraph<String, DefaultEdge> graph;
 
+    @Autowired
+    @Lazy
     public AsSynchronizedGraphTests() {
         graph = new AsSynchronizedGraph<>(new DefaultDirectedGraph<>(DefaultEdge.class));
     }

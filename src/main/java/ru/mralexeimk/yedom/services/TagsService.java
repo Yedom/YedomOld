@@ -8,7 +8,7 @@ import org.jgrapht.graph.concurrent.AsSynchronizedGraph;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
+import ru.mralexeimk.yedom.configs.properties.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.repositories.CoursesRepository;
 import ru.mralexeimk.yedom.models.TagsGraphNode;

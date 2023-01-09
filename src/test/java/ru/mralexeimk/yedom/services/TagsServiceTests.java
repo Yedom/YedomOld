@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
-import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
+import ru.mralexeimk.yedom.configs.properties.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
-import ru.mralexeimk.yedom.database.repositories.CoursesRepository;
 
 import java.util.List;
 import java.util.Set;

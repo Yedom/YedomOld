@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.ModerationConfig;
+import ru.mralexeimk.yedom.configs.properties.ModerationConfig;
 import ru.mralexeimk.yedom.database.entities.CourseModerationEntity;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.repositories.CoursesModerationRepository;

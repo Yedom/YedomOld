@@ -4,7 +4,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
+import ru.mralexeimk.yedom.configs.properties.OrganizationConfig;
 import ru.mralexeimk.yedom.database.repositories.OrganizationsRepository;
 import ru.mralexeimk.yedom.models.Organization;
 import ru.mralexeimk.yedom.utils.enums.OrganizationValidationType;
