@@ -7,7 +7,7 @@ import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.DraftCourse;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
 

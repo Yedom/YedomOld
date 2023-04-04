@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 import ru.mralexeimk.yedom.models.Course;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
 
