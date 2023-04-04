@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.test.context.ActiveProfiles;
 import ru.mralexeimk.yedom.services.UtilsService;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class UtilsServiceTests {
     private final UtilsService utilsService;
 

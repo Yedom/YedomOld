@@ -18,6 +18,7 @@
     <!-- Scripts -->
     <script th:src="@{/resources/libs/jquery.js}"></script>
     <script th:src="@{/resources/libs/material-kit.js}"></script>
+    <script th:src="@{/resources/libs/particles.js}"></script>
     <script th:src="@{/resources/libs/popper.js}"></script>
     <script th:src="@{/resources/libs/material-design.js}"></script>
     <script th:src="@{/resources/libs/three.min.js}"></script>
@@ -208,6 +209,12 @@
 <div th:replace="../resources/components/footer.html :: footer-fragment"></div>
 
 <script th:src="@{/resources/js/index.js}"></script>
+
+<script>
+    particlesJS.load('model-container', '../resources/assets/particles_home.json', function () {
+        console.log('particles-js loaded!');
+    });
+</script>
 
 </body>
 </html>

@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.EmailConfig;
+import ru.mralexeimk.yedom.configs.properties.EmailConfig;
 import ru.mralexeimk.yedom.models.Code;
 
 import java.util.concurrent.ConcurrentHashMap;

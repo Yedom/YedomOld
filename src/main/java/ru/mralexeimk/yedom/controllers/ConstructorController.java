@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,8 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
-import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.configs.properties.ConstructorConfig;
+import ru.mralexeimk.yedom.configs.properties.CoursesConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.DraftCourse;
@@ -18,7 +19,6 @@ import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.services.*;
 import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.*;
 
@@ -34,19 +34,21 @@ public class ConstructorController {
     private final UsersRepository usersRepository;
     private final CoursesConfig coursesConfig;
     private final ConstructorService constructorService;
+    private final ModerationService moderationService;
     private final RolesService rolesService;
     private final LoaderService loaderService;
     private final TagsService tagsService;
     private final ConstructorValidator constructorValidator;
     private final ConstructorConfig constructorConfig;
 
-    public ConstructorController(UtilsService utilsService, CoursesService coursesService, DraftCoursesRepository draftCoursesRepository, UsersRepository usersRepository, CoursesConfig coursesConfig, ConstructorService constructorService, RolesService rolesService, LoaderService loaderService, TagsService tagsService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig) {
+    public ConstructorController(UtilsService utilsService, CoursesService coursesService, DraftCoursesRepository draftCoursesRepository, UsersRepository usersRepository, CoursesConfig coursesConfig, ConstructorService constructorService, ModerationService moderationService, RolesService rolesService, LoaderService loaderService, TagsService tagsService, ConstructorValidator constructorValidator, ConstructorConfig constructorConfig) {
         this.utilsService = utilsService;
         this.coursesService = coursesService;
         this.draftCoursesRepository = draftCoursesRepository;
         this.usersRepository = usersRepository;
         this.coursesConfig = coursesConfig;
         this.constructorService = constructorService;
+        this.moderationService = moderationService;
         this.rolesService = rolesService;
         this.loaderService = loaderService;
         this.tagsService = tagsService;
@@ -209,13 +211,11 @@ public class ConstructorController {
         if(userEntity == null || draftCourseEntity == null) return "redirect:/constructor";
         if(constructorService.hasNoAccess(userEntity, draftCourseEntity)) return "redirect:/constructor";
 
-        if(rolesService.hasPermission(userEntity, "courses.add")) {
-            constructorService.publicCourse(draftCourseEntity);
-        }
-        else {
-            draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
-            draftCoursesRepository.save(draftCourseEntity);
-        }
+        draftCourseEntity.setPublicRequest(!draftCourseEntity.isPublicRequest());
+        draftCoursesRepository.save(draftCourseEntity);
+
+        moderationService.update(draftCourseEntity);
+
         return "redirect:/constructor/" + hash + "/public";
     }
 

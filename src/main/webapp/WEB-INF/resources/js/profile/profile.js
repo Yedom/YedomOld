@@ -107,7 +107,7 @@ function linksUpdate() {
     var res = '';
     $('.link').each(function (index, el) {
         let aTag = $(el).find('a');
-        if(profile > 0) res += '|';
+        if(res.length > 0) res += '|';
         res += aTag.text() + '$' + aTag.attr('href');
     });
     let data = {links: res};
@@ -123,7 +123,7 @@ function linksUpdate() {
 }
 
 function clickButton(value) {
-    if(userEntityName === '') window.location = '../../../..';
+    if(userEntityName === '') window.location = '/profile/';
     window.location = '/profile/' + userEntityName + '/' + value;
 }
 

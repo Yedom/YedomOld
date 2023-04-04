@@ -1,11 +1,11 @@
 package ru.mralexeimk.yedom.database.entities;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
 

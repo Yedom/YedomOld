@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import ru.mralexeimk.yedom.config.configs.CoursesConfig;
-import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
-import ru.mralexeimk.yedom.config.configs.SmartSearchConfig;
+import ru.mralexeimk.yedom.configs.properties.CoursesConfig;
+import ru.mralexeimk.yedom.configs.properties.ConstructorConfig;
+import ru.mralexeimk.yedom.configs.properties.SmartSearchConfig;
 import ru.mralexeimk.yedom.database.entities.*;
 import ru.mralexeimk.yedom.database.repositories.*;
 import ru.mralexeimk.yedom.models.DraftCourse;
@@ -21,8 +22,6 @@ import ru.mralexeimk.yedom.models.Course;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.utils.validators.ConstructorValidator;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
@@ -91,11 +90,10 @@ public class CoursesController {
     @GetMapping
     public String index(Model model,
                         @RequestParam(required = false, name = "search") String search,
-                        @RequestParam(required = false, name = "tag") String tag,
-                        HttpServletRequest request) {
+                        @RequestParam(required = false, name = "tag") String tag) {
         List<Course> courses;
         if(search == null) {
-            List<CourseEntity> popularCourses = new ArrayList<>();
+            Set<CourseEntity> popularCourses = new HashSet<>();
             tagsService.getPopularTags().forEach(
                     tagTitle -> popularCourses.addAll(tagsService.searchCoursesByTag(tagTitle)));
             courses = popularCourses.stream()
@@ -105,13 +103,13 @@ public class CoursesController {
         }
         else {
             if(tag == null) {
-                courses = tagsService.searchCoursesByTag(search).stream()
+                courses = tagsService.searchCoursesByInput(search).stream()
                         .map(Course::new)
                         .peek(this::courseProcess)
                         .toList();
             }
             else {
-                courses = tagsService.searchCoursesByInput(search).stream()
+                courses = tagsService.searchCoursesByTag(search).stream()
                         .map(Course::new)
                         .peek(this::courseProcess)
                         .toList();

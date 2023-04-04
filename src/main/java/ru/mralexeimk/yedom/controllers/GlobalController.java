@@ -9,7 +9,7 @@ import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.services.UtilsService;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Timestamp;
 
 @ControllerAdvice

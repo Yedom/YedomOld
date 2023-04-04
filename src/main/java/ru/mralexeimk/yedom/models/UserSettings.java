@@ -1,8 +1,7 @@
 package ru.mralexeimk.yedom.models;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Model of user's settings

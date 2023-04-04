@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.services;
 
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
@@ -7,8 +8,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import ru.mralexeimk.yedom.config.configs.ConstructorConfig;
-import ru.mralexeimk.yedom.config.configs.CoursesConfig;
+import ru.mralexeimk.yedom.configs.properties.ConstructorConfig;
+import ru.mralexeimk.yedom.configs.properties.CoursesConfig;
 import ru.mralexeimk.yedom.database.entities.CourseEntity;
 import ru.mralexeimk.yedom.database.entities.DraftCourseEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
@@ -18,7 +19,6 @@ import ru.mralexeimk.yedom.models.Lesson;
 import ru.mralexeimk.yedom.models.Module;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
@@ -286,9 +286,7 @@ public class ConstructorService {
 
                 courseFolder.mkdirs();
                 FileUtils.copyDirectory(constructorFolder, courseFolder);
-            } catch (Exception ex){
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) {}
         }).start();
 
         coursesRepository.save(courseEntity);

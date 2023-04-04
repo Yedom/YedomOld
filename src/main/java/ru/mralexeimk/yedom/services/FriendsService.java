@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.services;
 
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.FriendsConfig;
+import ru.mralexeimk.yedom.configs.properties.FriendsConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.UsersRepository;
 import ru.mralexeimk.yedom.utils.enums.UsersConnectionType;
@@ -60,6 +61,11 @@ public class FriendsService {
         }).start();
     }
 
+    @PreDestroy
+    public void stop() {
+        saveToDB();
+    }
+
     /**
      * Init graph from database table 'users'
      */
@@ -67,6 +73,8 @@ public class FriendsService {
         usersRepository.findAll().forEach(user -> {
             followingGraph.addVertex(user.getId());
             friendsGraph.addVertex(user.getId());
+        });
+        usersRepository.findAll().forEach(user -> {
             Arrays.stream(user.getFollowingIds().split(",")).forEach(following -> {
                 if(following.equals("")) return;
                 followingGraph.addEdge(user.getId(), Integer.parseInt(following));

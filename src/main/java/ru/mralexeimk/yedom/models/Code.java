@@ -1,8 +1,7 @@
 package ru.mralexeimk.yedom.models;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
 
 /**
  * Model of sending code (to confirm email)

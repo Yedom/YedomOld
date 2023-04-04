@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.test.context.ActiveProfiles;
 import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class ProfileServiceTests {
     private final ProfileService profileService;
     private final LanguageUtil languageUtil;

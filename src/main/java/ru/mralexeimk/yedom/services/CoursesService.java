@@ -138,10 +138,12 @@ public class CoursesService {
             for(Lesson lesson : module.getLessons()) {
                 res.append(lesson.getName()).append(",");
             }
-            if(res.charAt(res.length() - 1) == ',') res.deleteCharAt(res.length() - 1);
+            if(res.length() > 0 && res.charAt(res.length() - 1) == ',')
+                res.deleteCharAt(res.length() - 1);
             res.append("|");
         }
-        if(res.charAt(res.length() - 1) == '|') res.deleteCharAt(res.length() - 1);
+        if(res.length() > 0 && res.charAt(res.length() - 1) == '|')
+            res.deleteCharAt(res.length() - 1);
         return res.toString();
     }
 

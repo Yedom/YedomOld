@@ -80,3 +80,12 @@ if(!isTouchDevice()) {
         oldY = e.y;
     }
 }
+
+window.onload = function () {
+    let particles = $('.particles-js-canvas-el');
+    let top = $('footer').offset().top - 50;
+    particles.attr('style', 'height: ' + top + 'px !important');
+    particles.attr('height', top);
+
+    pJSDom[0].pJS.fn.particlesRefresh();
+}

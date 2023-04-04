@@ -1,7 +1,7 @@
 package ru.mralexeimk.yedom.services;
 
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.OrganizationConfig;
+import ru.mralexeimk.yedom.configs.properties.OrganizationConfig;
 import ru.mralexeimk.yedom.database.entities.OrganizationEntity;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.database.repositories.OrganizationsRepository;

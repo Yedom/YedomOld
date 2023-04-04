@@ -1,10 +1,9 @@
 package ru.mralexeimk.yedom.services;
 
 import org.springframework.stereotype.Service;
-import ru.mralexeimk.yedom.config.configs.BigFileConfig;
+import ru.mralexeimk.yedom.configs.properties.BigFileConfig;
 import ru.mralexeimk.yedom.database.entities.UserEntity;
 import ru.mralexeimk.yedom.models.BigFile;
-import ru.mralexeimk.yedom.models.User;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;

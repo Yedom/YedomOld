@@ -15,7 +15,7 @@ import ru.mralexeimk.yedom.services.RolesService;
 import ru.mralexeimk.yedom.services.TagsService;
 import ru.mralexeimk.yedom.services.UtilsService;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Set;
 
@@ -106,7 +106,7 @@ public class GraphsController {
         for(Integer id : usersIds) {
             JSONObject node = new JSONObject();
             node.put("id", id);
-            node.put("label", "user's id: " + id);
+            node.put("label", id);
             node.put("shape", "dot");
             node.put("size", 10);
             node.put("color", "#97c2fc");

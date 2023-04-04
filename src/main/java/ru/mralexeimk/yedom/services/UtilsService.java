@@ -1,5 +1,6 @@
 package ru.mralexeimk.yedom.services;
 
+import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,6 @@ import ru.mralexeimk.yedom.utils.custom.Pair;
 import ru.mralexeimk.yedom.utils.enums.HashAlg;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
 
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;

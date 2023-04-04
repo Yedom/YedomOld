@@ -1,13 +1,14 @@
 package ru.mralexeimk.yedom.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.mralexeimk.yedom.models.User;
 import ru.mralexeimk.yedom.services.LoaderService;
 import ru.mralexeimk.yedom.services.UtilsService;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 
 @Controller

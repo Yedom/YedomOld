@@ -15,6 +15,7 @@
 
   <!-- Scripts -->
   <script th:src="@{/resources/libs/jquery.js}"></script>
+  <script th:src="@{/resources/libs/particles.js}"></script>
   <script th:src="@{/resources/libs/material-kit.js}"></script>
   <script th:src="@{/resources/libs/popper.js}"></script>
   <script th:src="@{/resources/libs/material-design.js}"></script>
@@ -22,6 +23,8 @@
 <body class="index-page sidebar-collapse">
 
 <div th:replace="../resources/components/header.html :: header-fragment"></div>
+
+<div id="particles-container"></div>
 
 <div class="bg">
   <br />
@@ -59,6 +62,12 @@
 </div>
 
 <div th:replace="../resources/components/footer.html :: footer-fragment"></div>
+
+<script>
+  particlesJS.load('particles-container', '../resources/assets/particles.json', function () {
+    console.log('particles-js loaded!');
+  });
+</script>
 
 </body>
 </html>

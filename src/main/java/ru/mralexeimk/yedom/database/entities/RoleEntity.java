@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Comparator;
 
 @Getter
@@ -18,13 +18,13 @@ public class RoleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "role")
+    @Column(name = "role", unique = true)
     private String role;
 
-    @Column(name = "inherits")
+    @Column(name = "inherits", columnDefinition = "TEXT")
     private String inherits;
 
-    @Column(name = "permissions")
+    @Column(name = "permissions", columnDefinition = "TEXT")
     private String permissions;
 
     @Override

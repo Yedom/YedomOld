@@ -1,7 +1,6 @@
-package ru.mralexeimk.yedom.config.spring;
+package ru.mralexeimk.yedom.configs.spring;
 
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -11,33 +10,23 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
-import ru.mralexeimk.yedom.config.configs.LanguageConfig;
+import ru.mralexeimk.yedom.configs.properties.LanguageConfig;
 import ru.mralexeimk.yedom.services.UtilsService;
 import ru.mralexeimk.yedom.utils.language.AcceptHeaderResolver;
 import ru.mralexeimk.yedom.utils.language.LanguageUtil;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executors;
 
 /**
  * Spring configuration
@@ -47,7 +36,6 @@ import java.util.concurrent.Executors;
 @Configuration
 @ComponentScan("ru.mralexeimk.yedom")
 @EnableWebMvc
-@EnableWebSecurity
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
 
@@ -72,13 +60,6 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = new RequestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setIgnoreDefaultModelOnRedirect(true);
-        return requestMappingHandlerAdapter;
-    }
-
-    @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(defaultTemplateResolver());
@@ -90,8 +71,6 @@ public class SpringConfig implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(templateEngine());
-        resolver.setOrder(1);
-        resolver.setViewNames(new String[]{"*.html"});
         resolver.setCharacterEncoding("UTF-8");
         registry.viewResolver(resolver);
     }
@@ -170,17 +149,21 @@ public class SpringConfig implements WebMvcConfigurer {
         return messageSource;
     }
 
+    @Bean
+    public MappingJackson2HttpMessageConverter messageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(new ObjectMapper());
+        return converter;
+    }
+
     /**
-     * Redirect 'http' to 'https'
+     * Fix: No converter for [class org.springframework.boot.actuate.endpoint.OperationResponseBodyMap]
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.cors().and().csrf().disable()
-                .requiresChannel(channel ->
-                        channel.anyRequest().requiresSecure())
-                .authorizeRequests(authorize ->
-                        authorize.anyRequest().permitAll())
-                .build();
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter(MappingJackson2HttpMessageConverter messageConverter) {
+        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+        adapter.getMessageConverters().add(messageConverter);
+        return adapter;
     }
 
     @Bean
@@ -188,13 +171,5 @@ public class SpringConfig implements WebMvcConfigurer {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource());
         return bean;
-    }
-
-    /**
-     * Password encoder for user's passwords
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
