@@ -20,31 +20,31 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "hash", unique = true)
+    @Column(name = "hash", columnDefinition = "text", unique = true)
     private String hash;
 
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "text")
     private String title;
 
-    @Column(name = "by_organization")
+    @Column(name = "by_organization", columnDefinition = "text")
     private boolean byOrganization;
 
     @Column(name = "creator_id")
     private int creatorId;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @Column(name = "tags")
+    @Column(name = "tags", columnDefinition = "text")
     private String tags;
 
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "text")
     private String avatar;;
 
     @Column(name = "added_on")
     private Timestamp addedOn;
 
-    @Column(name = "modules")
+    @Column(name = "modules", columnDefinition = "text")
     private String modules;
 
     @Column(name = "views")
@@ -59,7 +59,7 @@ public class CourseEntity {
     @Column(name = "accept_tasks")
     private boolean acceptTasks = false;
 
-    @Column(name = "complete_requests_users_ids")
+    @Column(name = "complete_requests_users_ids", columnDefinition = "text")
     private String completeRequestsUsersIds = "";
 
     // Add to database constructor

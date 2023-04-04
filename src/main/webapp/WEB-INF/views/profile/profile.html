@@ -75,14 +75,14 @@
                             <!-- Last login -->
                             <div class="created-on" th:if="${show_online}">
                                 <h4 class="profile-label" th:text="#{profile.last_login}">Last login</h4>
-                                <h6 th:text="${@utilsService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
+                                <h6 th:text="${@profileService.calculateTimeLoginAgo(user.lastLogin)}">5 hours ago</h6>
                             </div>
 
                             <!-- Links -->
                             <div class="links-container" th:if="${relation == 'self' || (show_links && user.links.length() > 0)}">
                                 <h4 class="profile-label" th:text="#{profile.links}">Links</h4>
                                 <div class="links">
-                                    <div class="link" th:each="link : ${@utilsService.parseLinks(user.links)}" th:id="${link.first}">
+                                    <div class="link" th:each="link : ${@profileService.parseLinks(user.links)}" th:id="${link.first}">
                                         <a target="_blank" rel="noopener noreferrer" class="link-href"
                                            href="#" th:text="${link.first}" th:href="${link.second}">GitHub profile</a>
                                         <i th:attr="onclick=|deleteLink('${link.first}')|" class="material-icons centered-icon">delete</i>
@@ -98,12 +98,6 @@
                             </div>
                             <br />
 
-                            <!-- Add to friends -->
-                            <div class="add-to-friends" id="add_friend">
-                                <input type="button" onclick="follow()"
-                                       class="btn" th:classappend="${btn_properties.second}" value="Подписаться"
-                                       th:value="${btn_properties.first}" />
-                            </div>
                             <br />
                         </div>
                     </div>

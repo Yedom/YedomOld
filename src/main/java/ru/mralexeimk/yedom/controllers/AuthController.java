@@ -205,6 +205,7 @@ public class AuthController {
 
         Code code = emailService.getRandomCode();
 
+        System.out.println("code: " + code);
         emailService.saveCode(user.getUsername(), code);
         emailService.sendMessage(user.getEmail(),
                 languageUtil.getLocalizedMessage("auth.mail.title"),

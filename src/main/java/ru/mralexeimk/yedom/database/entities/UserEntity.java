@@ -21,7 +21,7 @@ public class UserEntity {
     @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", columnDefinition = "text")
     private String password;
 
     @Column(name = "email", unique = true)
@@ -39,7 +39,7 @@ public class UserEntity {
     @Column(name = "balance")
     private int balance = 0;
 
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "text")
     private String avatar = "";
 
     @Column(name = "courses_ids")
@@ -63,7 +63,7 @@ public class UserEntity {
     @Column(name = "organizations_following_ids")
     private String organizationsFollowingIds = "";
 
-    @Column(name = "settings")
+    @Column(name = "settings", columnDefinition = "text")
     private String settings = "lang=auto&strangersShowEmail=false&strangersShowLinks=false&strangersShowCompletedCourses=false&strangersShowOrganizations=false&friendsShowEmail=false&friendsShowLinks=false&friendsShowCompletedCourses=false&friendsShowOrganizations=true";
 
     @Column(name = "links")
